@@ -50,11 +50,10 @@ func (v *View) FormatActivities(username string, activities []UserActivity) stri
 	title := v.FormatWarn(fmt.Sprintf("Recent activity of %s", username))
 	sb.WriteString(title)
 
-	var msg string
 	for _, activity := range activities {
 		template, repoName, date := activity.GetInfo()
-		msg = fmt.Sprintf("\n+ %s", v.FormatTemplate(template, repoName, date))
-		sb.WriteString(msg)
+		sb.WriteString("\n+ ")
+		sb.WriteString(v.FormatTemplate(template, repoName, date))
 	}
 	return sb.String()
 }
