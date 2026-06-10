@@ -24,7 +24,7 @@ const (
 
 type View struct{}
 
-func (v *View) FormatInfo(msg string, repoName string, date time.Time) string {
+func (v *View) FormatTemplate(msg string, repoName string, date time.Time) string {
 	// "color msg color_date date color_reset "
 	out := "%s%s %s(%s)%s"
 	outDate := date.Format("Mon Jan 2 15:04:05 2006 MST")
@@ -51,8 +51,9 @@ func (v *View) FormatActivities(username string, activities []UserActivity) stri
 	sb.WriteString(title)
 
 	var msg string
-	for _, info := range activities {
-		msg = fmt.Sprintf("\n+ %s", info.GetInfo())
+	for _, activity := range activities {
+		template, repoName, date := activity.GetInfo()
+		msg = fmt.Sprintf("\n+ %s", v.FormatTemplate(template, repoName, date))
 		sb.WriteString(msg)
 	}
 	return sb.String()

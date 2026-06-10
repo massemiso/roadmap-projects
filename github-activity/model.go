@@ -25,6 +25,25 @@ const (
 	Watch                    Event = "WatchEvent"
 )
 
+var eventTemplates = map[Event]string{
+	CommitComment:            "Made a commit comment on %s",
+	Create:                   "Created a branch/tag on %s",
+	Delete:                   "Deleted a branch/tag on %s",
+	Discussion:               "Started a discussion on %s",
+	Fork:                     "Forked %s",
+	Gollum:                   "Created/Updated a wiki page on %s",
+	IssueComment:             "Made an activity in an issue/pull request comment on %s",
+	Issues:                   "Made an activity in an issue on %s",
+	Member:                   "Made an activity in a collaboration on %s",
+	Public:                   "Updated %s to public",
+	PullRequest:              "Made an activity in a pull request on %s",
+	PullRequestReview:        "Made an activity in a pull request review on %s",
+	PullRequestReviewComment: "Made an activity in a pull request review comment on %s",
+	Push:                     "Pushed commit to %s",
+	Release:                  "Made an activity related to a release on %s",
+	Watch:                    "Starred %s",
+}
+
 type UserActivity struct {
 	ID        string    `json:"id"`
 	Type      Event     `json:"type"`
@@ -35,46 +54,12 @@ type UserActivity struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (ua *UserActivity) GetInfo() string {
-	var msg string
-
-	switch ua.Type {
-	case CommitComment:
-		msg = "Made a commit comment on %s"
-	case Create:
-		msg = "Created a branch/tag on %s"
-	case Delete:
-		msg = "Deleted a branch/tag on %s"
-	case Discussion:
-		msg = "Started a discussion on %s"
-	case Fork:
-		msg = "Forked %s"
-	case Gollum:
-		msg = "Created/Updated a wiki page on %s"
-	case IssueComment:
-		msg = "Made an activity in an issue/pull request comment on %s"
-	case Issues:
-		msg = "Made an activity in an issue on %s"
-	case Member:
-		msg = "Made an activity in a collaboration on %s"
-	case Public:
-		msg = "Updated %s to public"
-	case PullRequest:
-		msg = "Made an activity in a pull request on %s"
-	case PullRequestReview:
-		msg = "Made an activity in a pull request review on %s"
-	case PullRequestReviewComment:
-		msg = "Made an activity in a pull request review comment on %s"
-	case Push:
-		msg = "Pushed commit to %s"
-	case Release:
-		msg = "Made an activity related to a release on %s"
-	case Watch:
-		msg = "Starred %s"
+func (ua *UserActivity) GetInfo() (string, string, time.Time) {
+	template, ok := eventTemplates[ua.Type]
+	if !ok {
+		template = "Performed an unknown action (" + string(ua.Type) + ") on %s"
 	}
-
-	view := View{}
-	return view.FormatInfo(msg, ua.Repo.Name, ua.CreatedAt)
+	return template, ua.Repo.Name, ua.CreatedAt
 }
 
 type User struct {
