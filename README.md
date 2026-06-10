@@ -46,6 +46,10 @@ go build -o app
 - Build robust, well-tested applications.
 - Transition into a professional backend development role.
 
+## 💭 Feedback and Contributing
+
+Feel free to contact me at <massemiso@proton.me>! Any feedback or tips would be appreciated.
+
 ---
 
 _Follow my progress as I work through the [Backend Roadmap](https://roadmap.sh/backend)._
