@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -74,11 +73,8 @@ func (ua *UserActivity) GetInfo() string {
 		msg = "Starred %s"
 	}
 
-	// "color msg color_date date color_reset \n"
-	out := "%s%s %s(%s)%s\n"
-	date := ua.CreatedAt.Format("Mon Jan 2 15:04:05 2006 MST")
-	msg = fmt.Sprintf(msg, ua.Repo.Name)
-	return fmt.Sprintf(out, Cyan, msg, Green, date, Reset)
+	view := View{}
+	return view.FormatInfo(msg, ua.Repo.Name, ua.CreatedAt)
 }
 
 type User struct {
