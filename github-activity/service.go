@@ -24,7 +24,7 @@ func NewGitHubService() *GitHubService {
 
 func (s *GitHubService) GetUserActivity(username string) ([]UserActivity, error) {
 	url := fmt.Sprintf(s.BaseURL, username)
-	body, bodyErr := s.conn(url)
+	body, bodyErr := s.conn(url, username)
 	if bodyErr != nil {
 		return nil, bodyErr
 	}
@@ -36,7 +36,7 @@ func (s *GitHubService) GetUserActivity(username string) ([]UserActivity, error)
 	return activity, nil
 }
 
-func (s *GitHubService) conn(url string) ([]byte, error) {
+func (s *GitHubService) conn(url string, username string) ([]byte, error) {
 	client := s.Client
 
 	// make request with url
@@ -55,18 +55,23 @@ func (s *GitHubService) conn(url string) ([]byte, error) {
 		return nil, getErr
 	}
 
-	// handle http error code
-	switch res.StatusCode {
-	case 403:
-		return nil, errors.New("403 Forbidden")
-	case 404:
-		return nil, errors.New("404 Not Found")
-	case 503:
-		return nil, errors.New("Service Unavailable")
-	}
-
 	if res.Body != nil {
 		defer res.Body.Close()
+	}
+
+	// handle http error code
+	switch res.StatusCode {
+	case http.StatusForbidden:
+		return nil, errors.New("Error: Forbidden")
+	case http.StatusNotFound:
+		return nil, errors.New("Error: User " + username + " not found")
+	case http.StatusServiceUnavailable:
+		return nil, errors.New("Error: Service Unavailable")
+	}
+
+	if res.StatusCode != http.StatusOK {
+		msg := fmt.Sprintf("Error: Something failed. Status Code: %d\n", res.StatusCode)
+		return nil, errors.New(msg)
 	}
 
 	// read all the body of the response into []byte
