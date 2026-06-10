@@ -1,0 +1,88 @@
+package main
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+)
+
+type GitHubService struct {
+	Client  *http.Client
+	BaseURL string
+}
+
+func NewGitHubService() *GitHubService {
+	const github_api = "https://api.github.com/users/%s/events"
+	return &GitHubService{
+		Client:  &http.Client{Timeout: time.Second * 2},
+		BaseURL: github_api,
+	}
+}
+
+func (s *GitHubService) GetUserActivity(username string) ([]UserActivity, error) {
+	url := fmt.Sprintf(s.BaseURL, username)
+	body, bodyErr := s.conn(url)
+	if bodyErr != nil {
+		return nil, bodyErr
+	}
+	activity, parseErr := s.parse(body)
+	if parseErr != nil {
+		return nil, parseErr
+	}
+
+	return activity, nil
+}
+
+func (s *GitHubService) conn(url string) ([]byte, error) {
+	client := s.Client
+
+	// make request with url
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// add headers as Github API recommends
+	req.Header.Add("Accept", "application/vnd.github+json")
+	req.Header.Add("User-Agent", "GitHub-Activity-Cli-massemiso")
+
+	// send request and capture response
+	res, getErr := client.Do(req)
+	if getErr != nil {
+		return nil, getErr
+	}
+
+	// handle http error code
+	switch res.StatusCode {
+	case 403:
+		return nil, errors.New("403 Forbidden")
+	case 404:
+		return nil, errors.New("404 Not Found")
+	case 503:
+		return nil, errors.New("Service Unavailable")
+	}
+
+	if res.Body != nil {
+		defer res.Body.Close()
+	}
+
+	// read all the body of the response into []byte
+	body, readErr := io.ReadAll(res.Body)
+	if readErr != nil {
+		return nil, readErr
+	}
+
+	return body, nil
+}
+
+func (s *GitHubService) parse(data []byte) ([]UserActivity, error) {
+	activity := []UserActivity{}
+	jsonErr := json.Unmarshal(data, &activity)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	return activity, nil
+}
