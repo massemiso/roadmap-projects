@@ -34,6 +34,17 @@ type PayloadCreate struct {
 	Description string `json:"description"`
 }
 
+type PayloadIssueComment struct {
+	Action string `json:"action"`
+	Issue  struct {
+		Number int `json:"number"`
+	} `json:"issue"`
+	Comment struct {
+		ID      int    `json:"id"`
+		HtmlURL string `json:"html_url"`
+	} `json:"comment"`
+}
+
 type PayloadPullRequest struct {
 	Action string `json:"action"`
 	Number int    `json:"number"`

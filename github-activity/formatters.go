@@ -26,28 +26,61 @@ var eventFormatters = map[Event]EventFormatter{
 		}
 		return sb.String()
 	},
-	Delete:       func(ua *UserActivity) string { return "Deleted a branch/tag on %s" },
-	Discussion:   func(ua *UserActivity) string { return "Started a discussion on %s" },
-	Fork:         func(ua *UserActivity) string { return "Forked %s" },
-	Gollum:       func(ua *UserActivity) string { return "Created/Updated a wiki page on %s" },
-	IssueComment: func(ua *UserActivity) string { return "Made an activity in an issue/pull request comment on %s" },
-	Issues:       func(ua *UserActivity) string { return "Made an activity in an issue on %s" },
-	Member:       func(ua *UserActivity) string { return "Made an activity in a collaboration on %s" },
-	Public:       func(ua *UserActivity) string { return "Updated %s to public" },
+	Delete: func(ua *UserActivity) string {
+		return "Deleted a branch/tag on %s"
+	},
+	Discussion: func(ua *UserActivity) string {
+		return "Started a discussion on %s"
+	},
+	Fork: func(ua *UserActivity) string {
+		return "Forked %s"
+	},
+	Gollum: func(ua *UserActivity) string {
+		return "Created/Updated a wiki page on %s"
+	},
+	IssueComment: func(ua *UserActivity) string {
+		var p PayloadIssueComment
+		json.Unmarshal(ua.Payload, &p)
+
+		action := capitalize(p.Action)
+		out := fmt.Sprintf("%s an issue comment (%d) for issue %d", action, p.Comment.ID, p.Issue.Number)
+		out += " on %s"
+		out += fmt.Sprintf("\n\t* URL: %s", p.Comment.HtmlURL)
+		return out
+	},
+	Issues: func(ua *UserActivity) string {
+		return "Made an activity in an issue on %s"
+	},
+	Member: func(ua *UserActivity) string {
+		return "Made an activity in a collaboration on %s"
+	},
+	Public: func(ua *UserActivity) string {
+		return "Updated %s to public"
+	},
 	PullRequest: func(ua *UserActivity) string {
 		var p PayloadPullRequest
 		json.Unmarshal(ua.Payload, &p)
 
-		action := strings.ToUpper(string(p.Action[0])) + string(p.Action[1:])
+		action := capitalize(p.Action)
 		out := fmt.Sprintf("%s a pull request (%d)", action, p.Number)
 		out += " on %s"
 		return out
 	},
-	PullRequestReview:        func(ua *UserActivity) string { return "Made an activity in a pull request review on %s" },
-	PullRequestReviewComment: func(ua *UserActivity) string { return "Made an activity in a pull request review comment on %s" },
-	Push:                     func(ua *UserActivity) string { return "Pushed commit to %s" },
-	Release:                  func(ua *UserActivity) string { return "Made an activity related to a release on %s" },
-	Watch:                    func(ua *UserActivity) string { return "Starred %s" },
+	PullRequestReview: func(ua *UserActivity) string {
+		return "Made an activity in a pull request review on %s"
+	},
+	PullRequestReviewComment: func(ua *UserActivity) string {
+		return "Made an activity in a pull request review comment on %s"
+	},
+	Push: func(ua *UserActivity) string {
+		return "Pushed commit to %s"
+	},
+	Release: func(ua *UserActivity) string {
+		return "Made an activity related to a release on %s"
+	},
+	Watch: func(ua *UserActivity) string {
+		return "Starred %s"
+	},
 }
 
 func (ua *UserActivity) GetInfo() (string, string, time.Time) {
@@ -59,4 +92,8 @@ func (ua *UserActivity) GetInfo() (string, string, time.Time) {
 		template = formatter(ua)
 	}
 	return template, ua.Repo.Name, ua.CreatedAt
+}
+
+func capitalize(word string) string {
+	return strings.ToUpper(string(word[0])) + string(word[1:])
 }
