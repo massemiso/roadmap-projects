@@ -30,8 +30,28 @@ type Repo struct {
 	URL  string `json:"url"`
 }
 
+type Payload interface {
+	GetData(data []byte)
+}
+
+type PayloadCommitComment struct {
+	Action  string `json:"action"`
+	Comment struct {
+		Body string `json:"body"`
+		URL  string `json:"html_url"`
+	} `json:"comment"`
+}
+
+func (p *PayloadCommitComment) GetData(data []byte) {
+	json.Unmarshal(data, &p)
+}
+
 type PayloadCreate struct {
 	Description string `json:"description"`
+}
+
+func (p *PayloadCreate) GetData(data []byte) {
+	json.Unmarshal(data, &p)
 }
 
 type PayloadIssueComment struct {
@@ -42,10 +62,19 @@ type PayloadIssueComment struct {
 	Comment struct {
 		ID      int    `json:"id"`
 		HtmlURL string `json:"html_url"`
+		Body    string `json:"body"`
 	} `json:"comment"`
+}
+
+func (p *PayloadIssueComment) GetData(data []byte) {
+	json.Unmarshal(data, &p)
 }
 
 type PayloadPullRequest struct {
 	Action string `json:"action"`
 	Number int    `json:"number"`
+}
+
+func (p *PayloadPullRequest) GetData(data []byte) {
+	json.Unmarshal(data, &p)
 }

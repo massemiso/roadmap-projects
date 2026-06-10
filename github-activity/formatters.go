@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -11,14 +10,32 @@ type EventFormatter func(ua *UserActivity) string
 
 var eventFormatters = map[Event]EventFormatter{
 	CommitComment: func(ua *UserActivity) string {
-		return "Made a commit comment on %s"
+		var sb strings.Builder
+
+		var p PayloadCommitComment
+		p.GetData(ua.Payload)
+		action := capitalize(p.Action)
+
+		sb.WriteString(action)
+		sb.WriteString("a commit comment on %s")
+
+		sb.WriteString("\n\t* Body: ")
+		if len(p.Comment.Body) >= 20 {
+			sb.WriteString(string(p.Comment.Body[0:20]))
+		} else {
+			sb.WriteString(p.Comment.Body)
+		}
+		sb.WriteString("\n\t* URL: ")
+		sb.WriteString(p.Comment.URL)
+
+		return sb.String()
 	},
 	Create: func(ua *UserActivity) string {
 		var sb strings.Builder
 		sb.WriteString("Created a branch/tag on %s")
 
 		var p PayloadCreate
-		json.Unmarshal(ua.Payload, &p)
+		p.GetData(ua.Payload)
 
 		if p.Description != "" {
 			sb.WriteString("\n\t* ")
@@ -40,11 +57,17 @@ var eventFormatters = map[Event]EventFormatter{
 	},
 	IssueComment: func(ua *UserActivity) string {
 		var p PayloadIssueComment
-		json.Unmarshal(ua.Payload, &p)
+		p.GetData(ua.Payload)
 
 		action := capitalize(p.Action)
 		out := fmt.Sprintf("%s an issue comment (%d) for issue %d", action, p.Comment.ID, p.Issue.Number)
 		out += " on %s"
+		out += "\n\t* Body: "
+		if len(p.Comment.Body) >= 20 {
+			out += string(p.Comment.Body[0:20])
+		} else {
+			out += p.Comment.Body
+		}
 		out += fmt.Sprintf("\n\t* URL: %s", p.Comment.HtmlURL)
 		return out
 	},
@@ -59,7 +82,7 @@ var eventFormatters = map[Event]EventFormatter{
 	},
 	PullRequest: func(ua *UserActivity) string {
 		var p PayloadPullRequest
-		json.Unmarshal(ua.Payload, &p)
+		p.GetData(ua.Payload)
 
 		action := capitalize(p.Action)
 		out := fmt.Sprintf("%s a pull request (%d)", action, p.Number)
