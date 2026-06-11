@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var (
+type View struct {
 	Reset     string
 	Bold      string
 	Underline string
@@ -19,53 +19,36 @@ var (
 	Purple    string
 	Cyan      string
 	White     string
-)
-
-type View struct{}
+}
 
 func NewView(noColor bool) View {
-	var v View
-
 	// if noColor exists and is true, set all output colorless
 	if noColor {
-		Reset = ""
-		Bold = ""
-		Underline = ""
-		Strike = ""
-		Italic = ""
-		Red = ""
-		Green = ""
-		Yellow = ""
-		Blue = ""
-		Purple = ""
-		Cyan = ""
-		White = ""
-
-		return v
+		return View{} // all will be "" by default
 	}
 
-	Reset = "\033[0m"
-	Bold = "\033[1m"
-	Underline = "\033[4m"
-	Strike = "\033[9m"
-	Italic = "\033[3m"
-	Red = "\033[31m"
-	Green = "\033[32m"
-	Yellow = "\033[33m"
-	Blue = "\033[34m"
-	Purple = "\033[35m"
-	Cyan = "\033[36m"
-	White = "\033[37m"
-
-	return v
+	return View{
+		Reset:     "\033[0m",
+		Bold:      "\033[1m",
+		Underline: "\033[4m",
+		Strike:    "\033[9m",
+		Italic:    "\033[3m",
+		Red:       "\033[31m",
+		Green:     "\033[32m",
+		Yellow:    "\033[33m",
+		Blue:      "\033[34m",
+		Purple:    "\033[35m",
+		Cyan:      "\033[36m",
+		White:     "\033[37m",
+	}
 }
 
 func (v *View) FormatError(errorMsg string) string {
-	return fmt.Sprintf("%s%s%s", Red, errorMsg, Reset)
+	return fmt.Sprintf("%s%s%s", v.Red, errorMsg, v.Reset)
 }
 
 func (v *View) FormatWarn(warnMsg string) string {
-	return fmt.Sprintf("%s%s%s", Bold, warnMsg, Reset)
+	return fmt.Sprintf("%s%s%s", v.Bold, warnMsg, v.Reset)
 }
 
 func (v *View) FormatTemplate(msg string, repoName string, date time.Time) string {
@@ -73,7 +56,7 @@ func (v *View) FormatTemplate(msg string, repoName string, date time.Time) strin
 	out := "%s(%s)%s %s%s"
 	outDate := date.Format(time.DateTime)
 	msg = fmt.Sprintf(msg, repoName)
-	return fmt.Sprintf(out, Green, outDate, (Reset + Cyan), msg, Reset)
+	return fmt.Sprintf(out, v.Green, outDate, (v.Reset + v.Cyan), msg, v.Reset)
 }
 
 func (v *View) FormatActivities(username string, activities []UserActivity) string {
@@ -84,7 +67,7 @@ func (v *View) FormatActivities(username string, activities []UserActivity) stri
 
 	for _, activity := range activities {
 		template, repoName, date := activity.GetInfo()
-		sb.WriteString(Bold)
+		sb.WriteString(v.Bold)
 		sb.WriteString("\n+ ")
 		sb.WriteString(v.FormatTemplate(template, repoName, date))
 	}
