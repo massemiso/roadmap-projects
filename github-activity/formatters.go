@@ -134,7 +134,7 @@ var eventFormatters = map[Event]EventFormatter{
 		return fmt.Sprintf("%s release '%s' (%s) on %%s", capitalize(p.Action), p.Release.Name, p.Release.TagName)
 	},
 	Watch: func(ua *UserActivity) string {
-		return "Starred %%s"
+		return "Starred %s"
 	},
 }
 
