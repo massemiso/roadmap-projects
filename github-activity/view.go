@@ -60,10 +60,6 @@ func NewView(noColor bool) View {
 	return v
 }
 
-func (v *View) FormatUsage(binaryName string) string {
-	return fmt.Sprintf("%sUsage: %s <username>%s", Red, binaryName, Reset)
-}
-
 func (v *View) FormatError(errorMsg string) string {
 	return fmt.Sprintf("%s%s%s", Red, errorMsg, Reset)
 }

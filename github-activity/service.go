@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type GitHubServiceInterface interface {
+	GetUserActivity(username string, limit int) ([]UserActivity, error)
+}
+
 type GitHubService struct {
 	Client  *http.Client
 	BaseURL string
