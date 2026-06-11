@@ -150,5 +150,8 @@ func (ua *UserActivity) GetInfo() (string, string, time.Time) {
 }
 
 func capitalize(word string) string {
+	if len(word) < 1 {
+		return word // when "", return ""
+	}
 	return strings.ToUpper(string(word[0])) + string(word[1:])
 }
