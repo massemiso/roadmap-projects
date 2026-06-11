@@ -22,7 +22,7 @@ func NewGitHubService() *GitHubService {
 	}
 }
 
-func (s *GitHubService) GetUserActivity(username string) ([]UserActivity, error) {
+func (s *GitHubService) GetUserActivity(username string, limit int) ([]UserActivity, error) {
 	url := fmt.Sprintf(s.BaseURL, username)
 	body, bodyErr := s.conn(url, username)
 	if bodyErr != nil {
@@ -33,7 +33,11 @@ func (s *GitHubService) GetUserActivity(username string) ([]UserActivity, error)
 		return nil, parseErr
 	}
 
-	return activity, nil
+	if limit != -1 && limit <= len(activity) {
+		return activity[0:limit], nil
+	} else {
+		return activity, nil
+	}
 }
 
 func (s *GitHubService) conn(url string, username string) ([]byte, error) {
