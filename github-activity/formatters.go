@@ -44,16 +44,31 @@ var eventFormatters = map[Event]EventFormatter{
 		return sb.String()
 	},
 	Delete: func(ua *UserActivity) string {
-		return "Deleted a branch/tag on %s"
+		var p PayloadDelete
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("Deleted %s '%s' on %%s", p.RefType, p.Ref)
 	},
 	Discussion: func(ua *UserActivity) string {
-		return "Started a discussion on %s"
+		var p PayloadDiscussion
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("Started a discussion: '%s' on %%s", p.Discussion.Title)
 	},
 	Fork: func(ua *UserActivity) string {
-		return "Forked %s"
+		var p PayloadFork
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("Forked %%s to %s", p.Forkee.FullName)
 	},
 	Gollum: func(ua *UserActivity) string {
-		return "Created/Updated a wiki page on %s"
+		var p PayloadGollum
+		p.GetData(ua.Payload)
+
+		if len(p.Pages) == 0 {
+			return "Updated the wiki on %s"
+		}
+
+		// Example output: "Created wiki page 'Home' on repo-name"
+		page := p.Pages[0]
+		return fmt.Sprintf("%s wiki page '%s' on %%s", capitalize(page.Action), page.Title)
 	},
 	IssueComment: func(ua *UserActivity) string {
 		var p PayloadIssueComment
@@ -72,13 +87,17 @@ var eventFormatters = map[Event]EventFormatter{
 		return out
 	},
 	Issues: func(ua *UserActivity) string {
-		return "Made an activity in an issue on %s"
+		var p PayloadIssues
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("%s issue #%d ('%s') on %%s", capitalize(p.Action), p.Issue.Number, p.Issue.Title)
 	},
 	Member: func(ua *UserActivity) string {
-		return "Made an activity in a collaboration on %s"
+		var p PayloadMember
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("%s member '%s' to %%s", capitalize(p.Action), p.Member.Login)
 	},
 	Public: func(ua *UserActivity) string {
-		return "Updated %s to public"
+		return "Made %%s public"
 	},
 	PullRequest: func(ua *UserActivity) string {
 		var p PayloadPullRequest
@@ -90,19 +109,32 @@ var eventFormatters = map[Event]EventFormatter{
 		return out
 	},
 	PullRequestReview: func(ua *UserActivity) string {
-		return "Made an activity in a pull request review on %s"
+		var p PayloadPullRequestReview
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("%s a review for pull request #%d on %%s", capitalize(p.Action), p.PullRequest.Number)
 	},
 	PullRequestReviewComment: func(ua *UserActivity) string {
-		return "Made an activity in a pull request review comment on %s"
+		var p PayloadPullRequestReviewComment
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("%s a review comment on pull request #%d for %%s", capitalize(p.Action), p.PullRequest.Number)
 	},
 	Push: func(ua *UserActivity) string {
-		return "Pushed commit to %s"
+		var p PayloadPush
+		p.GetData(ua.Payload)
+		// Extract branch name from refs/heads/branch
+		branch := p.Ref
+		if strings.HasPrefix(p.Ref, "refs/heads/") {
+			branch = p.Ref[11:]
+		}
+		return fmt.Sprintf("Pushed to %s at %%s", branch)
 	},
 	Release: func(ua *UserActivity) string {
-		return "Made an activity related to a release on %s"
+		var p PayloadRelease
+		p.GetData(ua.Payload)
+		return fmt.Sprintf("%s release '%s' (%s) on %%s", capitalize(p.Action), p.Release.Name, p.Release.TagName)
 	},
 	Watch: func(ua *UserActivity) string {
-		return "Starred %s"
+		return "Starred %%s"
 	},
 }
 
