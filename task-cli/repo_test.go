@@ -62,12 +62,12 @@ func TestLoadTasks_FileDoesntExist(t *testing.T) {
 	repo := TaskRepository{tempFile}
 	got, err := repo.LoadTasks()
 
-	if err == nil {
-		t.Errorf("Something went wrong!! Want some error, got nil instead")
+	if err != nil {
+		t.Errorf("Something went wrong!! Want nil, got %v instead", err)
 	}
 
-	if got != nil {
-		t.Errorf("Should return nil!! want = 'nil', got = %v", got)
+	if len(got) != 0 {
+		t.Errorf("Should return empty slice!! want = '0', got = %d", len(got))
 	}
 }
 
@@ -77,7 +77,7 @@ func TestLoadTasks_CorruptedJson(t *testing.T) {
 	tempFile := filepath.Join(tempDir, TEMP_FILE)
 	create_file(tempFile, []byte("HELLO WORLD"))
 
-	repo := TaskRepository{TEMP_FILE}
+	repo := TaskRepository{tempFile}
 	got, err := repo.LoadTasks()
 
 	if err == nil {

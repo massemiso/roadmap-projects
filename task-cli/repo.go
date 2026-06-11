@@ -23,6 +23,9 @@ func (r *TaskRepository) LoadTasks() ([]Task, error) {
 	// read file
 	tasks_enc, err := os.ReadFile(r.fileName)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return []Task{}, nil
+		}
 		return nil, err
 	}
 

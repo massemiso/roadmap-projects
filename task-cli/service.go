@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
 	"slices"
 )
 
@@ -20,10 +19,7 @@ func NewTaskService(r *TaskRepository) *TaskService {
 func (s *TaskService) Add(description string) error {
 	tasks, err := s.repo.LoadTasks()
 	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("Something went wrong! Can't read file on disk")
-			return nil
-		}
+		fmt.Println("Something went wrong! Can't read file on disk")
 		return err
 	}
 
@@ -45,10 +41,7 @@ func (s *TaskService) Add(description string) error {
 func (s *TaskService) Update(id uint, newDesc string) error {
 	tasks, err := s.repo.LoadTasks()
 	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("Something went wrong! Can't read file on disk")
-			return nil
-		}
+		fmt.Println("Something went wrong! Can't read file on disk")
 		return err
 	}
 
@@ -70,10 +63,7 @@ func (s *TaskService) Update(id uint, newDesc string) error {
 func (s *TaskService) Delete(id uint) error {
 	tasks, err := s.repo.LoadTasks()
 	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("Something went wrong! Can't read file on disk")
-			return nil
-		}
+		fmt.Println("Something went wrong! Can't read file on disk")
 		return err
 	}
 	_, found := s.findIndexById(tasks, id)
@@ -97,10 +87,7 @@ func (s *TaskService) Delete(id uint) error {
 func (s *TaskService) Mark(id uint, newStatus TaskStatus) error {
 	tasks, err := s.repo.LoadTasks()
 	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("Something went wrong! Can't read file on disk")
-			return nil
-		}
+		fmt.Println("Something went wrong! Can't read file on disk")
 		return err
 	}
 	idx, found := s.findIndexById(tasks, id)
