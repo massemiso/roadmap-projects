@@ -11,7 +11,9 @@ func main() {
 	flag.Parse()
 
 	args := flag.Args()
-	view := View{}
+
+	_, noColor := os.LookupEnv("NO_COLOR")
+	view := NewView(noColor)
 
 	if len(args) != 1 {
 		fmt.Println(view.FormatUsage("github-activity"))

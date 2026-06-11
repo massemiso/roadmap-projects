@@ -6,23 +6,59 @@ import (
 	"time"
 )
 
-const (
-	Reset     = "\033[0m"
-	Bold      = "\033[1m"
-	Underline = "\033[4m"
-	Strike    = "\033[9m"
-	Italic    = "\033[3m"
-
-	Red    = "\033[31m"
-	Green  = "\033[32m"
-	Yellow = "\033[33m"
-	Blue   = "\033[34m"
-	Purple = "\033[35m"
-	Cyan   = "\033[36m"
-	White  = "\033[37m"
+var (
+	Reset     string
+	Bold      string
+	Underline string
+	Strike    string
+	Italic    string
+	Red       string
+	Green     string
+	Yellow    string
+	Blue      string
+	Purple    string
+	Cyan      string
+	White     string
 )
 
 type View struct{}
+
+func NewView(noColor bool) View {
+	var v View
+
+	// if noColor exists and is true, set all output colorless
+	if noColor {
+		Reset = ""
+		Bold = ""
+		Underline = ""
+		Strike = ""
+		Italic = ""
+		Red = ""
+		Green = ""
+		Yellow = ""
+		Blue = ""
+		Purple = ""
+		Cyan = ""
+		White = ""
+
+		return v
+	}
+
+	Reset = "\033[0m"
+	Bold = "\033[1m"
+	Underline = "\033[4m"
+	Strike = "\033[9m"
+	Italic = "\033[3m"
+	Red = "\033[31m"
+	Green = "\033[32m"
+	Yellow = "\033[33m"
+	Blue = "\033[34m"
+	Purple = "\033[35m"
+	Cyan = "\033[36m"
+	White = "\033[37m"
+
+	return v
+}
 
 func (v *View) FormatUsage(binaryName string) string {
 	return fmt.Sprintf("%sUsage: %s <username>%s", Red, binaryName, Reset)
