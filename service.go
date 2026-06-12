@@ -75,8 +75,12 @@ func (s *ExpenseService) Update(id uint, description string, amount float64, cat
 	}
 
 	e := &es.Expenses[idx]
-	e.Amount = amount
-	e.Description = description
+	if amount != -1.0 {
+		e.Amount = amount
+	}
+	if description != "" {
+		e.Description = description
+	}
 	if category != "" {
 		e.Category = category
 	}
