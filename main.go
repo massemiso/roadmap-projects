@@ -88,7 +88,7 @@ func Update() error {
 }
 
 func Delete() error {
-	cmd := flag.NewFlagSet("update", flag.ExitOnError)
+	cmd := flag.NewFlagSet("delete", flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that delete")
 
 	cmd.Parse(os.Args[2:])
@@ -129,7 +129,7 @@ func Summary() error {
 	cmd.Parse(os.Args[2:])
 	month := *monthPtr
 
-	if month > 0 {
+	if month > 0 && month < 13 {
 		filter = true
 	}
 
