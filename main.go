@@ -20,6 +20,7 @@ const (
 	fList    = "list"
 	fSummary = "summary"
 	fClean   = "clean"
+	fExport  = "export"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 	args := os.Args
 	binName = args[0]
 	if len(args) < 2 {
-		exit("Usage: " + binName + " [add|update|delete|list|summary|clean] ...")
+		exit("Usage: " + binName + " [add|update|delete|list|summary|clean|export] ...")
 	}
 
 	var err error
@@ -44,8 +45,10 @@ func main() {
 		err = Summary()
 	case fClean:
 		err = Clean()
+	case fExport:
+		err = Export()
 	default:
-		err = errors.New("Expected 'add', 'list', 'update', 'delete', 'summary' or 'clean' subcommands")
+		err = errors.New("Expected 'add', 'list', 'update', 'delete', 'summary', 'clean' or 'export' subcommands")
 	}
 
 	if err != nil {
@@ -213,7 +216,21 @@ func Clean() error {
 		return err
 	}
 
-	fmt.Printf("%sExpenses cleared successfully\n", c.Green)
+	fmt.Printf("%sExpenses cleared successfully%s\n", c.Green, c.Reset)
+	return nil
+}
+
+func Export() error {
+	// service logic
+	data := NewExpenseDataCSV("expenses.json", "expenses.csv")
+	service := NewExpenseService(data)
+
+	err := service.Export()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%sExpenses exported to '%s' successfully%s\n", c.Green, data.csv, c.Reset)
 	return nil
 }
 

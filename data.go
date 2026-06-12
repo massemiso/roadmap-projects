@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"os"
@@ -9,17 +10,25 @@ import (
 const permissions = 0o644
 
 type ExpenseData struct {
-	file string
+	json string
+	csv  string
 }
 
-func NewExpenseData(file string) *ExpenseData {
+func NewExpenseData(json string) *ExpenseData {
 	return &ExpenseData{
-		file: file,
+		json: json,
+	}
+}
+
+func NewExpenseDataCSV(json string, csv string) *ExpenseData {
+	return &ExpenseData{
+		json: json,
+		csv:  csv,
 	}
 }
 
 func (d *ExpenseData) LoadExpenseStore() (ExpenseStore, error) {
-	enc, readErr := os.ReadFile(d.file)
+	enc, readErr := os.ReadFile(d.json)
 	if readErr != nil {
 		if os.IsNotExist(readErr) {
 			return ExpenseStore{Expenses: []Expense{}}, nil
@@ -41,7 +50,7 @@ func (d *ExpenseData) SaveExpenseStore(es ExpenseStore) error {
 		return encErr
 	}
 
-	writeErr := os.WriteFile(d.file, enc, permissions)
+	writeErr := os.WriteFile(d.json, enc, permissions)
 	if writeErr != nil {
 		return writeErr
 	}
@@ -50,11 +59,29 @@ func (d *ExpenseData) SaveExpenseStore(es ExpenseStore) error {
 }
 
 func (d *ExpenseData) CleanFile() error {
-	err := os.Remove(d.file)
+	err := os.Remove(d.json)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("Expenses already cleared.")
 		}
 	}
 	return err
+}
+
+func (d *ExpenseData) ExportCSV(es ExpenseStore) error {
+	file, writeCsvErr := os.Create(d.csv)
+	if writeCsvErr != nil {
+		return writeCsvErr
+	}
+	defer file.Close()
+
+	records := es.ToCSV()
+	w := csv.NewWriter(file)
+	w.WriteAll(records)
+
+	if err := w.Error(); err != nil {
+		return errors.New("Error exporting expenses to csv")
+	}
+
+	return nil
 }

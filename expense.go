@@ -72,3 +72,21 @@ func (es *ExpenseStore) SummaryByMonth(month uint) (float64, error) {
 	}
 	return out, nil
 }
+
+func (e *Expense) ToCSV() []string {
+	return []string{
+		fmt.Sprintf("%d", e.ID),
+		e.Description,
+		fmt.Sprintf("%f", e.Amount),
+		e.Date,
+		e.Category,
+	}
+}
+
+func (es *ExpenseStore) ToCSV() [][]string {
+	out := [][]string{}
+	for _, expense := range es.Expenses {
+		out = append(out, expense.ToCSV())
+	}
+	return out
+}

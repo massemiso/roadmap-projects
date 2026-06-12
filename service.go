@@ -12,6 +12,7 @@ type ExpenseServiceInterface interface {
 	List(filter bool, category string) ([]string, error)
 	Summary(filter bool, month uint) (float64, error)
 	Clean() error
+	Export() error
 }
 
 type ExpenseService struct {
@@ -160,4 +161,13 @@ func (s *ExpenseService) Summary(filter bool, month uint) (float64, error) {
 
 func (s *ExpenseService) Clean() error {
 	return s.Data.CleanFile()
+}
+
+func (s *ExpenseService) Export() error {
+	es, loadErr := s.Data.LoadExpenseStore()
+	if loadErr != nil {
+		return loadErr
+	}
+
+	return s.Data.ExportCSV(es)
 }
