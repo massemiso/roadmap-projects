@@ -70,19 +70,24 @@ func Update() error {
 	idPtr := cmd.Uint("id", 0, "id of the expense that you want to update")
 	descriptionPtr := cmd.String("description", "", "new description")
 	amountPtr := cmd.Float64("amount", -1.0, "new amount")
+	categoryPtr := cmd.String("category", "", "new category")
 
 	cmd.Parse(os.Args[2:])
 	id := *idPtr
 	description := *descriptionPtr
 	amount := *amountPtr
+	category := *categoryPtr
 
-	// TODO: use old description and amount if not provided
+	// TODO: use old description, amount or category if not provided
 	if id == 0 || description == "" || amount <= 0.0 {
 		return errors.New("Usage: " + binName +
-			" update --id=1 --description=\"your description\" --amount=100.0")
+			` update --description="your description" --amount=100.0 --category="your category" (optional)`)
 	}
 
 	// service logic
+	if category != "" {
+		fmt.Println(category)
+	}
 
 	return nil
 }
