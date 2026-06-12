@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type ExpenseServiceInterface interface {
 	Add(description string, amount float64, category string) error
@@ -50,6 +53,40 @@ func (s *ExpenseService) Add(description string, amount float64, category string
 }
 
 func (s *ExpenseService) Update(id uint, description string, amount float64, category string) error {
+	// load expense store
+	es, loadErr := s.Data.LoadExpenseStore()
+	if loadErr != nil {
+		return loadErr
+	}
+
+	// find expense & update
+	var found bool
+	var idx uint
+	for i, expense := range es.Expenses {
+		if expense.ID == id {
+			found = true
+			idx = uint(i)
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("Expense with ID %d not found.", id)
+	}
+
+	e := &es.Expenses[idx]
+	e.Amount = amount
+	e.Description = description
+	if category != "" {
+		e.Category = category
+	}
+
+	// save expenses
+	saveErr := s.Data.SaveExpenseStore(es)
+	if saveErr != nil {
+		return saveErr
+	}
+
 	return nil
 }
 

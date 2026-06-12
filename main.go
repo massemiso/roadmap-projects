@@ -86,14 +86,19 @@ func Update() error {
 	// TODO: use old description, amount or category if not provided
 	if id == 0 || description == "" || amount <= 0.0 {
 		return errors.New("Usage: " + binName +
-			` update --description="your description" --amount=100.0 --category="your category" (optional)`)
+			` update --id=1 --description="your description" --amount=100.0 --category="your category" (optional)`)
 	}
 
 	// service logic
-	if category != "" {
-		fmt.Println(category)
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
+
+	err := service.Update(id, description, amount, category)
+	if err != nil {
+		return err
 	}
 
+	fmt.Printf("%sExpense updated successfully (ID: %d)%s\n", c.Green, id, c.Reset)
 	return nil
 }
 
