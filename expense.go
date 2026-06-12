@@ -26,7 +26,8 @@ func (es *ExpenseStore) DeleteExpense(id uint) {
 }
 
 func (e *Expense) ToString() string {
-	return fmt.Sprintf("|%-3d|%-12s|%-12s|$%-6.2f|", e.ID, e.Date, e.Description, e.Amount)
+	return fmt.Sprintf("|%-3d|%-12s|%-12s|$%-6.2f|%-12s|",
+		e.ID, e.Date, e.Description, e.Amount, e.Category)
 }
 
 func (es *ExpenseStore) ToString() []string {
@@ -77,14 +78,18 @@ func (e *Expense) ToCSV() []string {
 	return []string{
 		fmt.Sprintf("%d", e.ID),
 		e.Description,
-		fmt.Sprintf("%f", e.Amount),
+		fmt.Sprintf("%.2f", e.Amount),
 		e.Date,
 		e.Category,
 	}
 }
 
 func (es *ExpenseStore) ToCSV() [][]string {
-	out := [][]string{}
+	out := [][]string{
+		{
+			"ID", "Description", "Amount", "Date", "Category",
+		},
+	}
 	for _, expense := range es.Expenses {
 		out = append(out, expense.ToCSV())
 	}

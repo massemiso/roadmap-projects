@@ -166,7 +166,8 @@ func List() error {
 		return nil
 	}
 
-	fmt.Printf("%s|%-3s|%-12s|%-12s|%-7s|%s\n", c.Bold, "ID", "Date", "Description", "Amount", c.Reset)
+	fmt.Printf("%s|%-3s|%-12s|%-12s|%-7s|%-12s|%s\n",
+		c.Bold, "ID", "Date", "Description", "Amount", "Category", c.Reset)
 	fmt.Printf("%s", c.Blue)
 	for _, str := range exStr {
 		fmt.Println(str)
