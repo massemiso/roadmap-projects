@@ -6,11 +6,11 @@ import (
 )
 
 type ExpenseServiceInterface interface {
-	Add(description string, amount float64, category string) error
+	Add(description string, amount float64, category string) (uint, error)
 	Update(id uint, description string, amount float64, category string) error
 	Delete(id uint) error
-	List(category string) error
-	Summary(month uint) error
+	List(filter bool, category string) ([]string, error)
+	Summary(filter bool, month uint) (float64, error)
 }
 
 type ExpenseService struct {
