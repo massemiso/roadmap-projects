@@ -58,10 +58,15 @@ func Add() error {
 	}
 
 	// service logic
-	if category != "" {
-		fmt.Println(category)
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
+
+	id, err := service.Add(description, amount, category)
+	if err != nil {
+		return err
 	}
 
+	fmt.Printf("%sExpense added successfully (ID: %d)%s\n", c.Green, id, c.Reset)
 	return nil
 }
 
