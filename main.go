@@ -13,28 +13,39 @@ var (
 	binName string
 )
 
+const (
+	fAdd     = "add"
+	fUpdate  = "update"
+	fDelete  = "delete"
+	fList    = "list"
+	fSummary = "summary"
+	fClean   = "clean"
+)
+
 func main() {
 	c = importColors()
 	args := os.Args
 	binName = args[0]
 	if len(args) < 2 {
-		exit("Usage: " + binName + " [add|update|delete|list|summary] ...")
+		exit("Usage: " + binName + " [add|update|delete|list|summary|clean] ...")
 	}
 
 	var err error
 	switch args[1] {
-	case "add":
+	case fAdd:
 		err = Add()
-	case "update":
+	case fUpdate:
 		err = Update()
-	case "delete":
+	case fDelete:
 		err = Delete()
-	case "list":
+	case fList:
 		err = List()
-	case "summary":
+	case fSummary:
 		err = Summary()
+	case fClean:
+		err = Clean()
 	default:
-		err = errors.New("Expected 'add', 'list', 'update', 'delete', or 'summary' subcommands")
+		err = errors.New("Expected 'add', 'list', 'update', 'delete', 'summary' or 'clean' subcommands")
 	}
 
 	if err != nil {
@@ -43,7 +54,7 @@ func main() {
 }
 
 func Add() error {
-	cmd := flag.NewFlagSet("add", flag.ExitOnError)
+	cmd := flag.NewFlagSet(fAdd, flag.ExitOnError)
 	descriptionPtr := cmd.String("description", "", "description of your new expense")
 	amountPtr := cmd.Float64("amount", 0.0, "amount of money of your new expense")
 	categoryPtr := cmd.String("category", "", "category of your new expense")
@@ -72,7 +83,7 @@ func Add() error {
 }
 
 func Update() error {
-	cmd := flag.NewFlagSet("update", flag.ExitOnError)
+	cmd := flag.NewFlagSet(fUpdate, flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that you want to update")
 	descriptionPtr := cmd.String("description", "", "new description")
 	amountPtr := cmd.Float64("amount", -1.0, "new amount")
@@ -103,7 +114,7 @@ func Update() error {
 }
 
 func Delete() error {
-	cmd := flag.NewFlagSet("delete", flag.ExitOnError)
+	cmd := flag.NewFlagSet(fDelete, flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that delete")
 
 	cmd.Parse(os.Args[2:])
@@ -127,7 +138,7 @@ func Delete() error {
 }
 
 func List() error {
-	cmd := flag.NewFlagSet("list", flag.ExitOnError)
+	cmd := flag.NewFlagSet(fList, flag.ExitOnError)
 	var filter bool
 	categoryPtr := cmd.String("category", "", "filter by category")
 
@@ -163,7 +174,7 @@ func List() error {
 }
 
 func Summary() error {
-	cmd := flag.NewFlagSet("summary", flag.ExitOnError)
+	cmd := flag.NewFlagSet(fSummary, flag.ExitOnError)
 	var filter bool
 	monthPtr := cmd.Uint("month", 0, "filter by month")
 
@@ -189,6 +200,20 @@ func Summary() error {
 	}
 	fmt.Printf(": $%.2f%s\n", sum, c.Reset)
 
+	return nil
+}
+
+func Clean() error {
+	// service logic
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
+
+	err := service.Clean()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%sExpenses cleared successfully\n", c.Green)
 	return nil
 }
 

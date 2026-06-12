@@ -11,6 +11,7 @@ type ExpenseServiceInterface interface {
 	Delete(id uint) error
 	List(filter bool, category string) ([]string, error)
 	Summary(filter bool, month uint) (float64, error)
+	Clean() error
 }
 
 type ExpenseService struct {
@@ -155,4 +156,8 @@ func (s *ExpenseService) Summary(filter bool, month uint) (float64, error) {
 	}
 
 	return es.Summary(), nil
+}
+
+func (s *ExpenseService) Clean() error {
+	return s.Data.CleanFile()
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 )
 
@@ -46,4 +47,14 @@ func (d *ExpenseData) SaveExpenseStore(es ExpenseStore) error {
 	}
 
 	return nil
+}
+
+func (d *ExpenseData) CleanFile() error {
+	err := os.Remove(d.file)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return errors.New("Expenses already cleared.")
+		}
+	}
+	return err
 }
