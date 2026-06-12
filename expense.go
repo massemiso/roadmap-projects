@@ -65,7 +65,8 @@ func (es *ExpenseStore) SummaryByMonth(month uint) (float64, error) {
 			return 0.0, errParse
 		}
 
-		if uint(exDate.Month()) == month {
+		currentYear := time.Now().Year()
+		if exDate.Year() == currentYear && uint(exDate.Month()) == month {
 			out += expense.Amount
 		}
 	}
