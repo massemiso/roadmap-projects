@@ -84,7 +84,7 @@ func Update() error {
 	amount := *amountPtr
 	category := *categoryPtr
 
-	if id <= 0 || (description == "" && amount <= 0.0 && category == "") {
+	if id <= 0 || (description == "" && amount < 0.0 && category == "") {
 		return errors.New("Usage: " + binName +
 			` update --id=1 --description="your description" --amount=100.0 --category="your category" (optional)`)
 	}
