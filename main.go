@@ -114,7 +114,15 @@ func Delete() error {
 	}
 
 	// service logic
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
 
+	err := service.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%sExpense deleted successfully (ID: %d)%s\n", c.Green, id, c.Reset)
 	return nil
 }
 
@@ -131,7 +139,20 @@ func List() error {
 	}
 
 	// service logic
-	fmt.Printf("list filtered? %v\n", filter)
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
+
+	exStr, err := service.List(filter, category)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s|%-3s|%-12s|%-12s|%-7s|%s\n", c.Bold, "ID", "Date", "Description", "Amount", c.Reset)
+	fmt.Printf("%s", c.Blue)
+	for _, str := range exStr {
+		fmt.Println(str)
+	}
+	fmt.Printf("%s", c.Reset)
 
 	return nil
 }

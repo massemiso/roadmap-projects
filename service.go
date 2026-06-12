@@ -91,11 +91,48 @@ func (s *ExpenseService) Update(id uint, description string, amount float64, cat
 }
 
 func (s *ExpenseService) Delete(id uint) error {
+	// load expense store
+	es, loadErr := s.Data.LoadExpenseStore()
+	if loadErr != nil {
+		return loadErr
+	}
+
+	// find expense
+	var found bool
+	for _, expense := range es.Expenses {
+		if expense.ID == id {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("Expense with ID %d not found.", id)
+	}
+
+	// delete from ExpenseStore
+	es.DeleteExpense(id)
+
+	// save expenses
+	saveErr := s.Data.SaveExpenseStore(es)
+	if saveErr != nil {
+		return saveErr
+	}
+
 	return nil
 }
 
-func (s *ExpenseService) List(category string) error {
-	return nil
+func (s *ExpenseService) List(filter bool, category string) ([]string, error) {
+	// load expense store
+	es, loadErr := s.Data.LoadExpenseStore()
+	if loadErr != nil {
+		return nil, loadErr
+	}
+
+	if filter {
+		return es.ToStringByCategory(category), nil
+	}
+	return es.ToString(), nil
 }
 
 func (s *ExpenseService) Summary(month uint) error {
