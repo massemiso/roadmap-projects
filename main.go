@@ -7,13 +7,17 @@ import (
 	"os"
 )
 
-var c Colors
+var (
+	c       Colors
+	binName string
+)
 
 func main() {
 	c = importColors()
 	args := os.Args
+	binName = args[0]
 	if len(args) < 2 {
-		exit("Usage: " + args[0] + " [add|update|delete|list|summary] ...")
+		exit("Usage: " + binName + " [add|update|delete|list|summary] ...")
 	}
 
 	var err error
@@ -49,8 +53,8 @@ func Add() error {
 	category := *categoryPtr
 
 	if description == "" || amount <= 0.0 {
-		return errors.New(`Usage: %s add --description=\"your description\"
-		--amount=100.0 --category=\"your category\" (optional)`)
+		return errors.New(`Usage: ` + binName +
+			` add --description="your description" --amount=100.0 --category="your category" (optional)`)
 	}
 
 	// service logic
@@ -74,7 +78,8 @@ func Update() error {
 
 	// TODO: use old description and amount if not provided
 	if id == 0 || description == "" || amount <= 0.0 {
-		return errors.New("Usage: %s update --id=1 --description=\"your description\" --amount=100.0")
+		return errors.New("Usage: " + binName +
+			" update --id=1 --description=\"your description\" --amount=100.0")
 	}
 
 	// service logic
@@ -90,7 +95,7 @@ func Delete() error {
 	id := *idPtr
 
 	if id == 0 {
-		return errors.New("Usage: %s delete --id=1")
+		return errors.New("Usage: " + binName + " delete --id=1")
 	}
 
 	// service logic
