@@ -135,6 +135,20 @@ func (s *ExpenseService) List(filter bool, category string) ([]string, error) {
 	return es.ToString(), nil
 }
 
-func (s *ExpenseService) Summary(month uint) error {
-	return nil
+func (s *ExpenseService) Summary(filter bool, month uint) (float64, error) {
+	// load expense store
+	es, loadErr := s.Data.LoadExpenseStore()
+	if loadErr != nil {
+		return 0.0, loadErr
+	}
+
+	if filter {
+		sum, sumErr := es.SummaryByMonth(month)
+		if sumErr != nil {
+			return 0.0, sumErr
+		}
+		return sum, nil
+	}
+
+	return es.Summary(), nil
 }

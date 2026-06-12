@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
+	"time"
 )
 
 type Expense struct {
@@ -45,4 +46,28 @@ func (es *ExpenseStore) ToStringByCategory(category string) []string {
 		out = append(out, expense.ToString())
 	}
 	return out
+}
+
+func (es *ExpenseStore) Summary() float64 {
+	var out float64
+	for _, expense := range es.Expenses {
+		out += expense.Amount
+	}
+	return out
+}
+
+func (es *ExpenseStore) SummaryByMonth(month uint) (float64, error) {
+	var out float64
+	for _, expense := range es.Expenses {
+
+		exDate, errParse := time.Parse("2006-01-02", expense.Date)
+		if errParse != nil {
+			return 0.0, errParse
+		}
+
+		if uint(exDate.Month()) == month {
+			out += expense.Amount
+		}
+	}
+	return out, nil
 }

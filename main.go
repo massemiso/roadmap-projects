@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 )
 
 var (
@@ -170,7 +171,19 @@ func Summary() error {
 	}
 
 	// service logic
-	fmt.Printf("summary filtered? %v\n", filter)
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
+
+	sum, err := service.Summary(filter, month)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%sTotal expenses", c.Green)
+	if filter {
+		fmt.Printf(" for %s", time.Month(month).String())
+	}
+	fmt.Printf(": $%.2f%s\n", sum, c.Reset)
 
 	return nil
 }
