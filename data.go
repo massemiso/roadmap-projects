@@ -21,7 +21,7 @@ func (d *ExpenseData) LoadExpenseStore() (ExpenseStore, error) {
 	enc, readErr := os.ReadFile(d.file)
 	if readErr != nil {
 		if os.IsNotExist(readErr) {
-			return ExpenseStore{}, nil
+			return ExpenseStore{Expenses: []Expense{}}, nil
 		}
 		return ExpenseStore{}, readErr
 	}
