@@ -149,7 +149,7 @@ func (s *ExpenseService) Summary(filter bool, month uint) (float64, error) {
 	}
 
 	if filter {
-		sum, sumErr := es.SummaryByMonth(month)
+		sum, sumErr := es.SummaryByMonth(time.Now().Year(), month)
 		if sumErr != nil {
 			return 0.0, sumErr
 		}

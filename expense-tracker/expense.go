@@ -57,7 +57,7 @@ func (es *ExpenseStore) Summary() float64 {
 	return out
 }
 
-func (es *ExpenseStore) SummaryByMonth(month uint) (float64, error) {
+func (es *ExpenseStore) SummaryByMonth(currentYear int, month uint) (float64, error) {
 	var out float64
 	for _, expense := range es.Expenses {
 
@@ -66,7 +66,6 @@ func (es *ExpenseStore) SummaryByMonth(month uint) (float64, error) {
 			return 0.0, errParse
 		}
 
-		currentYear := time.Now().Year()
 		if exDate.Year() == currentYear && uint(exDate.Month()) == month {
 			out += expense.Amount
 		}
