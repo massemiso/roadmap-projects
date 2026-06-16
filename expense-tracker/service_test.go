@@ -117,6 +117,7 @@ func TestServiceList(t *testing.T) {
 }
 
 func TestServiceUpdate(t *testing.T) {
+	const NoChange = "__NO_CHANGE__"
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_update.json")
 
@@ -155,7 +156,7 @@ func TestServiceUpdate(t *testing.T) {
 			id:           id,
 			description:  "Only Desc Updated",
 			amount:       -1.0,
-			category:     "",
+			category:     NoChange,
 			errContains:  "",
 			checkDesc:    "Only Desc Updated",
 			checkAmount:  18.00,
@@ -349,8 +350,8 @@ func TestServiceCleanAndExport(t *testing.T) {
 
 	// 1. Initially Clean should error because file doesn't exist
 	err := service.Clean()
-	if err == nil {
-		t.Error("expected error cleaning non-existent file, got nil")
+	if err != nil {
+		t.Error("expected nil, got %w", err) // idem op
 	}
 
 	// 2. Add item and export

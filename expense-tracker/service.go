@@ -57,6 +57,8 @@ func (s *ExpenseService) Add(description string, amount float64, category string
 }
 
 func (s *ExpenseService) Update(id uint, description string, amount float64, category string) (bool, error) {
+	const NoChange = "__NO_CHANGE__"
+
 	// load expense store
 	es, loadErr := s.Data.LoadExpenseStore()
 	if loadErr != nil {
@@ -79,13 +81,13 @@ func (s *ExpenseService) Update(id uint, description string, amount float64, cat
 	}
 
 	e := &es.Expenses[idx]
-	if amount != -1.0 {
+	if amount > 0.0 {
 		e.Amount = amount
 	}
-	if description != "" {
+	if description != NoChange {
 		e.Description = description
 	}
-	if category != "" {
+	if category != NoChange {
 		e.Category = category
 	}
 

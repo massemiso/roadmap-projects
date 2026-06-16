@@ -37,6 +37,7 @@ var commands = []string{
 	fBudget,
 }
 
+// TODO: change sentinels checking for flag Visit() like in Update
 var flags = map[string]func(s ExpenseServiceInterface) error{
 	fAdd:     Add,
 	fUpdate:  Update,
@@ -151,11 +152,13 @@ func Add(service ExpenseServiceInterface) error {
 }
 
 func Update(service ExpenseServiceInterface) error {
+	const NoChange = "__NO_CHANGE__"
+
 	cmd := flag.NewFlagSet(fUpdate, flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that you want to update")
-	descriptionPtr := cmd.String("description", "", "new description")
-	amountPtr := cmd.Float64("amount", -1.0, "new amount")
-	categoryPtr := cmd.String("category", "", "new category")
+	descriptionPtr := cmd.String("description", NoChange, "new description")
+	amountPtr := cmd.Float64("amount", 0.0, "new amount")
+	categoryPtr := cmd.String("category", NoChange, "new category")
 
 	cmd.Parse(os.Args[2:])
 	id := *idPtr
@@ -163,12 +166,18 @@ func Update(service ExpenseServiceInterface) error {
 	amount := *amountPtr
 	category := *categoryPtr
 
+	// custom bool to check if a flag was set
+	passedFlags := make(map[string]bool)
+	cmd.Visit(func(f *flag.Flag) {
+		passedFlags[f.Name] = true
+	})
+
 	// if user don't pass ANY flag
-	if id <= 0 || (description == "" && amount < 0.0 && category == "") {
+	if !passedFlags["id"] || (!passedFlags["description"] && !passedFlags["amount"] && !passedFlags["category"]) {
 		return errors.New("Usage: " + binName +
 			` update --id=1 --description="your description" --amount=100.0 --category="your category" (optional)`)
 	}
-	if amount < 0.0 && amount != -1.0 {
+	if passedFlags["amount"] && amount < 0.0 {
 		return errors.New("Amount CAN'T be a negative number!")
 	}
 
