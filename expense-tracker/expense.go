@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
-	"time"
+	"strings"
 )
 
 type Expense struct {
@@ -67,20 +67,18 @@ func (es *ExpenseStore) Summary() float64 {
 	return out
 }
 
-func (es *ExpenseStore) SummaryByMonth(currentYear int, month uint) (float64, error) {
+func (es *ExpenseStore) SummaryByMonth(currentYear int, month uint) float64 {
 	var out float64
+
+	// "YYYY-MM"
+	targetPrefix := fmt.Sprintf("%04d-%02d-", currentYear, month)
+
 	for _, expense := range es.Expenses {
-
-		exDate, errParse := time.Parse("2006-01-02", expense.Date)
-		if errParse != nil {
-			return 0.0, errParse
-		}
-
-		if exDate.Year() == currentYear && uint(exDate.Month()) == month {
+		if strings.HasPrefix(expense.Date, targetPrefix) {
 			out += expense.Amount
 		}
 	}
-	return out, nil
+	return out
 }
 
 func (e *Expense) ToCSV() []string {

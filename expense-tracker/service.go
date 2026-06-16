@@ -152,11 +152,7 @@ func (s *ExpenseService) Summary(filter bool, month uint) (float64, error) {
 	}
 
 	if filter {
-		sum, sumErr := es.SummaryByMonth(time.Now().Year(), month)
-		if sumErr != nil {
-			return 0.0, sumErr
-		}
-		return sum, nil
+		return es.SummaryByMonth(time.Now().Year(), month), nil
 	}
 
 	return es.Summary(), nil
@@ -200,11 +196,8 @@ func checkIfExceedBudget(es *ExpenseStore) error {
 	if budget == 0.0 {
 		return nil
 	}
-	sum, sumErr := es.SummaryByMonth(int(now.Year()), month)
-	if sumErr != nil {
-		return sumErr
-	}
 
+	sum := es.SummaryByMonth(int(now.Year()), month)
 	if sum >= budget {
 		return fmt.Errorf("Careful!! You exceed the monthly budget of $%.2f by $%.2f",
 			budget,

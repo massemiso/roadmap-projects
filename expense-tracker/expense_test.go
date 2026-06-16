@@ -92,7 +92,6 @@ func TestSummaryByMonth(t *testing.T) {
 		store    ExpenseStore
 		month    uint
 		expected float64
-		wantErr  bool
 	}{
 		{
 			name: "happy case",
@@ -116,16 +115,12 @@ func TestSummaryByMonth(t *testing.T) {
 			},
 			month:    6,
 			expected: 0.0,
-			wantErr:  true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			total, err := tc.store.SummaryByMonth(2026, 6)
-			if (err != nil) != tc.wantErr {
-				t.Fatalf("SummaryByMonth() error = %v, wantErr %v", err, tc.wantErr)
-			}
+			total := tc.store.SummaryByMonth(2026, 6)
 			if total != tc.expected {
 				t.Errorf("expected summary for month %d to be %.2f, got %.2f", tc.month, tc.expected, total)
 			}
