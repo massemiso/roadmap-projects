@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -14,44 +15,64 @@ var (
 )
 
 const (
-	fAdd     = "add"
-	fUpdate  = "update"
-	fDelete  = "delete"
-	fList    = "list"
-	fSummary = "summary"
-	fClean   = "clean"
-	fExport  = "export"
+	fAdd     string = "add"
+	fUpdate  string = "update"
+	fDelete  string = "delete"
+	fList    string = "list"
+	fSummary string = "summary"
+	fClean   string = "clean"
+	fExport  string = "export"
 )
+
+var commands = []string{
+	fAdd,
+	fUpdate,
+	fDelete,
+	fSummary,
+	fClean,
+	fExport,
+}
+
+var flags = map[string]func() error{
+	fAdd:     Add,
+	fUpdate:  Update,
+	fDelete:  Delete,
+	fList:    List,
+	fSummary: Summary,
+	fClean:   Clean,
+	fExport:  Export,
+}
 
 func main() {
 	c = importColors()
 	args := os.Args
 	binName = args[0]
+
 	if len(args) < 2 {
-		exit("Usage: " + binName + " [add|update|delete|list|summary|clean|export] ...")
+		parts := make([]string, len(commands))
+		for i, cmd := range commands {
+			parts[i] = string(cmd)
+		}
+		exit(fmt.Sprintf(
+			"Usage: %s [%s] ...",
+			binName,
+			strings.Join(parts, "|"),
+		))
 	}
 
-	var err error
-	switch args[1] {
-	case fAdd:
-		err = Add()
-	case fUpdate:
-		err = Update()
-	case fDelete:
-		err = Delete()
-	case fList:
-		err = List()
-	case fSummary:
-		err = Summary()
-	case fClean:
-		err = Clean()
-	case fExport:
-		err = Export()
-	default:
-		err = errors.New("Expected 'add', 'list', 'update', 'delete', 'summary', 'clean' or 'export' subcommands")
+	fn, ok := flags[string(args[1])]
+	if !ok {
+		parts := make([]string, len(commands))
+		for i, cmd := range commands {
+			parts[i] = string(cmd)
+		}
+		exit(fmt.Sprintf(
+			"Expected %s subcommands...",
+			strings.Join(parts, ", "),
+		))
 	}
 
-	if err != nil {
+	if err := fn(); err != nil {
 		exit(err.Error())
 	}
 }
