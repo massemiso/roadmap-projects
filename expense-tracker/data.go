@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"os"
 )
 
@@ -64,7 +64,7 @@ func (d *ExpenseData) CleanFile() error {
 	err := os.Remove(d.json)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return errors.New("Expenses already cleared.")
+			return nil // idempotent op
 		}
 	}
 	return err
@@ -82,7 +82,7 @@ func (d *ExpenseData) ExportCSV(es ExpenseStore) error {
 	w.WriteAll(records)
 
 	if err := w.Error(); err != nil {
-		return errors.New("Error exporting expenses to csv")
+		return fmt.Errorf("Error exporting expenses to csv: %w", err)
 	}
 
 	return nil
