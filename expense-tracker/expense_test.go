@@ -148,7 +148,7 @@ func TestToString(t *testing.T) {
 				Date:        "2026-06-15",
 				Category:    "Food",
 			},
-			expected: fmt.Sprintf("|%-3d|%-12s|%-12s|$%-6.2f|%-12s|",
+			expected: fmt.Sprintf("|%-3d|%-12s|%-12s|$%-8.2f|%-12s|",
 				1, "2026-06-15", "Lunch", 20.0, "Food"),
 		},
 		{
@@ -159,7 +159,7 @@ func TestToString(t *testing.T) {
 				Amount:      20.0,
 				Date:        "2026-06-15",
 			},
-			expected: fmt.Sprintf("|%-3d|%-12s|%-12s|$%-6.2f|%-12s|",
+			expected: fmt.Sprintf("|%-3d|%-12s|%-12s|$%-8.2f|%-12s|",
 				1, "2026-06-15", "Lunch", 20.0, ""),
 		},
 	}

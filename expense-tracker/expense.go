@@ -27,8 +27,17 @@ func (es *ExpenseStore) DeleteExpense(id uint) {
 }
 
 func (e *Expense) ToString() string {
-	return fmt.Sprintf("|%-3d|%-12s|%-12s|$%-6.2f|%-12s|",
-		e.ID, e.Date, e.Description, e.Amount, e.Category)
+	desc := e.Description
+	cat := e.Category
+	if len(e.Description) > 12 {
+		desc = e.Description[0:9] + "..."
+	}
+	if len(e.Category) > 12 {
+		cat = e.Category[0:9] + "..."
+	}
+
+	return fmt.Sprintf("|%-3d|%-12s|%-12s|$%-8.2f|%-12s|",
+		e.ID, e.Date, desc, e.Amount, cat)
 }
 
 func (es *ExpenseStore) ToString() []string {
