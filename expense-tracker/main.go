@@ -38,15 +38,15 @@ var commands = []string{
 }
 
 // TODO: change sentinels checking for flag Visit() like in Update
-var flags = map[string]func(s ExpenseServiceInterface) error{
-	fAdd:     Add,
-	fUpdate:  Update,
-	fDelete:  Delete,
-	fList:    List,
-	fSummary: Summary,
-	fClean:   Clean,
-	fExport:  Export,
-	fBudget:  Budget,
+var flags = map[string]func(*AppEnv, ExpenseServiceInterface) error{
+	fAdd:     (*AppEnv).Add,
+	fUpdate:  (*AppEnv).Update,
+	fDelete:  (*AppEnv).Delete,
+	fList:    (*AppEnv).List,
+	fSummary: (*AppEnv).Summary,
+	fClean:   (*AppEnv).Clean,
+	fExport:  (*AppEnv).Export,
+	fBudget:  (*AppEnv).Budget,
 }
 
 type AppEnv struct {
@@ -81,7 +81,7 @@ func main() {
 	}
 
 	if err := env.Run(); err != nil {
-		fmt.Fprintf(env.Stderr, "%s\n", err)
+		fmt.Fprintf(env.Stderr, "%s%s%s\n", env.Colors.Red, err, env.Colors.Reset)
 		os.Exit(1)
 	}
 }
@@ -97,11 +97,11 @@ func (env *AppEnv) Run() error {
 		for i, cmd := range commands {
 			parts[i] = string(cmd)
 		}
-		exit(fmt.Sprintf(
+		return fmt.Errorf(
 			"Usage: %s [%s] ...",
 			binName,
 			strings.Join(parts, "|"),
-		))
+		)
 	}
 
 	fn, ok := flags[string(args[1])]
@@ -110,25 +110,25 @@ func (env *AppEnv) Run() error {
 		for i, cmd := range commands {
 			parts[i] = string(cmd)
 		}
-		exit(fmt.Sprintf(
+		return fmt.Errorf(
 			"Expected %s subcommands...",
 			strings.Join(parts, ", "),
-		))
+		)
 	}
 
-	if err := fn(service); err != nil {
-		exit(err.Error())
+	if err := fn(env, service); err != nil {
+		return fmt.Errorf("%v", err.Error())
 	}
 	return nil
 }
 
-func Add(service ExpenseServiceInterface) error {
+func (env *AppEnv) Add(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fAdd, flag.ExitOnError)
 	descriptionPtr := cmd.String("description", "", "description of your new expense")
 	amountPtr := cmd.Float64("amount", 0.0, "amount of money of your new expense")
 	categoryPtr := cmd.String("category", "", "category of your new expense")
 
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(env.Args[2:])
 	description := *descriptionPtr
 	amount := *amountPtr
 	category := *categoryPtr
@@ -144,14 +144,14 @@ func Add(service ExpenseServiceInterface) error {
 		return err
 	}
 
-	fmt.Printf("%sExpense added successfully (ID: %d)%s\n", c.Green, id, c.Reset)
+	fmt.Fprintf(env.Stdout, "%sExpense added successfully (ID: %d)%s\n", c.Green, id, c.Reset)
 	if err != nil { // to catch budget warning
 		return err
 	}
 	return nil
 }
 
-func Update(service ExpenseServiceInterface) error {
+func (env *AppEnv) Update(service ExpenseServiceInterface) error {
 	const NoChange = "__NO_CHANGE__"
 
 	cmd := flag.NewFlagSet(fUpdate, flag.ExitOnError)
@@ -160,7 +160,7 @@ func Update(service ExpenseServiceInterface) error {
 	amountPtr := cmd.Float64("amount", 0.0, "new amount")
 	categoryPtr := cmd.String("category", NoChange, "new category")
 
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(env.Args[2:])
 	id := *idPtr
 	description := *descriptionPtr
 	amount := *amountPtr
@@ -187,18 +187,18 @@ func Update(service ExpenseServiceInterface) error {
 		return err
 	}
 
-	fmt.Printf("%sExpense updated successfully (ID: %d)%s\n", c.Green, id, c.Reset)
+	fmt.Fprintf(env.Stdout, "%sExpense updated successfully (ID: %d)%s\n", c.Green, id, c.Reset)
 	if err != nil { // to catch budget warning
 		return err
 	}
 	return nil
 }
 
-func Delete(service ExpenseServiceInterface) error {
+func (env *AppEnv) Delete(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fDelete, flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that delete")
 
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(env.Args[2:])
 	id := *idPtr
 
 	if id == 0 {
@@ -211,16 +211,16 @@ func Delete(service ExpenseServiceInterface) error {
 		return err
 	}
 
-	fmt.Printf("%sExpense deleted successfully (ID: %d)%s\n", c.Green, id, c.Reset)
+	fmt.Fprintf(env.Stdout, "%sExpense deleted successfully (ID: %d)%s\n", c.Green, id, c.Reset)
 	return nil
 }
 
-func List(service ExpenseServiceInterface) error {
+func (env *AppEnv) List(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fList, flag.ExitOnError)
 	var filter bool
 	categoryPtr := cmd.String("category", "", "filter by category")
 
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(env.Args[2:])
 	category := *categoryPtr
 
 	if category != "" {
@@ -234,27 +234,27 @@ func List(service ExpenseServiceInterface) error {
 	}
 
 	if len(exStr) == 0 {
-		fmt.Printf("%sThere are no expenses registered!%s\n", c.Magenta, c.Reset)
+		fmt.Fprintf(env.Stdout, "%sThere are no expenses registered!%s\n", c.Magenta, c.Reset)
 		return nil
 	}
 
-	fmt.Printf("%s|%-3s|%-12s|%-12s|%-9s|%-12s|%s\n",
+	fmt.Fprintf(env.Stdout, "%s|%-3s|%-12s|%-12s|%-9s|%-12s|%s\n",
 		c.Bold, "ID", "Date", "Description", "Amount", "Category", c.Reset)
-	fmt.Printf("%s", c.Blue)
+	fmt.Fprintf(env.Stdout, "%s", c.Blue)
 	for _, str := range exStr {
-		fmt.Println(str)
+		fmt.Fprintln(env.Stdout, str)
 	}
-	fmt.Printf("%s", c.Reset)
+	fmt.Fprintf(env.Stdout, "%s", c.Reset)
 
 	return nil
 }
 
-func Summary(service ExpenseServiceInterface) error {
+func (env *AppEnv) Summary(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fSummary, flag.ExitOnError)
 	var filter bool
 	monthPtr := cmd.Uint("month", 0, "filter by month")
 
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(env.Args[2:])
 	month := *monthPtr
 
 	if month != 0 && (month < 1 || month > 12) {
@@ -269,44 +269,44 @@ func Summary(service ExpenseServiceInterface) error {
 		return err
 	}
 
-	fmt.Printf("%sTotal expenses", c.Green)
+	fmt.Fprintf(env.Stdout, "%sTotal expenses", c.Green)
 	if filter {
-		fmt.Printf(" for %s", time.Month(month).String())
+		fmt.Fprintf(env.Stdout, " for %s", time.Month(month).String())
 	}
-	fmt.Printf(": $%.2f%s\n", sum, c.Reset)
+	fmt.Fprintf(env.Stdout, ": $%.2f%s\n", sum, c.Reset)
 
 	return nil
 }
 
-func Clean(service ExpenseServiceInterface) error {
+func (env *AppEnv) Clean(service ExpenseServiceInterface) error {
 	// service logic
 	err := service.Clean()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%sExpenses cleared successfully%s\n", c.Green, c.Reset)
+	fmt.Fprintf(env.Stdout, "%sExpenses cleared successfully%s\n", c.Green, c.Reset)
 	return nil
 }
 
-func Export(service ExpenseServiceInterface) error {
+func (env *AppEnv) Export(service ExpenseServiceInterface) error {
 	// service logic
 	err := service.Export()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%sExpenses exported to '%s' successfully%s\n",
+	fmt.Fprintf(env.Stdout, "%sExpenses exported to '%s' successfully%s\n",
 		c.Green, service.GetData().GetCSVFile(), c.Reset)
 	return nil
 }
 
-func Budget(service ExpenseServiceInterface) error {
+func (env *AppEnv) Budget(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fBudget, flag.ExitOnError)
 	monthPtr := cmd.Uint("month", 0, "month to set budget")
 	amountPtr := cmd.Float64("amount", -1.0, "your budget amount of money")
 
-	cmd.Parse(os.Args[2:])
+	cmd.Parse(env.Args[2:])
 	month := *monthPtr
 	amount := *amountPtr
 
@@ -321,7 +321,7 @@ func Budget(service ExpenseServiceInterface) error {
 		return err
 	}
 
-	fmt.Printf("%sSet budget $%.2f for %s successfully!%s\n",
+	fmt.Fprintf(env.Stdout, "%sSet budget $%.2f for %s successfully!%s\n",
 		c.Green, amount, time.Month(month).String(), c.Reset)
 	return nil
 }
@@ -329,9 +329,4 @@ func Budget(service ExpenseServiceInterface) error {
 func importColors() Colors {
 	_, noColor := os.LookupEnv("NO_COLOR")
 	return NewColors(noColor)
-}
-
-func exit(error string) {
-	fmt.Printf("%s%s%s\n", c.Red, error, c.Reset)
-	os.Exit(1)
 }
