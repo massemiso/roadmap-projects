@@ -195,15 +195,19 @@ func (s *ExpenseService) Budget(month uint, amount float64) error {
 func checkIfExceedBudget(es *ExpenseStore) error {
 	now := time.Now()
 	month := uint(now.Month())
+	budget := es.Budgets[month-1]
+	if budget == 0.0 {
+		return nil
+	}
 	sum, sumErr := es.SummaryByMonth(int(now.Year()), month)
 	if sumErr != nil {
 		return sumErr
 	}
 
-	if sum >= es.Budgets[month-1] {
+	if sum >= budget {
 		return fmt.Errorf("Careful!! You exceed the monthly budget of $%.2f by $%.2f",
-			es.Budgets[month-1],
-			sum-es.Budgets[month-1])
+			budget,
+			sum-budget)
 	}
 
 	return nil

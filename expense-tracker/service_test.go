@@ -127,51 +127,55 @@ func TestServiceUpdate(t *testing.T) {
 	id, _ := service.Add("Lunch", 15.50, "Food")
 
 	tests := []struct {
-		name        string
-		id          uint
-		description string
-		amount      float64
-		category    string
-		errContains string
-		checkDesc   string
-		checkAmount float64
-		checkCat    string
+		name         string
+		id           uint
+		description  string
+		amount       float64
+		category     string
+		errContains  string
+		checkDesc    string
+		checkAmount  float64
+		checkCat     string
+		wantModified bool
 	}{
 		{
-			name:        "full update",
-			id:          id,
-			description: "Business Lunch",
-			amount:      18.00,
-			category:    "Work",
-			errContains: "",
-			checkDesc:   "Business Lunch",
-			checkAmount: 18.00,
-			checkCat:    "Work",
+			name:         "full update",
+			id:           id,
+			description:  "Business Lunch",
+			amount:       18.00,
+			category:     "Work",
+			errContains:  "",
+			checkDesc:    "Business Lunch",
+			checkAmount:  18.00,
+			checkCat:     "Work",
+			wantModified: true,
 		},
 		{
-			name:        "partial update description only",
-			id:          id,
-			description: "Only Desc Updated",
-			amount:      -1.0,
-			category:    "",
-			errContains: "",
-			checkDesc:   "Only Desc Updated",
-			checkAmount: 18.00, // should remain from previous test step
-			checkCat:    "Work",  // should remain from previous test step
+			name:         "partial update description only",
+			id:           id,
+			description:  "Only Desc Updated",
+			amount:       -1.0,
+			category:     "",
+			errContains:  "",
+			checkDesc:    "Only Desc Updated",
+			checkAmount:  18.00,
+			checkCat:     "Work",
+			wantModified: true,
 		},
 		{
-			name:        "update nonexistent expense",
-			id:          999,
-			description: "Ghost Expense",
-			amount:      20.0,
-			category:    "Ghost",
-			errContains: "not found",
+			name:         "update nonexistent expense",
+			id:           999,
+			description:  "Ghost Expense",
+			amount:       20.0,
+			category:     "Ghost",
+			errContains:  "not found",
+			wantModified: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := service.Update(tt.id, tt.description, tt.amount, tt.category)
+			modified, err := service.Update(tt.id, tt.description, tt.amount, tt.category)
 
 			if tt.errContains != "" {
 				if err == nil {
@@ -180,11 +184,18 @@ func TestServiceUpdate(t *testing.T) {
 				if !strings.Contains(err.Error(), tt.errContains) {
 					t.Errorf("expected error to contain %q, got: %v", tt.errContains, err)
 				}
+				if modified != tt.wantModified {
+					t.Errorf("expected modified = %v, got %v", tt.wantModified, modified)
+				}
 				return
 			}
 
 			if err != nil {
 				t.Fatalf("unexpected update error: %v", err)
+			}
+
+			if modified != tt.wantModified {
+				t.Errorf("expected modified = %v, got %v", tt.wantModified, modified)
 			}
 
 			// Verify fields in storage
@@ -367,5 +378,53 @@ func TestServiceCleanAndExport(t *testing.T) {
 	}
 	if len(store.Expenses) != 0 {
 		t.Errorf("expected 0 expenses after clean, got %d", len(store.Expenses))
+	}
+}
+
+func TestServiceBudget(t *testing.T) {
+	tempDir := t.TempDir()
+	jsonPath := filepath.Join(tempDir, "expenses_budget.json")
+
+	data := NewExpenseData(jsonPath)
+	service := NewExpenseService(data)
+
+	// Set budget for the current month
+	currentMonth := uint(time.Now().Month())
+	err := service.Budget(currentMonth, 50.00)
+	if err != nil {
+		t.Fatalf("failed to set budget: %v", err)
+	}
+
+	// 1. Add expense under budget
+	id, err := service.Add("Lunch", 30.00, "Food")
+	if err != nil {
+		t.Fatalf("unexpected error adding under budget: %v", err)
+	}
+	if id != 1 {
+		t.Errorf("expected ID 1, got %d", id)
+	}
+
+	// 2. Add expense that goes over budget
+	id2, err := service.Add("Dinner", 25.00, "Food")
+	if err == nil {
+		t.Error("expected budget warning error, got nil")
+	} else if !strings.Contains(err.Error(), "exceed the monthly budget") {
+		t.Errorf("expected budget exceeded warning, got: %v", err)
+	}
+	// The item should still be added despite the warning error
+	if id2 != 2 {
+		t.Errorf("expected ID 2, got %d", id2)
+	}
+
+	// 3. Update expense that triggers budget warning
+	// Update dinner to be even higher (still over budget)
+	modified, err := service.Update(id2, "", 30.00, "")
+	if err == nil {
+		t.Error("expected budget warning error on update, got nil")
+	} else if !strings.Contains(err.Error(), "exceed the monthly budget") {
+		t.Errorf("expected budget warning error on update, got: %v", err)
+	}
+	if !modified {
+		t.Error("expected modified to be true")
 	}
 }
