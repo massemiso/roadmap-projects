@@ -130,7 +130,7 @@ func Update() error {
 		return errors.New("Usage: " + binName +
 			` update --id=1 --description="your description" --amount=100.0 --category="your category" (optional)`)
 	}
-	if amount < 0.0 {
+	if amount < 0.0 && amount != -1.0 {
 		return errors.New("Amount CAN'T be a negative number!")
 	}
 
