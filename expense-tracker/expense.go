@@ -15,8 +15,9 @@ type Expense struct {
 }
 
 type ExpenseStore struct {
-	LastID   uint      `json:"id"`
-	Expenses []Expense `json:"expenses"`
+	LastID   uint        `json:"id"`
+	Expenses []Expense   `json:"expenses"`
+	Budgets  [12]float64 `json:"budgets"`
 }
 
 func (es *ExpenseStore) DeleteExpense(id uint) {

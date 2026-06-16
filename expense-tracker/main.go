@@ -22,6 +22,7 @@ const (
 	fSummary string = "summary"
 	fClean   string = "clean"
 	fExport  string = "export"
+	fBudget  string = "budget"
 )
 
 var commands = []string{
@@ -31,6 +32,7 @@ var commands = []string{
 	fSummary,
 	fClean,
 	fExport,
+	fBudget,
 }
 
 var flags = map[string]func() error{
@@ -41,6 +43,7 @@ var flags = map[string]func() error{
 	fSummary: Summary,
 	fClean:   Clean,
 	fExport:  Export,
+	fBudget:  Budget,
 }
 
 func main() {
@@ -98,11 +101,14 @@ func Add() error {
 	service := NewExpenseService(data)
 
 	id, err := service.Add(description, amount, category)
-	if err != nil {
+	if err != nil && id == 0 {
 		return err
 	}
 
 	fmt.Printf("%sExpense added successfully (ID: %d)%s\n", c.Green, id, c.Reset)
+	if err != nil { // to catch budget warning
+		return err
+	}
 	return nil
 }
 
@@ -128,12 +134,15 @@ func Update() error {
 	data := NewExpenseData("expenses.json")
 	service := NewExpenseService(data)
 
-	err := service.Update(id, description, amount, category)
-	if err != nil {
+	modified, err := service.Update(id, description, amount, category)
+	if !modified && err != nil {
 		return err
 	}
 
 	fmt.Printf("%sExpense updated successfully (ID: %d)%s\n", c.Green, id, c.Reset)
+	if err != nil { // to catch budget warning
+		return err
+	}
 	return nil
 }
 
@@ -253,6 +262,34 @@ func Export() error {
 	}
 
 	fmt.Printf("%sExpenses exported to '%s' successfully%s\n", c.Green, data.csv, c.Reset)
+	return nil
+}
+
+func Budget() error {
+	cmd := flag.NewFlagSet(fBudget, flag.ExitOnError)
+	monthPtr := cmd.Uint("month", 0, "month to set budget")
+	amountPtr := cmd.Float64("amount", -1.0, "your budget amount of money")
+
+	cmd.Parse(os.Args[2:])
+	month := *monthPtr
+	amount := *amountPtr
+
+	if (month <= 0 || month > 12) || amount < 0.0 {
+		return errors.New(`Usage: ` + binName +
+			` budget --month=1 --amount=100.0`)
+	}
+
+	// service logic
+	data := NewExpenseData("expenses.json")
+	service := NewExpenseService(data)
+
+	err := service.Budget(month, amount)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%sSet budget $%.2f for %s successfully!%s\n",
+		c.Green, amount, time.Month(month).String(), c.Reset)
 	return nil
 }
 

@@ -13,6 +13,7 @@ type ExpenseServiceInterface interface {
 	Summary(filter bool, month uint) (float64, error)
 	Clean() error
 	Export() error
+	Budget(month uint, amount float64) error
 }
 
 type ExpenseService struct {
@@ -51,14 +52,14 @@ func (s *ExpenseService) Add(description string, amount float64, category string
 		return 0, saveErr
 	}
 
-	return e.ID, nil
+	return e.ID, checkIfExceedBudget(&es)
 }
 
-func (s *ExpenseService) Update(id uint, description string, amount float64, category string) error {
+func (s *ExpenseService) Update(id uint, description string, amount float64, category string) (bool, error) {
 	// load expense store
 	es, loadErr := s.Data.LoadExpenseStore()
 	if loadErr != nil {
-		return loadErr
+		return false, loadErr
 	}
 
 	// find expense & update
@@ -73,7 +74,7 @@ func (s *ExpenseService) Update(id uint, description string, amount float64, cat
 	}
 
 	if !found {
-		return fmt.Errorf("Expense with ID %d not found.", id)
+		return false, fmt.Errorf("Expense with ID %d not found.", id)
 	}
 
 	e := &es.Expenses[idx]
@@ -90,10 +91,11 @@ func (s *ExpenseService) Update(id uint, description string, amount float64, cat
 	// save expenses
 	saveErr := s.Data.SaveExpenseStore(es)
 	if saveErr != nil {
-		return saveErr
+		return false, saveErr
 	}
 
-	return nil
+	// check if user exceed budget for this month
+	return true, checkIfExceedBudget(&es)
 }
 
 func (s *ExpenseService) Delete(id uint) error {
@@ -170,4 +172,39 @@ func (s *ExpenseService) Export() error {
 	}
 
 	return s.Data.ExportCSV(es)
+}
+
+func (s *ExpenseService) Budget(month uint, amount float64) error {
+	es, loadErr := s.Data.LoadExpenseStore()
+	if loadErr != nil {
+		return loadErr
+	}
+
+	es.Budgets[month-1] = amount
+
+	// save budgets
+	saveErr := s.Data.SaveExpenseStore(es)
+	if saveErr != nil {
+		return saveErr
+	}
+
+	return nil
+}
+
+// check if user exceed budget for this month
+func checkIfExceedBudget(es *ExpenseStore) error {
+	now := time.Now()
+	month := uint(now.Month())
+	sum, sumErr := es.SummaryByMonth(int(now.Year()), month)
+	if sumErr != nil {
+		return sumErr
+	}
+
+	if sum >= es.Budgets[month-1] {
+		return fmt.Errorf("Careful!! You exceed the monthly budget of $%.2f by $%.2f",
+			es.Budgets[month-1],
+			sum-es.Budgets[month-1])
+	}
+
+	return nil
 }
