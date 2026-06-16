@@ -257,10 +257,14 @@ func (env *AppEnv) Summary(service ExpenseServiceInterface) error {
 	cmd.Parse(env.Args[2:])
 	month := *monthPtr
 
-	if month != 0 && (month < 1 || month > 12) {
+	cmd.Visit(func(f *flag.Flag) {
+		if f.Name == "month" {
+			filter = true
+		}
+	})
+
+	if filter && (month < 1 || month > 12) {
 		return errors.New("Month CAN'T be less than 1 or greater than 12!")
-	} else if month != 0 {
-		filter = true
 	}
 
 	// service logic
