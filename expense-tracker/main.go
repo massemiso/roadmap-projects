@@ -125,9 +125,13 @@ func Update() error {
 	amount := *amountPtr
 	category := *categoryPtr
 
+	// if user don't pass ANY flag
 	if id <= 0 || (description == "" && amount < 0.0 && category == "") {
 		return errors.New("Usage: " + binName +
 			` update --id=1 --description="your description" --amount=100.0 --category="your category" (optional)`)
+	}
+	if amount < 0.0 {
+		return errors.New("Amount CAN'T be a negative number!")
 	}
 
 	// service logic
@@ -215,7 +219,9 @@ func Summary() error {
 	cmd.Parse(os.Args[2:])
 	month := *monthPtr
 
-	if month > 0 && month < 13 {
+	if month != 0 && (month < 1 || month > 12) {
+		return errors.New("Month CAN'T be less than 1 or greater than 12!")
+	} else if month != 0 {
 		filter = true
 	}
 
