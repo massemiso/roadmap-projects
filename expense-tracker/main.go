@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -56,7 +57,18 @@ type AppEnv struct {
 }
 
 func main() {
-	data := NewExpenseData("expenses.json", "expenses.csv")
+	// uses relative path
+	baseDir, err := os.UserConfigDir()
+	if err != nil {
+		baseDir = "."
+	}
+	appFolder := filepath.Join(baseDir, "expense-tracker")
+	_ = os.MkdirAll(appFolder, 0o755)
+
+	jsonPath := filepath.Join(appFolder, "expenses.json")
+	csvPath := filepath.Join(appFolder, "expenses.csv")
+
+	data := NewExpenseData(jsonPath, csvPath)
 	service := NewExpenseService(data)
 
 	env := &AppEnv{
