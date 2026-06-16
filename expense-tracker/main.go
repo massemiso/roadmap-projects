@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -46,16 +47,37 @@ var flags = map[string]func(s ExpenseServiceInterface) error{
 	fBudget:  Budget,
 }
 
+type AppEnv struct {
+	Service ExpenseServiceInterface
+	Stdout  io.Writer
+	Stderr  io.Writer
+	Args    []string
+	Colors  Colors
+}
+
 func main() {
 	data := NewExpenseData("expenses.json", "expenses.csv")
 	service := NewExpenseService(data)
-	Run(service)
+
+	env := &AppEnv{
+		Service: service,
+		Stdout:  os.Stdout,
+		Stderr:  os.Stderr,
+		Args:    os.Args,
+		Colors:  importColors(),
+	}
+
+	if err := env.Run(); err != nil {
+		fmt.Fprintf(env.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
 }
 
-func Run(service ExpenseServiceInterface) {
-	c = importColors()
-	args := os.Args
+func (env *AppEnv) Run() error {
+	c = env.Colors
+	args := env.Args
 	binName = args[0]
+	service := env.Service
 
 	if len(args) < 2 {
 		parts := make([]string, len(commands))
@@ -84,6 +106,7 @@ func Run(service ExpenseServiceInterface) {
 	if err := fn(service); err != nil {
 		exit(err.Error())
 	}
+	return nil
 }
 
 func Add(service ExpenseServiceInterface) error {
