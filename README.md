@@ -18,10 +18,15 @@ A command-line interface for managing daily tasks with persistent JSON storage.
 - **Key Concepts:** File I/O, JSON Serialization, CRUD operations, CLI Argument Parsing.
 - **Status:** ✅ Complete.
 
+### 3. [Expense Tracker CLI](./expense-tracker)
+A feature-rich financial management CLI with budget controls, multi-format data persistence, and CSV exporting.
+- **Key Concepts:** Layered Architecture, Interface-Driven Design, Command Dispatch Maps, Error as Warning Pattern, Integration/Mock Testing.
+- **Status:** ✅ Complete.
+
 ## 🛠 Tech Stack
 
 - **Language:** [Go (Golang)](https://go.dev/)
-- **Principles:** Clean Architecture, SOLID principles, and Table-Driven Testing.
+- **Principles:** Clean Architecture, SOLID principles, Table-Driven Testing, and Dependency Injection.
 - **Philosophy:** I prioritize using the **Go Standard Library** to ensure I fully understand how the language works before reaching for external frameworks.
 
 ## 🎯 Current Goals
