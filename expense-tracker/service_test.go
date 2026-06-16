@@ -13,7 +13,7 @@ func TestServiceAdd(t *testing.T) {
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_add.json")
 
-	data := NewExpenseData(jsonPath)
+	data := NewExpenseData(jsonPath, "")
 	service := NewExpenseService(data)
 
 	tests := []struct {
@@ -59,7 +59,7 @@ func TestServiceList(t *testing.T) {
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_list.json")
 
-	data := NewExpenseData(jsonPath)
+	data := NewExpenseData(jsonPath, "")
 	service := NewExpenseService(data)
 
 	// Pre-populate database
@@ -120,7 +120,7 @@ func TestServiceUpdate(t *testing.T) {
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_update.json")
 
-	data := NewExpenseData(jsonPath)
+	data := NewExpenseData(jsonPath, "")
 	service := NewExpenseService(data)
 
 	// Pre-populate with one item (will get ID: 1)
@@ -229,7 +229,7 @@ func TestServiceDelete(t *testing.T) {
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_delete.json")
 
-	data := NewExpenseData(jsonPath)
+	data := NewExpenseData(jsonPath, "")
 	service := NewExpenseService(data)
 
 	// Pre-populate with one item (will get ID: 1)
@@ -283,7 +283,7 @@ func TestServiceSummary(t *testing.T) {
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_summary.json")
 
-	data := NewExpenseData(jsonPath)
+	data := NewExpenseData(jsonPath, "")
 	service := NewExpenseService(data)
 
 	// Pre-populate
@@ -344,7 +344,7 @@ func TestServiceCleanAndExport(t *testing.T) {
 	jsonPath := filepath.Join(tempDir, "expenses_clean.json")
 	csvPath := filepath.Join(tempDir, "expenses_clean.csv")
 
-	data := NewExpenseDataCSV(jsonPath, csvPath)
+	data := NewExpenseData(jsonPath, csvPath)
 	service := NewExpenseService(data)
 
 	// 1. Initially Clean should error because file doesn't exist
@@ -385,7 +385,7 @@ func TestServiceBudget(t *testing.T) {
 	tempDir := t.TempDir()
 	jsonPath := filepath.Join(tempDir, "expenses_budget.json")
 
-	data := NewExpenseData(jsonPath)
+	data := NewExpenseData(jsonPath, "")
 	service := NewExpenseService(data)
 
 	// Set budget for the current month

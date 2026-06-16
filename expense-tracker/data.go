@@ -9,18 +9,20 @@ import (
 
 const permissions = 0o644
 
+type ExpenseDataInterface interface {
+	LoadExpenseStore() (ExpenseStore, error)
+	SaveExpenseStore(es ExpenseStore) error
+	CleanFile() error
+	ExportCSV(es ExpenseStore) error
+	GetCSVFile() string
+}
+
 type ExpenseData struct {
 	json string
 	csv  string
 }
 
-func NewExpenseData(json string) *ExpenseData {
-	return &ExpenseData{
-		json: json,
-	}
-}
-
-func NewExpenseDataCSV(json string, csv string) *ExpenseData {
+func NewExpenseData(json string, csv string) *ExpenseData {
 	return &ExpenseData{
 		json: json,
 		csv:  csv,
@@ -84,4 +86,8 @@ func (d *ExpenseData) ExportCSV(es ExpenseStore) error {
 	}
 
 	return nil
+}
+
+func (d *ExpenseData) GetCSVFile() string {
+	return d.csv
 }

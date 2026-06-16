@@ -35,7 +35,7 @@ var commands = []string{
 	fBudget,
 }
 
-var flags = map[string]func() error{
+var flags = map[string]func(s ExpenseServiceInterface) error{
 	fAdd:     Add,
 	fUpdate:  Update,
 	fDelete:  Delete,
@@ -47,6 +47,12 @@ var flags = map[string]func() error{
 }
 
 func main() {
+	data := NewExpenseData("expenses.json", "expenses.csv")
+	service := NewExpenseService(data)
+	Run(service)
+}
+
+func Run(service ExpenseServiceInterface) {
 	c = importColors()
 	args := os.Args
 	binName = args[0]
@@ -75,12 +81,12 @@ func main() {
 		))
 	}
 
-	if err := fn(); err != nil {
+	if err := fn(service); err != nil {
 		exit(err.Error())
 	}
 }
 
-func Add() error {
+func Add(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fAdd, flag.ExitOnError)
 	descriptionPtr := cmd.String("description", "", "description of your new expense")
 	amountPtr := cmd.Float64("amount", 0.0, "amount of money of your new expense")
@@ -97,9 +103,6 @@ func Add() error {
 	}
 
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	id, err := service.Add(description, amount, category)
 	if err != nil && id == 0 {
 		return err
@@ -112,7 +115,7 @@ func Add() error {
 	return nil
 }
 
-func Update() error {
+func Update(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fUpdate, flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that you want to update")
 	descriptionPtr := cmd.String("description", "", "new description")
@@ -135,9 +138,6 @@ func Update() error {
 	}
 
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	modified, err := service.Update(id, description, amount, category)
 	if !modified && err != nil {
 		return err
@@ -150,7 +150,7 @@ func Update() error {
 	return nil
 }
 
-func Delete() error {
+func Delete(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fDelete, flag.ExitOnError)
 	idPtr := cmd.Uint("id", 0, "id of the expense that delete")
 
@@ -162,9 +162,6 @@ func Delete() error {
 	}
 
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	err := service.Delete(id)
 	if err != nil {
 		return err
@@ -174,7 +171,7 @@ func Delete() error {
 	return nil
 }
 
-func List() error {
+func List(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fList, flag.ExitOnError)
 	var filter bool
 	categoryPtr := cmd.String("category", "", "filter by category")
@@ -187,9 +184,6 @@ func List() error {
 	}
 
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	exStr, err := service.List(filter, category)
 	if err != nil {
 		return err
@@ -211,7 +205,7 @@ func List() error {
 	return nil
 }
 
-func Summary() error {
+func Summary(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fSummary, flag.ExitOnError)
 	var filter bool
 	monthPtr := cmd.Uint("month", 0, "filter by month")
@@ -226,9 +220,6 @@ func Summary() error {
 	}
 
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	sum, err := service.Summary(filter, month)
 	if err != nil {
 		return err
@@ -243,11 +234,8 @@ func Summary() error {
 	return nil
 }
 
-func Clean() error {
+func Clean(service ExpenseServiceInterface) error {
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	err := service.Clean()
 	if err != nil {
 		return err
@@ -257,21 +245,19 @@ func Clean() error {
 	return nil
 }
 
-func Export() error {
+func Export(service ExpenseServiceInterface) error {
 	// service logic
-	data := NewExpenseDataCSV("expenses.json", "expenses.csv")
-	service := NewExpenseService(data)
-
 	err := service.Export()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%sExpenses exported to '%s' successfully%s\n", c.Green, data.csv, c.Reset)
+	fmt.Printf("%sExpenses exported to '%s' successfully%s\n",
+		c.Green, service.GetData().GetCSVFile(), c.Reset)
 	return nil
 }
 
-func Budget() error {
+func Budget(service ExpenseServiceInterface) error {
 	cmd := flag.NewFlagSet(fBudget, flag.ExitOnError)
 	monthPtr := cmd.Uint("month", 0, "month to set budget")
 	amountPtr := cmd.Float64("amount", -1.0, "your budget amount of money")
@@ -286,9 +272,6 @@ func Budget() error {
 	}
 
 	// service logic
-	data := NewExpenseData("expenses.json")
-	service := NewExpenseService(data)
-
 	err := service.Budget(month, amount)
 	if err != nil {
 		return err

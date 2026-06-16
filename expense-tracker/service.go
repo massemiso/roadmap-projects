@@ -7,20 +7,21 @@ import (
 
 type ExpenseServiceInterface interface {
 	Add(description string, amount float64, category string) (uint, error)
-	Update(id uint, description string, amount float64, category string) error
+	Update(id uint, description string, amount float64, category string) (bool, error)
 	Delete(id uint) error
 	List(filter bool, category string) ([]string, error)
 	Summary(filter bool, month uint) (float64, error)
 	Clean() error
 	Export() error
 	Budget(month uint, amount float64) error
+	GetData() ExpenseDataInterface
 }
 
 type ExpenseService struct {
-	Data *ExpenseData
+	Data ExpenseDataInterface
 }
 
-func NewExpenseService(d *ExpenseData) *ExpenseService {
+func NewExpenseService(d ExpenseDataInterface) *ExpenseService {
 	return &ExpenseService{Data: d}
 }
 
@@ -211,4 +212,8 @@ func checkIfExceedBudget(es *ExpenseStore) error {
 	}
 
 	return nil
+}
+
+func (s *ExpenseService) GetData() ExpenseDataInterface {
+	return s.Data
 }
