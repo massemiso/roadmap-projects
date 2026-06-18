@@ -34,45 +34,32 @@ func (gs *GameSession) SelectDifficulty() {
 	fmt.Println("2. Medium (5 chances)")
 	fmt.Println("3. Hard (3 chances)")
 
-	var choiceStr string
-	var attempts uint8
 	for {
-		choice, err := gs.Input.promptNumber("\nEnter your choice: ", 1, 3)
-		if err != nil {
-			continue
-		}
-
+		choice := gs.Input.promptNumber("\nEnter your choice: ", 1, 3)
 		switch choice {
 		case 1:
-			choiceStr = "Easy"
-			attempts = 10
+			gs.Difficulty, gs.MaxAttempts = "Easy", 10
 		case 2:
-			choiceStr = "Medium"
-			attempts = 5
+			gs.Difficulty, gs.MaxAttempts = "Medium", 5
 		case 3:
-			choiceStr = "Hard"
-			attempts = 3
+			gs.Difficulty, gs.MaxAttempts = "Hard", 3
 		default:
 			fmt.Println("Wrong choice!")
 			continue
 		}
-
 		break
 	}
 
-	fmt.Printf("\nGreat! You have selected the %s difficulty level.\n", choiceStr)
-	fmt.Printf("You have %d chances to guess the correct number.\n", attempts)
+	fmt.Printf("\nGreat! You have selected the %s difficulty level.\n", gs.Difficulty)
+	fmt.Printf("You have %d chances to guess the correct number.\n", gs.MaxAttempts)
 	fmt.Println("Let's start the game!")
-
-	gs.Difficulty = choiceStr
-	gs.MaxAttempts = attempts
 }
 
 func (gs *GameSession) RunRound() {
 	startTime := time.Now()
 	fmt.Println()
 	for i := range gs.MaxAttempts {
-		guess, _ := gs.Input.promptNumber("Enter your guess: ", 1, 100)
+		guess := gs.Input.promptNumber("Enter your guess: ", 1, 100)
 
 		if guess == gs.SecretNumber {
 			elapsedTime := time.Since(startTime)

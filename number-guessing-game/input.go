@@ -17,7 +17,7 @@ func NewGameInput(r *bufio.Reader) *GameInput {
 	}
 }
 
-func (i *GameInput) promptNumber(prompt string, minLimit int, maxLimit int) (uint8, error) {
+func (i *GameInput) promptNumber(prompt string, minLimit int, maxLimit int) uint8 {
 	var number uint8
 	for {
 		fmt.Printf("%s", prompt)
@@ -33,7 +33,7 @@ func (i *GameInput) promptNumber(prompt string, minLimit int, maxLimit int) (uin
 		number = uint8(n)
 		break
 	}
-	return number, nil
+	return number
 }
 
 func (i *GameInput) promptYN(prompt string) (string, error) {
