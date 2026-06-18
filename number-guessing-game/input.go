@@ -9,25 +9,27 @@ import (
 
 type GameInput struct {
 	Reader *bufio.Reader
+	Output *GameOutput
 }
 
-func NewGameInput(r *bufio.Reader) *GameInput {
+func NewGameInput(r *bufio.Reader, out *GameOutput) *GameInput {
 	return &GameInput{
 		Reader: r,
+		Output: out,
 	}
 }
 
 func (i *GameInput) promptNumber(prompt string, minLimit int, maxLimit int) uint8 {
 	var number uint8
 	for {
-		fmt.Printf("%s", prompt)
+		i.Output.Printf("%s", prompt)
 		input, err := i.Reader.ReadString('\n')
 		if err != nil {
 			continue
 		}
 		n, err := i.sanitizeChoiceNumber(input, minLimit, maxLimit)
 		if err != nil {
-			fmt.Println(err.Error())
+			i.Output.PrintError("%v", err.Error())
 			continue
 		}
 		number = uint8(n)
@@ -37,7 +39,7 @@ func (i *GameInput) promptNumber(prompt string, minLimit int, maxLimit int) uint
 }
 
 func (i *GameInput) promptYN(prompt string) (string, error) {
-	fmt.Printf("%s", prompt)
+	i.Output.Printf("%s", prompt)
 	res, err := i.Reader.ReadString('\n')
 	if err != nil {
 		return "", err

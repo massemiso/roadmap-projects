@@ -1,22 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"math/rand/v2"
 	"time"
 )
 
 type GameSession struct {
 	Input        *GameInput
+	Output       *GameOutput
 	Difficulty   string
 	MaxAttempts  uint8
 	SecretNumber uint8
 	// Leaderboard  *Leaderboard
 }
 
-func NewGameSession(gi *GameInput) *GameSession {
+func NewGameSession(in *GameInput, out *GameOutput) *GameSession {
 	return &GameSession{
-		Input: gi,
+		Input:  in,
+		Output: out,
 	}
 }
 
@@ -27,12 +28,12 @@ func (gs *GameSession) ResetRound() {
 }
 
 func (gs *GameSession) SelectDifficulty() {
-	fmt.Println("Welcome to the Number Guessing Game!")
-	fmt.Println("I'm thinking of a number between 1 and 100.")
-	fmt.Println("\nPlease select the difficulty level:")
-	fmt.Println("1. Easy (10 chances)")
-	fmt.Println("2. Medium (5 chances)")
-	fmt.Println("3. Hard (3 chances)")
+	gs.Output.PrintInfo("Welcome to the Number Guessing Game!\n")
+	gs.Output.Println("I'm thinking of a number between 1 and 100.")
+	gs.Output.Println("Please select the difficulty level:")
+	gs.Output.Println("1. Easy (10 chances)")
+	gs.Output.Println("2. Medium (5 chances)")
+	gs.Output.Println("3. Hard (3 chances)")
 
 	for {
 		choice := gs.Input.promptNumber("\nEnter your choice: ", 1, 3)
@@ -44,34 +45,35 @@ func (gs *GameSession) SelectDifficulty() {
 		case 3:
 			gs.Difficulty, gs.MaxAttempts = "Hard", 3
 		default:
-			fmt.Println("Wrong choice!")
+			gs.Output.PrintError("Wrong choice!")
 			continue
 		}
 		break
 	}
 
-	fmt.Printf("\nGreat! You have selected the %s difficulty level.\n", gs.Difficulty)
-	fmt.Printf("You have %d chances to guess the correct number.\n", gs.MaxAttempts)
-	fmt.Println("Let's start the game!")
+	gs.Output.PrintDifficulty("\nGreat! You have selected the %s difficulty level.\n", gs.Difficulty)
+	gs.Output.Printf("You have %d chances to guess the correct number.\n", gs.MaxAttempts)
+	gs.Output.Println("Let's start the game!")
 }
 
 func (gs *GameSession) RunRound() {
 	startTime := time.Now()
-	fmt.Println()
+	gs.Output.Println("")
+
 	for i := range gs.MaxAttempts {
 		guess := gs.Input.promptNumber("Enter your guess: ", 1, 100)
 
 		if guess == gs.SecretNumber {
 			elapsedTime := time.Since(startTime)
-			fmt.Printf("Congratulations! You guessed the correct number in %d attempts and %v.\n",
+			gs.Output.PrintSuccess("Congratulations! You guessed the correct number in %d attempts and %v.\n",
 				i+1, elapsedTime.Round(time.Second))
 			return
 		}
 
 		if guess > gs.SecretNumber {
-			fmt.Printf("Incorrect! The number is less than %d\n\n", guess)
+			gs.Output.PrintFail("Incorrect! The number is less than %d\n\n", guess)
 		} else {
-			fmt.Printf("Incorrect! The number is greater than %d\n\n", guess)
+			gs.Output.PrintFail("Incorrect! The number is greater than %d\n\n", guess)
 		}
 
 		if i+1 == gs.MaxAttempts {
@@ -80,15 +82,15 @@ func (gs *GameSession) RunRound() {
 
 		wantClue, err := gs.Input.promptYN("Do you want a clue? (Y/N): ")
 		if err != nil {
-			fmt.Println(err.Error())
+			gs.Output.PrintError("%v", err.Error())
 		}
 
 		if wantClue == "Y" {
 			minClue, maxClue := calculateClue(i+1, gs.SecretNumber)
-			fmt.Printf("Clue: The number is between %d and %d\n", minClue, maxClue)
+			gs.Output.PrintInfo("Clue: The number is between %d and %d\n", minClue, maxClue)
 		}
 	}
 
 	elapsedTime := time.Since(startTime)
-	fmt.Printf("Oops! after %v you didn't make it, the number was %d!\n", elapsedTime.Round(time.Second), gs.SecretNumber)
+	gs.Output.PrintFail("Oops! after %v you didn't make it, the number was %d!\n", elapsedTime.Round(time.Second), gs.SecretNumber)
 }
