@@ -2,32 +2,40 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
-	"strings"
+	"os/exec"
+	"runtime"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	gs := NewGameSession(reader)
+	gi := NewGameInput(reader)
+	gs := NewGameSession(gi)
 	for {
+		ClearScreen()
 		gs.ResetRound()
-
 		gs.SelectDifficulty()
-		fmt.Println()
-
 		gs.RunRound()
-		fmt.Println()
 
-		fmt.Printf("Do you want to keep playing (Y/N): ")
-		keepPlaying, err := reader.ReadString('\n')
+		keepPlaying, err := gi.promptYN("Do you want to keep playing (Y/N): ")
 		if err != nil {
 			return
 		}
-		keepPlaying = strings.TrimSpace(strings.ToUpper(keepPlaying))
 
 		if keepPlaying != "Y" {
 			break
 		}
+	}
+}
+
+func ClearScreen() {
+	if runtime.GOOS == "windows" {
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	} else {
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
 	}
 }

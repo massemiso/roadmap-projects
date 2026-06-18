@@ -1,25 +1,22 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"math/rand/v2"
-	"strconv"
-	"strings"
 	"time"
 )
 
 type GameSession struct {
-	Reader       *bufio.Reader
+	Input        *GameInput
 	Difficulty   string
 	MaxAttempts  uint8
 	SecretNumber uint8
 	// Leaderboard  *Leaderboard
 }
 
-func NewGameSession(r *bufio.Reader) *GameSession {
+func NewGameSession(gi *GameInput) *GameSession {
 	return &GameSession{
-		Reader: r,
+		Input: gi,
 	}
 }
 
@@ -40,15 +37,8 @@ func (gs *GameSession) SelectDifficulty() {
 	var choiceStr string
 	var attempts uint8
 	for {
-		fmt.Printf("\nEnter your choice: ")
-		input, err := gs.Reader.ReadString('\n')
+		choice, err := gs.Input.promptNumber("\nEnter your choice: ", 1, 3)
 		if err != nil {
-			continue
-		}
-
-		choice, err := sanitizeChoiceNumber(input, 1, 3)
-		if err != nil {
-			fmt.Println(err.Error())
 			continue
 		}
 
@@ -80,23 +70,10 @@ func (gs *GameSession) SelectDifficulty() {
 
 func (gs *GameSession) RunRound() {
 	startTime := time.Now()
-
+	fmt.Println()
 	for i := range gs.MaxAttempts {
-		var guess uint8
-		for {
-			fmt.Printf("Enter your guess: ")
-			input, err := gs.Reader.ReadString('\n')
-			if err != nil {
-				continue
-			}
-			g, err := sanitizeChoiceNumber(input, 1, 100)
-			if err != nil {
-				fmt.Println(err.Error())
-				continue
-			}
-			guess = uint8(g)
-			break
-		}
+		guess, _ := gs.Input.promptNumber("Enter your guess: ", 1, 100)
+
 		if guess == gs.SecretNumber {
 			elapsedTime := time.Since(startTime)
 			fmt.Printf("Congratulations! You guessed the correct number in %d attempts and %v.\n",
@@ -114,33 +91,17 @@ func (gs *GameSession) RunRound() {
 			break
 		}
 
-		fmt.Printf("Do you want a clue? (Y/N): ")
-		wantClue, err := gs.Reader.ReadString('\n')
+		wantClue, err := gs.Input.promptYN("Do you want a clue? (Y/N): ")
 		if err != nil {
-			return
+			fmt.Println(err.Error())
 		}
-		wantClue = sanitizeChoice(wantClue)
 
 		if wantClue == "Y" {
 			minClue, maxClue := calculateClue(i+1, gs.SecretNumber)
-			fmt.Printf("\nClue: The number is between %d and %d\n", minClue, maxClue)
+			fmt.Printf("Clue: The number is between %d and %d\n", minClue, maxClue)
 		}
 	}
 
 	elapsedTime := time.Since(startTime)
 	fmt.Printf("Oops! after %v you didn't make it, the number was %d!\n", elapsedTime.Round(time.Second), gs.SecretNumber)
-}
-
-func sanitizeChoice(choice string) string {
-	return strings.TrimSpace(strings.ToUpper(choice))
-}
-
-func sanitizeChoiceNumber(choiceNumber string, minLimit int, maxLimit int) (int, error) {
-	input := strings.TrimSpace(choiceNumber)
-	choice, err := strconv.Atoi(input)
-	if err != nil || choice < minLimit || choice > maxLimit {
-		return 0,
-			fmt.Errorf("Please enter a valid integer between %d and %d.", minLimit, maxLimit)
-	}
-	return choice, nil
 }
