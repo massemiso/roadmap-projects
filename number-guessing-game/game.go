@@ -11,13 +11,14 @@ type GameSession struct {
 	Difficulty   string
 	MaxAttempts  uint8
 	SecretNumber uint8
-	// Leaderboard  *Leaderboard
+	Leaderboard  *Leaderboard
 }
 
-func NewGameSession(in *GameInput, out *GameOutput) *GameSession {
+func NewGameSession(in *GameInput, out *GameOutput, lb *Leaderboard) *GameSession {
 	return &GameSession{
-		Input:  in,
-		Output: out,
+		Input:       in,
+		Output:      out,
+		Leaderboard: lb,
 	}
 }
 
@@ -67,6 +68,7 @@ func (gs *GameSession) RunRound() {
 			elapsedTime := time.Since(startTime)
 			gs.Output.PrintSuccess("Congratulations! You guessed the correct number in %d attempts and %v.\n",
 				i+1, elapsedTime.Round(time.Second))
+			gs.Leaderboard.check(gs.Difficulty, i+1, elapsedTime)
 			return
 		}
 
