@@ -36,11 +36,6 @@ A fun, strategy-based guessing game with leaderboard persistence and intelligent
 - **Key Concepts:** Strategy Pattern, Higher-order Functions, State Persistence, Table-Driven Testing.
 - **Status:** ✅ Complete.
 
-### 3. [Expense Tracker CLI](./expense-tracker)
-A feature-rich financial management CLI with budget controls, multi-format data persistence, and CSV exporting.
-- **Key Concepts:** Layered Architecture, Interface-Driven Design, Command Dispatch Maps, Error as Warning Pattern, Integration/Mock Testing.
-- **Status:** ✅ Complete.
-
 ## 🛠 Tech Stack
 
 - **Language:** [Go (Golang)](https://go.dev/)
