@@ -119,7 +119,8 @@ func (o *GameOutput) PrintLeaderboard(lb *Leaderboard) {
 		if score == nil {
 			return fmt.Sprintf("%-10s|%-8s|%-6s|", difficulty, "--", "--")
 		}
-		return fmt.Sprintf("%-10s|%-8d|%-6v|", difficulty, score.Attempts, score.Duration.Round(time.Second))
+		realDuration := time.Duration(score.Duration) * time.Millisecond
+		return fmt.Sprintf("%-10s|%-8d|%-6v|", difficulty, score.Attempts, realDuration.Round(time.Second))
 	}
 
 	fmt.Fprint(o.Writer, o.Color.cyan)

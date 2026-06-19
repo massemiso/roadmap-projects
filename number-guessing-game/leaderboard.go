@@ -11,9 +11,9 @@ const (
 )
 
 type Score struct {
-	Attempts uint8         `json:"attempts"`
-	Duration time.Duration `json:"duration"`
-	Date     time.Time     `json:"date"`
+	Attempts uint8     `json:"attempts"`
+	Duration int64     `json:"duration_ms"`
+	Date     time.Time `json:"date"`
 }
 
 // Tracks the best (fewest) attempts per difficulty level
@@ -39,7 +39,7 @@ func (lb *Leaderboard) LoadLeaderboard() error {
 	var aux Leaderboard
 	decErr := json.Unmarshal(lbFile, &aux)
 	if decErr != nil {
-		return err
+		return decErr
 	}
 
 	lb.Easy = aux.Easy
@@ -65,38 +65,33 @@ func (lb *Leaderboard) SaveLeaderboard() error {
 func (lb *Leaderboard) check(difficulty string, attempts uint8, duration time.Duration) {
 	newScore := Score{
 		Attempts: attempts,
-		Duration: duration,
+		Duration: duration.Milliseconds(),
 		Date:     time.Now(),
 	}
 
 	switch difficulty {
 	case "Easy":
-		if lb.Easy == nil {
+		if lb.Easy == nil || lb.Easy.IsBeatenBy(newScore) {
 			lb.Easy = &newScore
-		} else {
-			lb.Easy.checkScore(newScore)
 		}
 
 	case "Medium":
-		if lb.Medium == nil {
+		if lb.Medium == nil || lb.Medium.IsBeatenBy(newScore) {
 			lb.Medium = &newScore
-		} else {
-			lb.Medium.checkScore(newScore)
 		}
 
 	case "Hard":
-		if lb.Hard == nil {
+		if lb.Hard == nil || lb.Hard.IsBeatenBy(newScore) {
 			lb.Hard = &newScore
-		} else {
-			lb.Hard.checkScore(newScore)
 		}
 	}
 }
 
-func (s *Score) checkScore(other Score) {
+func (s *Score) IsBeatenBy(other Score) bool {
 	if s.Duration > other.Duration {
-		*s = other
+		return true
 	} else if s.Duration == other.Duration && s.Attempts > other.Attempts {
-		*s = other
+		return true
 	}
+	return false
 }
