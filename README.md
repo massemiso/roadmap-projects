@@ -8,14 +8,32 @@ I'm **massemiso**, a junior backend developer with a deep desire to master the u
 
 ## 📦 Projects
 
-### 1. [GitHub User Activity CLI](./github-activity)
+### 1. [Task Tracker CLI](./task-cli)
+
+A command-line interface for managing daily tasks with persistent JSON storage.
+
+- **Key Concepts:** File I/O, JSON Serialization, CRUD operations, CLI Argument Parsing.
+- **Status:** ✅ Complete.
+
+### 2. [GitHub User Activity CLI](./github-activity)
+
 A high-performance CLI tool to fetch and display GitHub activity with rich event details.
+
 - **Key Concepts:** REST API Consumption, `json.RawMessage` Polymorphism, Dependency Injection, Interface Mocking.
 - **Status:** ✅ Complete (100% logic test coverage).
 
-### 2. [Task Tracker CLI](./task-cli)
-A command-line interface for managing daily tasks with persistent JSON storage.
-- **Key Concepts:** File I/O, JSON Serialization, CRUD operations, CLI Argument Parsing.
+### 3. [Expense Tracker CLI](./expense-tracker)
+
+A feature-rich financial management CLI with budget controls, multi-format data persistence, and CSV exporting.
+
+- **Key Concepts:** Layered Architecture, Interface-Driven Design, Command Dispatch Maps, Error as Warning Pattern, Integration/Mock Testing.
+- **Status:** ✅ Complete.
+
+### 4. [Number Guessing Game CLI](./number-guessing-game)
+
+A fun, strategy-based guessing game with leaderboard persistence and intelligent hints.
+
+- **Key Concepts:** Strategy Pattern, Higher-order Functions, State Persistence, Table-Driven Testing.
 - **Status:** ✅ Complete.
 
 ## 🛠 Tech Stack
@@ -47,4 +65,5 @@ I'm always looking for ways to improve my code! If you're a senior dev or a fell
 Contact me at [massemiso@proton.me](mailto:massemiso@proton.me).
 
 ---
+
 _Follow my progress as I work through the [Backend Roadmap](https://roadmap.sh/backend)._
