@@ -1,22 +1,61 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+	"math/rand/v2"
+)
 
-func calculateClue(attemptsTried uint8, numToGuess uint8) (uint8, uint8) {
-	offset := uint8(math.Floor(25 / float64(attemptsTried)))
-	var minClue uint8 = 1
-	var maxClue uint8 = 100
+type HintFunc func(secret uint8) string
 
-	if numToGuess > offset {
-		minClue = numToGuess - offset
-		if minClue == 0 {
-			minClue = 1
+func GetRandomHint(attempts uint8, secret uint8) string {
+	hints := []HintFunc{
+		rangeHint(attempts),
+		parityHint(),
+		digitsHint(),
+	}
+
+	randomFunc := hints[rand.IntN(len(hints))]
+	return randomFunc(secret)
+}
+
+func rangeHint(attempts uint8) HintFunc {
+	return func(secret uint8) string {
+		offset := uint8(math.Floor(25 / float64(attempts)))
+		minClue := max(1, secret-offset)
+		maxClue := min(100, secret+offset)
+		return fmt.Sprintf("The number is between %d and %d", minClue, maxClue)
+	}
+}
+
+func parityHint() HintFunc {
+	return func(secret uint8) string {
+		if secret%2 == 0 {
+			return "The number is Even"
 		}
+		return "The number is Odd"
 	}
+}
 
-	if numToGuess+offset <= 100 {
-		maxClue = numToGuess + offset
+func digitsHint() HintFunc {
+	return func(secret uint8) string {
+		if secret < 10 {
+			return "The number has one digit"
+		}
+		if secret == 100 {
+			return "The number has two equal digits"
+		}
+
+		digits := []uint8{
+			uint8(math.Floor(float64(secret) / 10)),
+			secret % 10,
+		}
+		if digits[1] == 0 {
+			return "The number has a 0 in it"
+		}
+		if digits[0] == digits[1] {
+			return "The number has two equal digits"
+		}
+		return fmt.Sprintf("The number has a %d in it", digits[rand.IntN(len(digits))])
 	}
-
-	return minClue, maxClue
 }

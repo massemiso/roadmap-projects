@@ -88,8 +88,8 @@ func (gs *GameSession) RunRound() {
 		}
 
 		if wantClue == "Y" {
-			minClue, maxClue := calculateClue(i+1, gs.SecretNumber)
-			gs.Output.PrintInfo("Clue: The number is between %d and %d\n", minClue, maxClue)
+			clue := GetRandomHint(gs.MaxAttempts, gs.SecretNumber)
+			gs.Output.PrintInfo("Clue: %s\n", clue)
 		}
 	}
 
