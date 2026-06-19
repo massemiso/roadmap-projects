@@ -47,7 +47,7 @@ func digitsHint() HintFunc {
 		}
 
 		digits := []uint8{
-			uint8(math.Floor(float64(secret) / 10)),
+			secret / 10,
 			secret % 10,
 		}
 		if digits[1] == 0 {
