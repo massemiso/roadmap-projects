@@ -21,6 +21,9 @@ func main() {
 			out.PrintError("ERROR! Can't load leaderboard!")
 		}
 
+		out.PrintLeaderboard(lb)
+		out.Println("")
+
 		gs.ResetRound()
 		gs.SelectDifficulty()
 		gs.RunRound()

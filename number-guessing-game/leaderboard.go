@@ -42,6 +42,10 @@ func (lb *Leaderboard) LoadLeaderboard() error {
 		return err
 	}
 
+	lb.Easy = aux.Easy
+	lb.Medium = aux.Medium
+	lb.Hard = aux.Hard
+
 	return nil
 }
 
@@ -91,6 +95,8 @@ func (lb *Leaderboard) check(difficulty string, attempts uint8, duration time.Du
 
 func (s *Score) checkScore(other Score) {
 	if s.Duration > other.Duration {
+		*s = other
+	} else if s.Duration == other.Duration && s.Attempts > other.Attempts {
 		*s = other
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 )
 
 type GameOutput struct {
@@ -105,5 +106,33 @@ func (o *GameOutput) PrintInfo(format string, args ...any) {
 	fmt.Fprint(o.Writer, o.Color.cyan)
 	fmt.Fprintf(o.Writer, format, args...)
 	fmt.Fprint(o.Writer, o.Color.reset)
+	o.Writer.Flush()
+}
+
+func (o *GameOutput) PrintLeaderboard(lb *Leaderboard) {
+	if lb == nil {
+		o.PrintError("Leaderboard database is unavailable.\n")
+		return
+	}
+
+	formatScoreLine := func(difficulty string, score *Score) string {
+		if score == nil {
+			return fmt.Sprintf("%-10s|%-8s|%-6s|", difficulty, "--", "--")
+		}
+		return fmt.Sprintf("%-10s|%-8d|%-6v|", difficulty, score.Attempts, score.Duration.Round(time.Second))
+	}
+
+	fmt.Fprint(o.Writer, o.Color.cyan)
+
+	fmt.Fprintln(o.Writer, "--- LEADERBOARD ----")
+	fmt.Fprintf(o.Writer, "%-10s|%-8s|%-6s|\n", "Difficulty", "Attempts", "Time")
+
+	fmt.Fprintln(o.Writer, formatScoreLine("Easy", lb.Easy))
+	fmt.Fprintln(o.Writer, formatScoreLine("Medium", lb.Medium))
+	fmt.Fprintln(o.Writer, formatScoreLine("Hard", lb.Hard))
+
+	fmt.Fprintln(o.Writer, "-----------------------------")
+	fmt.Fprint(o.Writer, o.Color.reset)
+
 	o.Writer.Flush()
 }
