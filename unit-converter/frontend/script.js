@@ -2,89 +2,54 @@ const lengthForm = document.getElementById("length-form");
 const weightForm = document.getElementById("weight-form");
 const temperatureForm = document.getElementById("temperature-form");
 
-lengthForm.addEventListener("submit", (event) => convertLength(event));
-weightForm.addEventListener("submit", (event) => convertWeight(event));
+lengthForm.addEventListener("submit", (event) => postConvertLength(event));
+weightForm.addEventListener("submit", (event) => postConvertWeight(event));
 temperatureForm.addEventListener("submit", (event) =>
-  convertTemperature(event),
+  postConvertTemperature(event),
 );
 
-function convertAnything(event, from, to, form, measure) {
+function postConvert(event, form, measure) {
   event.preventDefault();
-  const value = parseFloat(form.elements[measure + "-value"].value);
-  const unitFrom = form.elements[measure + "-from"].value;
-  const unitTo = form.elements[measure + "-to"].value;
 
-  if (unitTo == unitFrom) {
-    document.getElementById(measure + "-result").textContent =
-      `${value.toFixed(2)} ${unitTo}`;
-    return;
-  }
+  const conversion = {
+    measure: measure,
+    value: parseFloat(form.elements[measure + "-value"].value),
+    from: form.elements[measure + "-from"].value,
+    to: form.elements[measure + "-to"].value,
+  };
 
-  var valueSI = from[unitFrom](value);
-  var valueTo = to[unitTo](valueSI);
-
-  document.getElementById(measure + "-result").textContent =
-    `${valueTo.toFixed(2)} ${unitTo}`;
+  fetch("http://localhost:8080/api/convert", {
+    method: "POST",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(conversion),
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Server returned status code: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      document.getElementById(measure + "-result").textContent =
+        `${data.result.toFixed(2)} ${conversion.to}`;
+    })
+    .catch(() => {
+      document.getElementById(measure + "-result").textContent =
+        `Invalid conversion from ${conversion.to} to ${conversion.from}`;
+    });
 }
 
-function convertLength(event) {
-  var fromAnyToSI = {
-    mm: (val) => val / 1000,
-    cm: (val) => val / 100,
-    m: (val) => val,
-    km: (val) => val * 1000,
-    in: (val) => val / 39.37,
-    ft: (val) => val / 3.281,
-    yd: (val) => val / 1.094,
-    mi: (val) => val * 1609,
-  };
-  var fromSIToAny = {
-    mm: (val) => val * 1000,
-    cm: (val) => val * 100,
-    m: (val) => val,
-    km: (val) => val / 1000,
-    in: (val) => val * 39.37,
-    ft: (val) => val * 3.281,
-    yd: (val) => val * 1.094,
-    mi: (val) => val / 1609,
-  };
-  convertAnything(event, fromAnyToSI, fromSIToAny, lengthForm, "length");
+function postConvertLength(event) {
+  postConvert(event, lengthForm, "length");
 }
 
-function convertWeight(event) {
-  var fromAnyToSI = {
-    mg: (val) => val / 1_000_000,
-    g: (val) => val / 1000,
-    kg: (val) => val,
-    oz: (val) => val / 35.274,
-    lb: (val) => val / 2.205,
-  };
-  var fromSIToAny = {
-    mg: (val) => val * 1_000_000,
-    g: (val) => val * 1000,
-    kg: (val) => val,
-    oz: (val) => val * 35.274,
-    lb: (val) => val * 2.205,
-  };
-  convertAnything(event, fromAnyToSI, fromSIToAny, weightForm, "weight");
+function postConvertWeight(event) {
+  postConvert(event, weightForm, "weight");
 }
 
-function convertTemperature(event) {
-  var fromAnyToSI = {
-    C: (val) => val + 273.15,
-    F: (val) => (val - 32) * (5 / 9) + 273.15,
-    K: (val) => val,
-  };
-  var fromSIToAny = {
-    C: (val) => val - 273.15,
-    F: (val) => (val - 273.15) * (9 / 5) + 32,
-    K: (val) => val,
-  };
-  convertAnything(
-    event,
-    fromAnyToSI,
-    fromSIToAny,
-    temperatureForm,
-    "temperature",
-  );
+function postConvertTemperature(event) {
+  postConvert(event, temperatureForm, "temperature");
 }

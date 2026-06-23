@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type ConversionReq struct {
 	Measure string  `json:"measure"`
 	Value   float64 `json:"value"`
@@ -53,4 +55,13 @@ func (req *ConversionReq) convertTemperature() ConversionRes {
 		result = req.Value
 	}
 	return ConversionRes{Result: result}
+}
+
+func (req *ConversionReq) toString() string {
+	return fmt.Sprintf("ConversionReq{Measure='%s', Value=%.2f, From='%s', To='%s'}",
+		req.Measure, req.Value, req.From, req.To)
+}
+
+func (res *ConversionRes) toString() string {
+	return fmt.Sprintf("ConversionRes{Result=%.2f}", res.Result)
 }
