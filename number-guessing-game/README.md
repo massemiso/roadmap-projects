@@ -1,6 +1,6 @@
 # 🎲 Number Guessing Game
 
-[← Back to Roadmap Projects](./README_roadmap.md)
+[← Back to Roadmap Projects](../README.md)
 
 A classic number guessing game CLI app proposed by [roadmap.sh](https://roadmap.sh/projects/number-guessing-game)
 
