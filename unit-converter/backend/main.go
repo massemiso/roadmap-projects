@@ -21,7 +21,7 @@ func handleConversion(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Malformed JSON request body", http.StatusBadRequest)
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return
 	}
 	log.Printf("REQUEST: %s\n", req.toString())
@@ -36,7 +36,7 @@ func handleConversion(w http.ResponseWriter, r *http.Request) {
 		res = req.convertTemperature()
 	default:
 		http.Error(w, "Unsupported conversion type", http.StatusBadRequest)
-		log.Fatalln("Unsupported conversion type")
+		log.Println("Unsupported conversion type")
 		return
 	}
 	log.Printf("RESPONSE: %s, Status %d\n", res.toString(), http.StatusOK)
