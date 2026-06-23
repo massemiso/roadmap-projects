@@ -36,6 +36,13 @@ A fun, strategy-based guessing game with leaderboard persistence and intelligent
 - **Key Concepts:** Strategy Pattern, Higher-order Functions, State Persistence, Table-Driven Testing.
 - **Status:** ✅ Complete.
 
+### 5. [Unit Converter](./unit-converter)
+
+A web-based tool for converting between length, weight, and temperature units, utilizing a Go backend.
+
+- **Key Concepts:** REST API, Client-Server architecture, CORS handling, JSON serialization.
+- **Status:** ✅ Complete.
+
 ## 🛠 Tech Stack
 
 - **Language:** [Go (Golang)](https://go.dev/)
