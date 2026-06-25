@@ -1,0 +1,114 @@
+package org.duckdns.massemiso.personal_blog.article;
+
+import jakarta.annotation.PostConstruct;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+
+@Component
+public class ArticleRepositoryImpl implements ArticleRepository {
+
+  @Value("${blog.storage.path}")
+  private String PATH_NAME;
+
+  private Path PATH;
+
+  @PostConstruct
+  public void init() {
+    PATH = Paths.get(PATH_NAME);
+  }
+
+  @Override
+  public Optional<Article> getById(Long id) {
+    try {
+      return Optional.of(this.readFile(id));
+    } catch (IOException | RuntimeException e) {
+      System.out.println(e.getMessage());
+    }
+    return Optional.empty();
+  }
+
+  @Override
+  public Article save(Article article) {
+    Long id = -100L;
+    try {
+      id = this.generateId();
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
+
+    article.setId(id);
+    try {
+      this.writeFile(article);
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
+    return article;
+  }
+
+  private synchronized void writeFile(Article article) throws IOException {
+    String json = this.toJson(article);
+    if (!Files.exists(PATH)) {
+      Files.createDirectory(PATH);
+    }
+    Path filePath = this.getPathFile(article.getId());
+    try (BufferedWriter bw = Files.newBufferedWriter(filePath)) {
+      bw.write(json);
+    }
+  }
+
+  private Article readFile(Long id) throws IOException {
+    Path filePath = this.getPathFile(id);
+    if (!Files.exists(filePath)) {
+      throw new RuntimeException("File" + PATH_NAME + id + " doesn't exist");
+    }
+    String json = Files.readString(filePath);
+    return this.toObject(json);
+  }
+
+  private String toJson(Article article) {
+    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    return ow.writeValueAsString(article);
+  }
+
+  private Article toObject(String json) {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readValue(json, Article.class);
+  }
+
+  private synchronized Long generateId() throws IOException {
+    if (!Files.exists(PATH)) {
+      Files.createDirectory(PATH);
+    }
+
+    Path idPath = PATH.resolve("last_id.txt");
+
+    // 1. Read existing ID
+    long currentId = 0L;
+    if (Files.exists(idPath)) {
+      String content = Files.readString(idPath).trim();
+      if (!content.isEmpty()) {
+        currentId = Long.parseLong(content);
+      }
+    }
+
+    // 2. Increment
+    long nextId = currentId + 1;
+
+    // 3. Write new ID back
+    Files.writeString(idPath, String.valueOf(nextId));
+
+    return nextId;
+  }
+
+  private Path getPathFile(Long id) {
+    return PATH.resolve(id + ".json");
+  }
+}
