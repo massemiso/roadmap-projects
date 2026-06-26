@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Article</title>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <strong>
+        <h1>New Article</h1>
+      </strong>
+    </header>
+    <main>
+      <form class="article" method="post" action="/article">
+        <input type="text" name="title" placeholder="Article Title" />
+        <br />
+        <input
+          type="date"
+          name="dateOfPublication"
+          placeholder="Publishing Date"
+        />
+        <br />
+        <textarea name="content" placeholder="Content"></textarea>
+        <br />
+        <input type="submit" value="Publish" />
+      </form>
+    </main>
+    <footer>
+      <i>
+        <small><a href="/admin">Go back to dashboard</a></small>
+      </i>
+    </footer>
+  </body>
+</html>

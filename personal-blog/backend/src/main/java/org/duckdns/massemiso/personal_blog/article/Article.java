@@ -1,6 +1,6 @@
 package org.duckdns.massemiso.personal_blog.article;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +14,10 @@ public class Article {
   @Setter private Long id;
   private String title;
   private String content;
-  private LocalDateTime dateOfPublication;
+  private LocalDate dateOfPublication;
 
   @Builder
-  public Article(String title, String content, LocalDateTime dateOfPublication) {
+  public Article(String title, String content, LocalDate dateOfPublication) {
     this.title = title;
     this.content = content;
     this.dateOfPublication = dateOfPublication;

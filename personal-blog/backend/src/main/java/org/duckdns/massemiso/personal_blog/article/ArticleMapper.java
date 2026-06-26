@@ -11,7 +11,7 @@ public class ArticleMapper {
         entity.getId(),
         entity.getTitle(),
         entity.getContent(),
-        entity.getDateOfPublication().toLocalDate().format(formatter));
+        entity.getDateOfPublication().format(formatter));
   }
 
   public Article toEntity(ArticleRequestDto dto) {

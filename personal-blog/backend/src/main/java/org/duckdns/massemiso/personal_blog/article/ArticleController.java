@@ -1,6 +1,5 @@
 package org.duckdns.massemiso.personal_blog.article;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @Slf4j
@@ -32,6 +31,17 @@ public class ArticleController {
     return "home";
   }
 
+  @GetMapping("/admin")
+  public String adminDashboard(Model model) {
+    log.info("REQUEST: admin");
+
+    List<ArticleResponseDto> articles = service.getAll();
+    model.addAttribute("articles", articles);
+
+    log.info("RESPONSE: {}", articles);
+    return "admin";
+  }
+
   @GetMapping("/article/{id}")
   public String getById(@PathVariable(name = "id", required = true) Long id, Model model) {
     log.info("REQUEST: getById({})", id);
@@ -43,15 +53,18 @@ public class ArticleController {
     return "article";
   }
 
-  @RequestMapping("/new")
-  public String create() {
-    ArticleRequestDto dto =
-        new ArticleRequestDto("xx title xx", "xxxxx content xxxx", LocalDateTime.now());
+  @GetMapping("/new")
+  public String formNew() {
+    log.info("REQUEST: formNew");
+    return "new";
+  }
 
+  @PostMapping("/article")
+  public String create(ArticleRequestDto dto) {
     log.info("REQUEST: create({})", dto);
     ArticleResponseDto responseDto = service.create(dto);
 
     log.info("RESPONSE: {}", responseDto);
-    return "index";
+    return "admin";
   }
 }

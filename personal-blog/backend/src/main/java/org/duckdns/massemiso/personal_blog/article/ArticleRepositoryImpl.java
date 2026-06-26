@@ -87,14 +87,13 @@ public class ArticleRepositoryImpl implements ArticleRepository {
               .map(s -> s.replaceAll(".json", ""))
               .toList();
       for (String id : ids) {
-        // Long idLong = Long.valueOf(id);
-        // System.out.println(idLong);
-        //
         articles.add(this.readFile(Long.valueOf(id)));
       }
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
+
+    articles.sort((i, j) -> j.getDateOfPublication().compareTo(i.getDateOfPublication()));
     return articles;
   }
 
