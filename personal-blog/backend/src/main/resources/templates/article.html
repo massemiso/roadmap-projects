@@ -7,8 +7,24 @@
     <link href="css/style.css" rel="stylesheet" />
   </head>
   <body>
-    <h1 th:text="${dto.title}" />
-    <h4 th:text="${dto.dop}" />
-    <p th:text="${dto.content}" />
+    <header>
+      <strong>
+        <h1 th:text="${dto.title}" />
+      </strong>
+    </header>
+    <main>
+      <article>
+        <p th:text="${dto.content}" />
+      </article>
+    </main>
+    <footer>
+      <i>
+        <small th:text="${dto.dop}" />
+      </i>
+      <br />
+      <i>
+        <small><a href="/home">Go back to home</a></small>
+      </i>
+    </footer>
   </body>
 </html>
