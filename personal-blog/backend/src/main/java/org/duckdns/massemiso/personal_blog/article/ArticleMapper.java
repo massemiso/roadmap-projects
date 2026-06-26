@@ -6,7 +6,10 @@ import org.springframework.stereotype.Component;
 public class ArticleMapper {
   public ArticleResponseDto toDto(Article entity) {
     return new ArticleResponseDto(
-        entity.getId(), entity.getTitle(), entity.getContent(), entity.getDateOfPublication());
+        entity.getId(),
+        entity.getTitle(),
+        entity.getContent(),
+        entity.getDateOfPublication().toLocalDate());
   }
 
   public Article toEntity(ArticleRequestDto dto) {

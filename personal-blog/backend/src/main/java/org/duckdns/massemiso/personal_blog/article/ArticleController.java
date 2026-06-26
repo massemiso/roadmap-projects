@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,12 +21,14 @@ public class ArticleController {
   }
 
   @GetMapping("/article/{id}")
-  public String getById(@PathVariable Long id) {
+  public String getById(@PathVariable(name = "id", required = true) Long id, Model model) {
     log.info("REQUEST: getById({})", id);
 
     ArticleResponseDto responseDto = service.getById(id);
+    model.addAttribute("dto", responseDto);
+
     log.info("RESPONSE: {}", responseDto);
-    return "index";
+    return "article";
   }
 
   @RequestMapping("/new")
