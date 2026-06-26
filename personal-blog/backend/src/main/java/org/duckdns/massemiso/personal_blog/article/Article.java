@@ -9,9 +9,10 @@ import lombok.ToString;
 
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 public class Article {
-  @Setter private Long id;
+  private Long id;
   private String title;
   private String content;
   private LocalDate dateOfPublication;

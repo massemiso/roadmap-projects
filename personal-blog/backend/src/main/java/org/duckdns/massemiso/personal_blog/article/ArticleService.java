@@ -51,4 +51,29 @@ public class ArticleService {
     log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, responseDto);
     return responseDto;
   }
+
+  public ArticleResponseDto update(Long id, ArticleRequestDto requestDto) {
+    String methodName = "update";
+    log.info("SERVICE: Attempting method [{}] with arguments: {}, {}", methodName, id, requestDto);
+
+    Article article = repository.getById(id).orElseThrow();
+    article.setTitle(requestDto.title());
+    article.setContent(requestDto.content());
+    article.setDateOfPublication(requestDto.dateOfPublication());
+    repository.delete(id);
+    article = repository.save(article);
+    ArticleResponseDto responseDto = mapper.toDto(article);
+
+    log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, responseDto);
+    return responseDto;
+  }
+
+  public void delete(Long id) {
+    String methodName = "delete";
+    log.info("SERVICE: Attempting method [{}] with arguments: {}", methodName, id);
+
+    repository.delete(id);
+
+    log.info("SERVICE: Method [{}] completed successfully");
+  }
 }

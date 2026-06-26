@@ -66,6 +66,22 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     return article;
   }
 
+  @Override
+  public void delete(Long id) {
+    try {
+      this.deleteFile(this.getPathFile(id));
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  private synchronized void deleteFile(Path filePath) throws IOException {
+    if (!Files.exists(filePath)) {
+      return;
+    }
+    Files.delete(filePath);
+  }
+
   private synchronized void writeFile(Article article) throws IOException {
     String json = this.toJson(article);
     if (!Files.exists(PATH)) {

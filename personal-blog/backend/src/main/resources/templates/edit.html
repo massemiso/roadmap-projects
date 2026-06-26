@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Update Article</title>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <strong>
+        <h1>Update Article</h1>
+      </strong>
+    </header>
+    <main>
+      <form method="post" th:action="@{/update/{id}(id=${id})}">
+        <input type="text" name="title" th:placeholder="${dto.title}" />
+        <br />
+        <input type="date" name="dateOfPublication" />
+        <br />
+        <textarea name="content" th:placeholder="${dto.content}"></textarea>
+        <br />
+        <input type="submit" value="Update" />
+      </form>
+    </main>
+    <footer>
+      <i>
+        <small><a href="/admin">Go back to dashboard</a></small>
+      </i>
+    </footer>
+  </body>
+</html>

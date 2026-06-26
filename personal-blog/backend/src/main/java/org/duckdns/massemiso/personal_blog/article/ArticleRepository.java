@@ -11,4 +11,6 @@ public interface ArticleRepository {
   Optional<Article> getById(Long id);
 
   Article save(Article article);
+
+  void delete(Long id);
 }

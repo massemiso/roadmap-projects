@@ -67,4 +67,34 @@ public class ArticleController {
     log.info("RESPONSE: {}", responseDto);
     return "admin";
   }
+
+  @GetMapping("/edit/{id}")
+  public String formEdit(@PathVariable(name = "id", required = true) Long id, Model model) {
+    log.info("REQUEST: formDelete");
+
+    ArticleResponseDto responseDto = service.getById(id);
+    model.addAttribute("dto", responseDto);
+    model.addAttribute("id", id);
+
+    log.info("RESPONSE: {}", responseDto);
+    return "edit";
+  }
+
+  @PostMapping("/update/{id}")
+  public String update(@PathVariable(name = "id", required = true) Long id, ArticleRequestDto dto) {
+    log.info("REQUEST: update({})", dto);
+    ArticleResponseDto responseDto = service.update(id, dto);
+
+    log.info("RESPONSE: {}", responseDto);
+    return "admin";
+  }
+
+  @GetMapping("/delete/{id}")
+  public String delete(@PathVariable(name = "id", required = true) Long id) {
+    log.info("REQUEST: delete({})", id);
+    service.delete(id);
+
+    log.info("RESPONSE: {}", "Article " + id + " deleted succesfully");
+    return "admin";
+  }
 }
