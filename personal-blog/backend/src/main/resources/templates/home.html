@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home</title>
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <strong>
+        <h1>Personal Blog</h1>
+      </strong>
+    </header>
+    <ul>
+      <li th:each="article:${articles}">
+        <strong>
+          <a
+            th:href="@{/article/{id}(id=${article.id})}"
+            th:text="${article.title}"
+          ></a>
+        </strong>
+        <i th:text="${article.dop}"></i>
+      </li>
+    </ul>
+    <nav></nav>
+  </body>
+</html>

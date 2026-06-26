@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -23,6 +26,16 @@ public class ArticleRepositoryImpl implements ArticleRepository {
   @PostConstruct
   public void init() {
     PATH = Paths.get(PATH_NAME);
+  }
+
+  @Override
+  public List<Article> getAll() {
+    try {
+      return this.readAllFiles();
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+      return List.of();
+    }
   }
 
   @Override
@@ -62,6 +75,27 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     try (BufferedWriter bw = Files.newBufferedWriter(filePath)) {
       bw.write(json);
     }
+  }
+
+  private List<Article> readAllFiles() throws IOException {
+    List<Article> articles = new ArrayList<>();
+    try (Stream<Path> paths = Files.walk(PATH)) {
+      List<String> ids =
+          paths
+              .map(p -> p.getFileName().toString())
+              .filter(s -> s.endsWith(".json"))
+              .map(s -> s.replaceAll(".json", ""))
+              .toList();
+      for (String id : ids) {
+        // Long idLong = Long.valueOf(id);
+        // System.out.println(idLong);
+        //
+        articles.add(this.readFile(Long.valueOf(id)));
+      }
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
+    return articles;
   }
 
   private Article readFile(Long id) throws IOException {

@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.personal_blog.article;
 
+import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,17 @@ public class ArticleService {
   public ArticleService(ArticleRepository repository, ArticleMapper mapper) {
     this.repository = repository;
     this.mapper = mapper;
+  }
+
+  public List<ArticleResponseDto> getAll() {
+    String methodName = "getAll";
+    log.info("SERVICE: Attempting method [{}] with no arguments", methodName);
+
+    List<ArticleResponseDto> articles =
+        repository.getAll().stream().map(a -> mapper.toDto(a)).toList();
+
+    log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, articles);
+    return articles;
   }
 
   public ArticleResponseDto getById(Long id) {

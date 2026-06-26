@@ -1,6 +1,7 @@
 package org.duckdns.massemiso.personal_blog.article;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,17 @@ public class ArticleController {
   @Autowired
   public ArticleController(ArticleService service) {
     this.service = service;
+  }
+
+  @GetMapping("/home")
+  public String home(Model model) {
+    log.info("REQUEST: home");
+
+    List<ArticleResponseDto> articles = service.getAll();
+    model.addAttribute("articles", articles);
+
+    log.info("RESPONSE: {}", articles);
+    return "home";
   }
 
   @GetMapping("/article/{id}")
