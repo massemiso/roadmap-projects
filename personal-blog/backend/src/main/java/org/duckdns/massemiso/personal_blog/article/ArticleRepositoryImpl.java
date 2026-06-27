@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectWriter;
 
 @Component
+@Slf4j
 public class ArticleRepositoryImpl implements ArticleRepository {
 
   @Value("${blog.storage.path}")
@@ -34,7 +36,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     try {
       return this.readAllFiles();
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      log.error("Can't read article files", e);
       return List.of();
     }
   }
@@ -44,7 +46,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     try {
       return Optional.of(this.readFile(id));
     } catch (IOException | RuntimeException e) {
-      System.out.println(e.getMessage());
+      log.error("Can't read article file", e);
     }
     return Optional.empty();
   }
@@ -55,14 +57,14 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     try {
       id = this.generateId();
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      log.error("Can't generate new id file", e);
     }
 
     article.setId(id);
     try {
       this.writeFile(article);
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      log.error("Can't write new article file", e);
     }
     return article;
   }
@@ -72,7 +74,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     try {
       this.updateFile(article);
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      log.error("Can't update article file", e);
     }
     return article;
   }
@@ -82,7 +84,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     try {
       this.deleteFile(this.getPathFile(id));
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      log.error("Can't delete article file", e);
     }
   }
 
@@ -131,7 +133,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
         articles.add(this.readFile(Long.valueOf(id)));
       }
     } catch (IOException e) {
-      System.out.println(e.getMessage());
+      throw e;
     }
 
     articles.sort((i, j) -> j.getDateOfPublication().compareTo(i.getDateOfPublication()));
