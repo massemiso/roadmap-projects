@@ -1,0 +1,49 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Log Folder ###
+docker/logs/**/*.log
+docker/logs/**/*.csv
+docker/logs/**/*.gz
+!docker/logs/**/.gitkeep
+
+### Certificates ###
+docker/certs/*.crt
+docker/certs/*.key
+!docker/certs/.gitkeep
+
+### Environment Variables ###
+.env
+
+
