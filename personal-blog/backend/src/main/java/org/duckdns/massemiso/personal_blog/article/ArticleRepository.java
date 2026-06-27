@@ -12,5 +12,7 @@ public interface ArticleRepository {
 
   Article save(Article article);
 
+  Article update(Article article);
+
   void delete(Long id);
 }

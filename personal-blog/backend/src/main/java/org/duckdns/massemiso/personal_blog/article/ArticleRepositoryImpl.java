@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,6 +68,16 @@ public class ArticleRepositoryImpl implements ArticleRepository {
   }
 
   @Override
+  public Article update(Article article) {
+    try {
+      this.updateFile(article);
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+    }
+    return article;
+  }
+
+  @Override
   public void delete(Long id) {
     try {
       this.deleteFile(this.getPathFile(id));
@@ -80,6 +91,20 @@ public class ArticleRepositoryImpl implements ArticleRepository {
       return;
     }
     Files.delete(filePath);
+  }
+
+  private synchronized void updateFile(Article article) throws IOException {
+    String json = this.toJson(article);
+    if (!Files.exists(PATH)) {
+      Files.createDirectory(PATH);
+    }
+    Path filePath = this.getPathFile(article.getId());
+    Path tempPath = this.getPathTempFile(article.getId());
+    try (BufferedWriter bw = Files.newBufferedWriter(tempPath)) {
+      bw.write(json);
+      Files.move(
+          tempPath, filePath, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+    }
   }
 
   private synchronized void writeFile(Article article) throws IOException {
@@ -159,5 +184,9 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
   private Path getPathFile(Long id) {
     return PATH.resolve(id + ".json");
+  }
+
+  private Path getPathTempFile(Long id) {
+    return PATH.resolve(id + "_temp.json");
   }
 }

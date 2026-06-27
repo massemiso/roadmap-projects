@@ -1,12 +1,12 @@
 package org.duckdns.massemiso.personal_blog.article;
 
 import java.util.List;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@Log4j2
+@Slf4j
 public class ArticleService {
 
   private final ArticleRepository repository;
@@ -60,8 +60,7 @@ public class ArticleService {
     article.setTitle(requestDto.title());
     article.setContent(requestDto.content());
     article.setDateOfPublication(requestDto.dateOfPublication());
-    repository.delete(id);
-    article = repository.save(article);
+    article = repository.update(article);
     ArticleResponseDto responseDto = mapper.toDto(article);
 
     log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, responseDto);
