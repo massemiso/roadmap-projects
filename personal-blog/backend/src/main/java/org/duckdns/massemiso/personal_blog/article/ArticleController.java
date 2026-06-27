@@ -65,7 +65,7 @@ public class ArticleController {
     ArticleResponseDto responseDto = service.create(dto);
 
     log.info("RESPONSE: {}", responseDto);
-    return "admin";
+    return "redirect:/admin";
   }
 
   @GetMapping("/edit/{id}")
@@ -86,7 +86,7 @@ public class ArticleController {
     ArticleResponseDto responseDto = service.update(id, dto);
 
     log.info("RESPONSE: {}", responseDto);
-    return "admin";
+    return "redirect:/admin";
   }
 
   @GetMapping("/delete/{id}")
@@ -95,6 +95,6 @@ public class ArticleController {
     service.delete(id);
 
     log.info("RESPONSE: {}", "Article " + id + " deleted succesfully");
-    return "admin";
+    return "redirect:/admin";
   }
 }
