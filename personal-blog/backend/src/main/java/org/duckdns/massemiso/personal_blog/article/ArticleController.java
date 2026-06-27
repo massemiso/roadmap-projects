@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.personal_blog.article;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class ArticleController {
   }
 
   @PostMapping("/article")
-  public String create(ArticleRequestDto dto) {
+  public String create(@Valid ArticleRequestDto dto) {
     log.info("REQUEST: create({})", dto);
     ArticleResponseDto responseDto = service.create(dto);
 
@@ -81,7 +82,8 @@ public class ArticleController {
   }
 
   @PostMapping("/update/{id}")
-  public String update(@PathVariable(name = "id", required = true) Long id, ArticleRequestDto dto) {
+  public String update(
+      @PathVariable(name = "id", required = true) Long id, @Valid ArticleRequestDto dto) {
     log.info("REQUEST: update({})", dto);
     ArticleResponseDto responseDto = service.update(id, dto);
 
