@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -21,14 +22,11 @@ import tools.jackson.databind.ObjectWriter;
 @Slf4j
 public class ArticleRepositoryImpl implements ArticleRepository {
 
-  @Value("${blog.storage.path}")
-  private String PATH_NAME;
+  private final Path PATH;
 
-  private Path PATH;
-
-  @PostConstruct
-  public void init() {
-    PATH = Paths.get(PATH_NAME);
+  @Autowired
+  public ArticleRepositoryImpl(@Value("${blog.storage.path}") String pathName) {
+    this.PATH = Paths.get(pathName);
   }
 
   @Override
@@ -44,7 +42,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
   @Override
   public Optional<Article> getById(Long id) {
     try {
-      return Optional.of(this.readFile(id));
+      return this.readFile(id);
     } catch (IOException | RuntimeException e) {
       log.error("Can't read article file", e);
     }
@@ -53,18 +51,20 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
   @Override
   public Article save(Article article) {
-    Long id = -100L;
-    try {
-      id = this.generateId();
-    } catch (IOException e) {
-      log.error("Can't generate new id file", e);
+    if (article.getId() == null){
+      try {
+        article.setId(this.generateId());
+      } catch (IOException e) {
+        log.error("Can't generate new id file", e);
+        throw new RuntimeException("Failed to save article");
+      }
     }
 
-    article.setId(id);
     try {
       this.writeFile(article);
     } catch (IOException e) {
       log.error("Can't write new article file", e);
+      throw new RuntimeException("Failed to write article file");
     }
     return article;
   }
@@ -75,6 +75,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
       this.updateFile(article);
     } catch (IOException e) {
       log.error("Can't update article file", e);
+      throw new RuntimeException("Failed to update article file");
     }
     return article;
   }
@@ -85,6 +86,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
       this.deleteFile(this.getPathFile(id));
     } catch (IOException e) {
       log.error("Can't delete article file", e);
+      throw new RuntimeException("Failed to delete article file");
     }
   }
 
@@ -130,23 +132,22 @@ public class ArticleRepositoryImpl implements ArticleRepository {
               .map(s -> s.replaceAll(".json", ""))
               .toList();
       for (String id : ids) {
-        articles.add(this.readFile(Long.valueOf(id)));
+        this.readFile(Long.valueOf(id)).ifPresent(articles::add);
       }
-    } catch (IOException e) {
-      throw e;
     }
 
     articles.sort((i, j) -> j.getDateOfPublication().compareTo(i.getDateOfPublication()));
     return articles;
   }
 
-  private Article readFile(Long id) throws IOException {
+  private Optional<Article> readFile(Long id) throws IOException {
     Path filePath = this.getPathFile(id);
     if (!Files.exists(filePath)) {
-      throw new RuntimeException("File" + PATH_NAME + id + " doesn't exist");
+      log.error("File {} doesn't exist", filePath);
+      return Optional.empty();
     }
     String json = Files.readString(filePath);
-    return this.toObject(json);
+    return Optional.of(this.toObject(json));
   }
 
   private String toJson(Article article) {
