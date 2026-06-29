@@ -12,57 +12,55 @@ I'm **massemiso**, a junior backend developer with a deep desire to master the u
 
 A command-line interface for managing daily tasks with persistent JSON storage.
 
-- **Key Concepts:** File I/O, JSON Serialization, CRUD operations, CLI Argument Parsing.
-- **Status:** ✅ Complete.
+- **Concepts:** File I/O, JSON Serialization, CRUD, CLI Argument Parsing.
 
 ### 2. [GitHub User Activity CLI](./github-activity)
 
-A high-performance CLI tool to fetch and display GitHub activity with rich event details.
+A CLI tool to fetch and display GitHub activity with rich event details.
 
-- **Key Concepts:** REST API Consumption, `json.RawMessage` Polymorphism, Dependency Injection, Interface Mocking.
-- **Status:** ✅ Complete (100% logic test coverage).
+- **Concepts:** REST API Consumption, `json.RawMessage` Polymorphism, Dependency Injection.
 
 ### 3. [Expense Tracker CLI](./expense-tracker)
 
-A feature-rich financial management CLI with budget controls, multi-format data persistence, and CSV exporting.
+A financial management CLI with budget controls and CSV exporting.
 
-- **Key Concepts:** Layered Architecture, Interface-Driven Design, Command Dispatch Maps, Error as Warning Pattern, Integration/Mock Testing.
-- **Status:** ✅ Complete.
+- **Concepts:** Layered Architecture, Interface-Driven Design, Command Dispatch Maps.
 
 ### 4. [Number Guessing Game CLI](./number-guessing-game)
 
-A fun, strategy-based guessing game with leaderboard persistence and intelligent hints.
+A strategy-based guessing game with leaderboard persistence.
 
-- **Key Concepts:** Strategy Pattern, Higher-order Functions, State Persistence, Table-Driven Testing.
-- **Status:** ✅ Complete.
+- **Concepts:** Strategy Pattern, Higher-order Functions, State Persistence.
 
 ### 5. [Unit Converter](./unit-converter)
 
-A web-based tool for converting between length, weight, and temperature units, utilizing a Go backend.
+A web-based tool for unit conversion, utilizing a Go backend and JS frontend.
 
-- **Key Concepts:** REST API, Client-Server architecture, CORS handling, JSON serialization.
-- **Status:** ✅ Complete.
+- **Concepts:** REST API, Client-Server Architecture, CORS handling.
+
+### 6. [Personal Blog](./personal-blog)
+
+A full-stack personal blog platform with server-side rendering.
+
+- **Concepts:** Spring Boot, Thymeleaf, Spring Security, Responsive Design (Bootstrap).
 
 ## 🛠 Tech Stack
 
-- **Language:** [Go (Golang)](https://go.dev/)
-- **Principles:** Clean Architecture, SOLID principles, Table-Driven Testing, and Dependency Injection.
-- **Philosophy:** I prioritize using the **Go Standard Library** to ensure I fully understand how the language works before reaching for external frameworks.
+- **Go (Golang):** My primary language for CLI tools and high-performance services, emphasizing standard library usage and clean architecture.
+- **Java (Spring Boot):** My chosen framework for building robust, enterprise-grade APIs and web applications.
+- **Web Frontend:** Basic HTML, JavaScript, and CSS for building functional and responsive user interfaces.
 
 ## 🎯 Current Goals
 
-- [ ] Complete the roadmap.sh Backend projects.
-- [ ] Master Go's concurrency primitives (Goroutines/Channels).
-- [ ] Deepen knowledge in PostgreSQL and Database Design.
+- [ ] Master backend development foundations.
+- [ ] Build small, efficient CLI applications using **Go**.
+- [ ] Develop scalable REST APIs using **Spring Boot**.
+- [ ] Create dynamic web interfaces using **HTML & JavaScript**.
 - [ ] Transition into a professional backend development role.
 
 ## 📖 How to Explore
 
-Each project is standalone. To try one out:
-
-1. Navigate to the project directory: `cd <project-name>`
-2. Run directly: `go run . [arguments]`
-3. Or run tests: `go test ./... -v`
+Each project is standalone. You can find detailed setup, build, and execution instructions in the `README.md` file within each project directory.
 
 ---
 

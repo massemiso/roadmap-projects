@@ -1,0 +1,85 @@
+# ✍️ Personal Blog
+
+[← Back to Roadmap Projects](../README.md)
+
+A full-stack personal blog platform built with Spring Boot, proposed by [roadmap.sh](https://roadmap.sh/projects/personal-blog).
+
+## 🌟 Highlights
+
+- **Atomic File Storage:** Implemented a thread-safe repository layer using Java NIO `Files.move` with `ATOMIC_MOVE` to prevent file corruption during updates.
+- **Spring Boot & Thymeleaf:** Built a classic server-side rendered application utilizing the power of Spring MVC and Thymeleaf templates.
+- **Security-First:** Integrated `spring-boot-starter-security` to provide robust, configurable authentication for admin endpoints.
+- **Responsive UI:** Fully stylized using **Bootstrap 5**, ensuring the blog looks great on both mobile and desktop devices.
+- **Robust Error Handling:** Centralized application exceptions using `@ControllerAdvice`, providing a consistent and user-friendly error experience.
+
+## ℹ️ Project Context
+
+This project served as a deep dive into **Java backend development**. Moving away from CLI tools, the goal was to build a complete web-based system handling HTTP requests, form validation, and user sessions. It provided practical experience in bridging the gap between raw data storage (JSON files) and a polished, dynamic user interface.
+
+## 🚀 Usage
+
+### 1. Requirements
+
+- Java 21+
+- Maven
+
+### 2. Run the Application
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+The server will start on `http://localhost:8080`.
+
+**Default Admin Credentials:**
+
+- **Username:** `admin`
+- **Password:** `admin123`
+
+## 📋 API & Controller Endpoints
+
+| Endpoint        | Method | Role   | Description                    |
+| :-------------- | :----- | :----- | :----------------------------- |
+| `/`             | GET    | Public | Redirects to home              |
+| `/home`         | GET    | Public | Displays list of articles      |
+| `/article/{id}` | GET    | Public | Displays specific article      |
+| `/admin`        | GET    | Admin  | Admin dashboard                |
+| `/new`          | GET    | Admin  | Form to add new article        |
+| `/article`      | POST   | Admin  | Process form to create article |
+| `/edit/{id}`    | GET    | Admin  | Form to edit existing article  |
+| `/update/{id}`  | POST   | Admin  | Process form to update article |
+| `/delete/{id}`  | GET    | Admin  | Delete an article              |
+
+_Note: All Admin endpoints require authentication. Errors (e.g., 404 Not Found) are handled via `GlobalExceptionHandler` and rendered through `error.html`._
+
+## 🛠️ Technical Architecture
+
+- **Layered Architecture:**
+  - **Controller:** Manages HTTP requests, session logic, and model data.
+  - **Service:** Contains business logic and orchestrates data manipulation.
+  - **Repository:** Handles filesystem interactions and JSON serialization (via Jackson).
+- **Security:** In-memory user management configured via `SecurityConfig`.
+- **Validation:** Server-side request validation using `jakarta.validation` annotations on DTOs.
+
+## 🧠 Key Learnings
+
+Building this project helped me understand:
+
+- **Server-Side Rendering (SSR):** Mastering templating engines (Thymeleaf) and model attribute binding.
+- **The PRG Pattern:** Implementing "Post-Redirect-Get" to avoid duplicate form submissions and improve user flow.
+- **Spring Security:** Managing authentication chains and securing administrative routes.
+- **Concurrency & I/O:** Handling file system operations safely in a multi-threaded web environment.
+
+## 🚧 Future Improvements
+
+As this is a foundation project, I plan to extend it with:
+
+- **Database Migration:** Moving from `.json` file storage to an embedded database (like H2 or SQLite) for better scalability.
+- **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich text articles.
+- **Containerization:** Adding a `Dockerfile` for easy deployment.
+- **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
+
+---
+
+[← Back to Roadmap Projects](../README.md)
