@@ -1,5 +1,8 @@
 package org.duckdns.massemiso.personal_blog.article;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +24,16 @@ public class Article {
   public Article(String title, String content, LocalDate dateOfPublication) {
     this.title = title;
     this.content = content;
+    this.dateOfPublication = dateOfPublication;
+  }
+
+  public void update(String title, String content, LocalDate dateOfPublication) {
+    if (!title.isBlank()){
+      this.title = title;
+    }
+    if (!content.isBlank()){
+      this.content = content;
+    }
     this.dateOfPublication = dateOfPublication;
   }
 }

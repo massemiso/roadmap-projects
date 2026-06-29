@@ -17,62 +17,43 @@ public class ArticleService {
     this.repository = repository;
     this.mapper = mapper;
   }
-
   public List<ArticleResponseDto> getAll() {
-    String methodName = "getAll";
-    log.info("SERVICE: Attempting method [{}] with no arguments", methodName);
-
-    List<ArticleResponseDto> articles =
-        repository.getAll().stream().map(a -> mapper.toDto(a)).toList();
-
-    log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, articles);
+    log.info("Fetching all articles");
+    List<ArticleResponseDto> articles = repository.getAll().stream().map(mapper::toDto).toList();
+    log.debug("Found {} articles", articles.size());
     return articles;
   }
 
   public ArticleResponseDto getById(Long id) {
-    String methodName = "getById";
-    log.info("SERVICE: Attempting method [{}] with arguments: {}", methodName, id);
-
-    Article entity = repository.getById(id).orElseThrow();
-    ArticleResponseDto responseDto = mapper.toDto(entity);
-
-    log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, responseDto);
+    log.info("Fetching article id {}", id);
+    Article article = repository.getById(id).orElseThrow();
+    ArticleResponseDto responseDto = mapper.toDto(article);
+    log.debug("Found article {}", responseDto);
     return responseDto;
   }
 
   public ArticleResponseDto create(ArticleRequestDto requestDto) {
-    String methodName = "create";
-    log.info("SERVICE: Attempting method [{}] with arguments: {}", methodName, "");
-
+    log.info("Creating article {}", requestDto);
     Article article = mapper.toEntity(requestDto);
     article = repository.save(article);
     ArticleResponseDto responseDto = mapper.toDto(article);
-
-    log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, responseDto);
+    log.debug("Created article {}", responseDto);
     return responseDto;
   }
 
   public ArticleResponseDto update(Long id, ArticleRequestDto requestDto) {
-    String methodName = "update";
-    log.info("SERVICE: Attempting method [{}] with arguments: {}, {}", methodName, id, requestDto);
-
+    log.info("Updating article {}", requestDto);
     Article article = repository.getById(id).orElseThrow();
-    article.setTitle(requestDto.title());
-    article.setContent(requestDto.content());
-    article.setDateOfPublication(requestDto.dateOfPublication());
+    article.update(requestDto.title(), requestDto.content(), requestDto.dateOfPublication());
     article = repository.update(article);
     ArticleResponseDto responseDto = mapper.toDto(article);
-
-    log.info("SERVICE: Method [{}] completed successfully. Data: {}", methodName, responseDto);
+    log.debug("Updated article {}", responseDto);
     return responseDto;
   }
 
   public void delete(Long id) {
-    String methodName = "delete";
-    log.info("SERVICE: Attempting method [{}] with arguments: {}", methodName, id);
-
+    log.info("Deleting article {}", id);
     repository.delete(id);
-
-    log.info("SERVICE: Method [{}] completed successfully");
+    log.debug("Deleted article {}", id);
   }
 }
