@@ -21,6 +21,11 @@ public class ArticleController {
     this.service = service;
   }
 
+  @GetMapping("/")
+  public String goToHome() {
+    return "redirect:/home";
+  }
+
   @GetMapping("/home")
   public String home(Model model) {
     log.info("REQUEST: home");
