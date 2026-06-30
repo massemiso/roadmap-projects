@@ -11,6 +11,7 @@ A full-stack personal blog platform built with Spring Boot, proposed by [roadmap
 - **Security-First:** Integrated `spring-boot-starter-security` to provide robust, configurable authentication for admin endpoints.
 - **Responsive UI:** Fully stylized using **Bootstrap 5**, ensuring the blog looks great on both mobile and desktop devices.
 - **Robust Error Handling:** Centralized application exceptions using `@ControllerAdvice`, providing a consistent and user-friendly error experience.
+- **Comprehensive Testing:** Achieved high test coverage using JUnit 5, Mockito for service-layer testing, and `MockMvc` for robust web-layer integration tests.
 
 ## ℹ️ Project Context
 
@@ -62,7 +63,16 @@ _Note: All Admin endpoints require authentication. Errors (e.g., 404 Not Found) 
 - **Security:** In-memory user management configured via `SecurityConfig`.
 - **Validation:** Server-side request validation using `jakarta.validation` annotations on DTOs.
 
-## 🧠 Key Learnings
+## 🧪 Testing
+
+The project includes a suite of tests to ensure stability and reliability:
+
+- **Unit Tests:** Business logic verification for `Article` entity and `ArticleService`.
+- **Web Layer Tests:** Integration tests using `MockMvc` to verify endpoint routing, security, and response handling for all CRUD operations.
+
+```bash
+mvn test
+```
 
 Building this project helped me understand:
 
@@ -70,15 +80,16 @@ Building this project helped me understand:
 - **The PRG Pattern:** Implementing "Post-Redirect-Get" to avoid duplicate form submissions and improve user flow.
 - **Spring Security:** Managing authentication chains and securing administrative routes.
 - **Concurrency & I/O:** Handling file system operations safely in a multi-threaded web environment.
+- **Testing:** Designing testable services and verifying web layers with `MockMvc`.
 
 ## 🚧 Future Improvements
 
 As this is a foundation project, I plan to extend it with:
 
-- **Database Migration:** Moving from `.json` file storage to an embedded database (like H2 or SQLite) for better scalability.
-- **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich text articles.
-- **Containerization:** Adding a `Dockerfile` for easy deployment.
-- **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
+- [ ] **Database Migration:** Moving from `.json` file storage to an embedded database (like H2 or SQLite) for better scalability.
+- [ ] **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich text articles.
+- [ ] **Containerization:** Adding a `Dockerfile` for easy deployment.
+- [ ] **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
 
 ---
 
