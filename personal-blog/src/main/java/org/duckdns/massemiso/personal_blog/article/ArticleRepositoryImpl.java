@@ -1,6 +1,5 @@
 package org.duckdns.massemiso.personal_blog.article;
 
-import jakarta.annotation.PostConstruct;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,7 +50,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
   @Override
   public Article save(Article article) {
-    if (article.getId() == null){
+    if (article.getId() == null) {
       try {
         article.setId(this.generateId());
       } catch (IOException e) {
