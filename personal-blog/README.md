@@ -86,7 +86,7 @@ Building this project helped me understand:
 
 As this is a foundation project, I plan to extend it with:
 
-- [ ] **Database Migration:** Moving from `.json` file storage to an embedded database (like H2 or SQLite) for better scalability.
+- [x] **Database Migration:** Moving from `.json` file storage to an embedded database (like H2 or SQLite) for better scalability.
 - [ ] **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich text articles.
 - [ ] **Containerization:** Adding a `Dockerfile` for easy deployment.
 - [ ] **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
