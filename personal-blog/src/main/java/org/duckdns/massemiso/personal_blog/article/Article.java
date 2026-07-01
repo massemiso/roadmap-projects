@@ -1,8 +1,10 @@
 package org.duckdns.massemiso.personal_blog.article;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +16,20 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Entity
 public class Article {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Column(nullable = false)
   private String title;
+
+  @Column(nullable = false, columnDefinition = "text")
   private String content;
+
+  @Column(nullable = false, name = "dop")
   private LocalDate dateOfPublication;
 
   @Builder
@@ -28,10 +40,10 @@ public class Article {
   }
 
   public void update(String title, String content, LocalDate dateOfPublication) {
-    if (!title.isBlank()){
+    if (!title.isBlank()) {
       this.title = title;
     }
-    if (!content.isBlank()){
+    if (!content.isBlank()) {
       this.content = content;
     }
     this.dateOfPublication = dateOfPublication;

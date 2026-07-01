@@ -17,16 +17,17 @@ public class ArticleService {
     this.repository = repository;
     this.mapper = mapper;
   }
+
   public List<ArticleResponseDto> getAll() {
     log.info("Fetching all articles");
-    List<ArticleResponseDto> articles = repository.getAll().stream().map(mapper::toDto).toList();
+    List<ArticleResponseDto> articles = repository.findAll().stream().map(mapper::toDto).toList();
     log.debug("Found {} articles", articles.size());
     return articles;
   }
 
   public ArticleResponseDto getById(Long id) {
     log.info("Fetching article id {}", id);
-    Article article = repository.getById(id).orElseThrow();
+    Article article = repository.findById(id).orElseThrow();
     ArticleResponseDto responseDto = mapper.toDto(article);
     log.debug("Found article {}", responseDto);
     return responseDto;
@@ -43,9 +44,9 @@ public class ArticleService {
 
   public ArticleResponseDto update(Long id, ArticleRequestDto requestDto) {
     log.info("Updating article {}", requestDto);
-    Article article = repository.getById(id).orElseThrow();
+    Article article = repository.findById(id).orElseThrow();
     article.update(requestDto.title(), requestDto.content(), requestDto.dateOfPublication());
-    article = repository.update(article);
+    article = repository.save(article);
     ArticleResponseDto responseDto = mapper.toDto(article);
     log.debug("Updated article {}", responseDto);
     return responseDto;
@@ -53,7 +54,8 @@ public class ArticleService {
 
   public void delete(Long id) {
     log.info("Deleting article {}", id);
-    repository.delete(id);
+    Article article = repository.findById(id).orElseThrow();
+    repository.delete(article);
     log.debug("Deleted article {}", id);
   }
 }

@@ -1,18 +1,9 @@
 package org.duckdns.massemiso.personal_blog.article;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArticleRepository {
-  List<Article> getAll();
+public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-  Optional<Article> getById(Long id);
-
-  Article save(Article article);
-
-  Article update(Article article);
-
-  void delete(Long id);
 }

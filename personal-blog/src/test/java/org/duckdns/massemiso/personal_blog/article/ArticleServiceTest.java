@@ -41,7 +41,7 @@ class ArticleServiceTest {
         new ArticleResponseDto(2L, "t2", "c2", nowStr));
 
     // Mock
-    when(repository.getAll())
+    when(repository.findAll())
         .thenReturn(articles);
     when(mapper.toDto(articles.getFirst()))
         .thenReturn(articleResponseDtos.getFirst());
@@ -56,7 +56,7 @@ class ArticleServiceTest {
     assertThat(actual.getFirst().id(), is(articles.getFirst().getId()));
     assertThat(actual.getLast().id(), is(articles.getLast().getId()));
 
-    verify(repository).getAll();
+    verify(repository).findAll();
     verify(mapper).toDto(articles.getFirst());
     verify(mapper).toDto(articles.getLast());
   }
@@ -69,7 +69,7 @@ class ArticleServiceTest {
     List<ArticleResponseDto> articleResponseDtos = List.of();
 
     // Mock
-    when(repository.getAll())
+    when(repository.findAll())
         .thenReturn(List.of());
 
     // Act
@@ -78,7 +78,7 @@ class ArticleServiceTest {
     // Asserts
     assertThat(actual.size(), is(0));
 
-    verify(repository).getAll();
+    verify(repository).findAll();
     verify(mapper, never()).toDto(any(Article.class));
   }
 
@@ -92,7 +92,7 @@ class ArticleServiceTest {
     ArticleResponseDto responseDto = new ArticleResponseDto(validId, "t1", "c1", null);
 
     // mock
-    when(repository.getById(validId))
+    when(repository.findById(validId))
         .thenReturn(Optional.of(article));
     when(mapper.toDto(article))
         .thenReturn(responseDto);
@@ -106,7 +106,7 @@ class ArticleServiceTest {
     assertThat(actual.content(), is(responseDto.content()));
     assertThat(actual.dop(), is(responseDto.dop()));
 
-    verify(repository).getById(validId);
+    verify(repository).findById(validId);
     verify(mapper).toDto(article);
   }
 
@@ -117,14 +117,14 @@ class ArticleServiceTest {
     Long invalidId = -1L;
 
     // mock
-    when(repository.getById(invalidId))
+    when(repository.findById(invalidId))
         .thenReturn(Optional.empty());
 
     // Act
     assertThrows(NoSuchElementException.class, () -> articleService.getById(invalidId));
 
     // Assert
-    verify(repository).getById(invalidId);
+    verify(repository).findById(invalidId);
     verify(mapper, never()).toDto(any(Article.class));
   }
 
@@ -163,8 +163,8 @@ class ArticleServiceTest {
     ArticleResponseDto responseDto = new ArticleResponseDto(id, "new t", "new c", "...");
 
     // Mock
-    when(repository.getById(id)).thenReturn(Optional.of(existingArticle));
-    when(repository.update(any(Article.class))).thenReturn(existingArticle);
+    when(repository.findById(id)).thenReturn(Optional.of(existingArticle));
+    when(repository.save(any(Article.class))).thenReturn(existingArticle);
     when(mapper.toDto(existingArticle)).thenReturn(responseDto);
 
     // Act
@@ -172,8 +172,8 @@ class ArticleServiceTest {
 
     // Assert
     assertThat(actual, is(responseDto));
-    verify(repository).getById(id);
-    verify(repository).update(existingArticle);
+    verify(repository).findById(id);
+    verify(repository).save(existingArticle);
     verify(mapper).toDto(existingArticle);
   }
 
@@ -181,12 +181,33 @@ class ArticleServiceTest {
   void delete_GivenValidId_ShouldCallRepositoryDelete() {
     // Arrange
     ArticleService articleService = new ArticleService(repository, mapper);
+    Article article = new Article("t1", "c1", LocalDate.now());
     Long id = 1L;
+    article.setId(id);
+
+    when(repository.findById(id)).thenReturn(Optional.of(article));
 
     // Act
     articleService.delete(id);
 
     // Assert
-    verify(repository).delete(id);
+    verify(repository).findById(id);
+    verify(repository).delete(any(Article.class));
+  }
+
+  @Test
+  void delete_GivenInvalidId_ShouldThrowNoSuchElementException() {
+    // Arrange
+    ArticleService articleService = new ArticleService(repository, mapper);
+    Long id = 1L;
+
+    when(repository.findById(id)).thenReturn(Optional.empty());
+
+    // Act
+    assertThrows(NoSuchElementException.class, () -> articleService.delete(id));
+
+    // Assert
+    verify(repository).findById(id);
+    verify(repository, never()).delete(any(Article.class));
   }
 }
