@@ -42,7 +42,7 @@ A web-based tool for unit conversion, utilizing a Go backend and JS frontend.
 
 A full-stack personal blog platform with server-side rendering.
 
-- **Concepts:** Spring Boot, Thymeleaf, Spring Security, Responsive Design, **Robust Testing (JUnit, Mockito, MockMvc)**.
+- **Concepts:** Spring Boot, Thymeleaf, Spring Security, Responsive Design, **Robust Testing (JUnit, Mockito, MockMvc)**, **Containerization (Docker)**.
 
 ## 🛠 Tech Stack
 
@@ -50,6 +50,7 @@ A full-stack personal blog platform with server-side rendering.
 - **Java (Spring Boot):** My chosen framework for building robust, enterprise-grade APIs and web applications.
 - **Web Frontend:** Basic HTML, JavaScript, and CSS for building functional and responsive user interfaces.
 - **Testing:** Unit, Integration, and Mock-based testing (JUnit 5, Mockito, MockMvc) to ensure high-quality, maintainable code.
+- **Containerization:** Docker & Docker Compose for consistent, portable deployments.
 
 ## 🎯 Current Goals
 
