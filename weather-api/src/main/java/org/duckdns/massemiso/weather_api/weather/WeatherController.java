@@ -22,7 +22,7 @@ public class WeatherController {
   public Weather getTodayForecast(
       @PathVariable String cityCode,
       @RequestParam(required = false, defaultValue = "metric") String unit){
-    log.info("Getting today forecast for '{}'", cityCode);
+    log.info("Getting today forecast for '{}-{}'", cityCode, unit.toLowerCase());
     DataUnit dataUnit = DataUnit.valueOf(unit.toUpperCase());
     WeatherQuery query = new WeatherQuery(cityCode, Optional.of(LocalDate.now()), Optional.empty(), dataUnit);
     return weatherService.getForecast(query);
@@ -32,7 +32,7 @@ public class WeatherController {
   public Weather getWeekForecast(
       @PathVariable String cityCode,
       @RequestParam(required = false, defaultValue = "metric") String unit){
-    log.info("Getting week forecast for '{}'", cityCode);
+    log.info("Getting week forecast for '{}-{}'", cityCode, unit.toLowerCase());
     DataUnit dataUnit = DataUnit.valueOf(unit.toUpperCase());
     WeatherQuery query = new WeatherQuery(cityCode, Optional.of(LocalDate.now()),
           Optional.of(LocalDate.now().plusDays(7)), dataUnit);
