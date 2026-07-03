@@ -13,7 +13,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Weather{
-  Long id;
   String address;
   String timezone;
   String description;

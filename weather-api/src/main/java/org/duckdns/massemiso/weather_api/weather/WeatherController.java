@@ -1,5 +1,7 @@
 package org.duckdns.massemiso.weather_api.weather;
 
+import java.time.LocalDate;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +24,8 @@ public class WeatherController {
       @RequestParam(required = false, defaultValue = "metric") String unit){
     log.info("Getting today forecast for '{}'", cityCode);
     DataUnit dataUnit = DataUnit.valueOf(unit.toUpperCase());
-    return weatherService.getForecastToday(cityCode, dataUnit);
+    WeatherQuery query = new WeatherQuery(cityCode, Optional.of(LocalDate.now()), Optional.empty(), dataUnit);
+    return weatherService.getForecast(query);
   }
 
   @GetMapping("/{cityCode}/week")
@@ -31,6 +34,8 @@ public class WeatherController {
       @RequestParam(required = false, defaultValue = "metric") String unit){
     log.info("Getting week forecast for '{}'", cityCode);
     DataUnit dataUnit = DataUnit.valueOf(unit.toUpperCase());
-    return weatherService.getForecastWeek(cityCode, dataUnit);
+    WeatherQuery query = new WeatherQuery(cityCode, Optional.of(LocalDate.now()),
+          Optional.of(LocalDate.now().plusDays(7)), dataUnit);
+    return weatherService.getForecast(query);
   }
 }
