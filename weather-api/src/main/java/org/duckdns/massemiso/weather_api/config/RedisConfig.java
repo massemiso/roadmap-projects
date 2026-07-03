@@ -2,6 +2,7 @@ package org.duckdns.massemiso.weather_api.config;
 
 import java.time.Duration;
 import org.duckdns.massemiso.weather_api.weather.Weather;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -12,11 +13,13 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 @Configuration
 public class RedisConfig {
+  @Value("${redis.ttl.duration}")
+  private Integer ttlDuration;
 
   @Bean
   public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
     RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-        .entryTtl(Duration.ofMinutes(15))
+        .entryTtl(Duration.ofMinutes(ttlDuration))
         .disableCachingNullValues()
         .serializeValuesWith(RedisSerializationContext.SerializationPair
             .fromSerializer(new JacksonJsonRedisSerializer<>(Weather.class)));
