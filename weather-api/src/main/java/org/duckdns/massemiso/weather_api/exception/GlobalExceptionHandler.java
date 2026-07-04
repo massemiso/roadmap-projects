@@ -18,4 +18,10 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().build();
   }
 
+  @ExceptionHandler(WeatherServiceException.class)
+  public ResponseEntity<Void> handleWeatherServiceException(WeatherServiceException e) {
+    log.warn("Weather Service Error", e);
+    return ResponseEntity.status(e.getStatusCode()).build();
+  }
+
 }
