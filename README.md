@@ -44,6 +44,12 @@ A full-stack personal blog platform with server-side rendering.
 
 - **Concepts:** Spring Boot, Thymeleaf, Spring Security, Responsive Design, **Robust Testing (JUnit, Mockito, MockMvc)**, **Containerization (Docker)**.
 
+### 7. [Weather API](./weather-api)
+
+A REST API that integrates with external services to provide weather information.
+
+- **Concepts:** REST API Consumption, External API Integration, Caching, Asynchronous Service Orchestration.
+
 ## 🛠 Tech Stack
 
 - **Go (Golang):** My primary language for CLI tools and high-performance services, emphasizing standard library usage and clean architecture.
