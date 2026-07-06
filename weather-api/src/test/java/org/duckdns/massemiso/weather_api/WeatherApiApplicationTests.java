@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @Disabled
+// TODO: Integration tests for API
 class WeatherApiApplicationTests {
 
 	@Test
