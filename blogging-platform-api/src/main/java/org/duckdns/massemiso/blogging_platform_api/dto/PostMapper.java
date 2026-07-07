@@ -17,7 +17,9 @@ public class PostMapper {
         post.getTitle(),
         post.getContent(),
         post.getCategory(),
-        tags
+        tags,
+        post.getCreatedAt().toString(),
+        post.getUpdatedAt().toString()
     );
   }
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.duckdns.massemiso.blogging_platform_api.dto.PostMapper;
 import org.duckdns.massemiso.blogging_platform_api.dto.PostRequestDto;
 import org.duckdns.massemiso.blogging_platform_api.dto.PostResponseDto;
+import org.duckdns.massemiso.blogging_platform_api.exception.PostNotFoundException;
 import org.duckdns.massemiso.blogging_platform_api.persistence.Post;
 import org.duckdns.massemiso.blogging_platform_api.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,8 @@ public class PostService {
   public PostResponseDto getById(Long id) {
     log.info("Getting post id {}", id);
 
-    Post entity = this.postRepository.findById(id).orElseThrow();
+    Post entity = this.postRepository.findById(id)
+        .orElseThrow(() -> new PostNotFoundException(id));
     PostResponseDto dto = this.postMapper.toDto(entity);
 
     log.info("Returning post {}...", dto);
@@ -62,7 +64,8 @@ public class PostService {
   public PostResponseDto update(Long id, PostRequestDto requestDto) {
     log.info("Updating post {} with {}", id, requestDto);
 
-    Post entity = this.postRepository.findById(id).orElseThrow();
+    Post entity = this.postRepository.findById(id)
+        .orElseThrow(() -> new PostNotFoundException(id));
     Post other =  this.postMapper.toEntity(requestDto);
     entity.update(other);
     PostResponseDto dto = this.postMapper.toDto(entity);

@@ -7,5 +7,7 @@ public record PostResponseDto(
     String title,
     String content,
     String category,
-    List<String> tags
+    List<String> tags,
+    String createdAt,
+    String updatedAt
 ) {}

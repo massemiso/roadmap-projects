@@ -6,8 +6,8 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record PostRequestDto(
-   @NotEmpty String title,
-   @NotEmpty String content,
-   @NotEmpty String category,
-   @NotNull @Size(min = 1) List<String> tags
+   @NotEmpty(message = "must not be empty") String title,
+   @NotEmpty(message = "must not be empty") String content,
+   @NotEmpty(message = "must not be empty") String category,
+   @NotNull @Size(min = 1, message = "need to have at least 1 tag") List<String> tags
 ) {}
