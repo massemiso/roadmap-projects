@@ -25,59 +25,59 @@ public class PostService {
   }
 
   public List<PostResponseDto> getAll() {
-    log.info("SERVICE: Getting all posts");
+    log.info("Getting all posts");
 
     List<PostResponseDto> list = this.postRepository.findAll().stream()
         .map(postMapper::toDto)
         .toList();
-    log.info("SERVICE: Returning all posts {}...",
+    log.info("Returning all posts {}...",
         (list.size() > 3) ? list.subList(0, 3) : list);
 
     return list;
   }
 
   public PostResponseDto getById(Long id) {
-    log.info("SERVICE: Getting post id {}", id);
+    log.info("Getting post id {}", id);
 
     Post entity = this.postRepository.findById(id).orElseThrow();
     PostResponseDto dto = this.postMapper.toDto(entity);
 
-    log.info("SERVICE: Returning post {}...", dto);
+    log.info("Returning post {}...", dto);
     return dto;
   }
 
   @Transactional
   public PostResponseDto create(PostRequestDto requestDto) {
-    log.info("SERVICE: Creating post {}", requestDto);
+    log.info("Creating post {}", requestDto);
 
     Post entity = this.postMapper.toEntity(requestDto);
     entity = this.postRepository.save(entity);
     PostResponseDto dto = this.postMapper.toDto(entity);
 
-    log.info("SERVICE: Returning post {}...", dto);
+    log.info("Returning post {}...", dto);
     return dto;
   }
 
   @Transactional
   public PostResponseDto update(Long id, PostRequestDto requestDto) {
-    log.info("SERVICE: Updating post {} with {}", id, requestDto);
+    log.info("Updating post {} with {}", id, requestDto);
 
     Post entity = this.postRepository.findById(id).orElseThrow();
-    entity.update(postMapper.toEntity(requestDto));
-    entity = this.postRepository.save(entity);
+    Post other =  this.postMapper.toEntity(requestDto);
+    entity.update(other);
     PostResponseDto dto = this.postMapper.toDto(entity);
 
-    log.info("SERVICE: Returning post {}...", dto);
+    log.info("Returning post {}...", dto);
     return dto;
   }
 
   @Transactional
   public void delete(Long id) {
-    log.info("SERVICE: Deleting post {}", id);
+    log.info("Deleting post {}", id);
 
     Post entity = this.postRepository.findById(id).orElseThrow();
     this.postRepository.delete(entity);
 
-    log.info("SERVICE: Deleting post {}...", entity);
+    log.info("Deleting post {}...", entity);
   }
 }
