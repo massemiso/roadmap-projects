@@ -8,7 +8,9 @@ import org.duckdns.massemiso.blogging_platform_api.dto.PostRequestDto;
 import org.duckdns.massemiso.blogging_platform_api.dto.PostResponseDto;
 import org.duckdns.massemiso.blogging_platform_api.exception.PostNotFoundException;
 import org.duckdns.massemiso.blogging_platform_api.persistence.Post;
-import org.duckdns.massemiso.blogging_platform_api.repository.PostRepository;
+import org.duckdns.massemiso.blogging_platform_api.persistence.Tag;
+import org.duckdns.massemiso.blogging_platform_api.persistence.repository.PostRepository;
+import org.duckdns.massemiso.blogging_platform_api.persistence.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +20,13 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final PostMapper postMapper;
+  private final TagRepository tagRepository;
 
   @Autowired
-  public PostService(PostRepository postRepository, PostMapper postMapper){
+  public PostService(PostRepository postRepository, PostMapper postMapper, TagRepository tagRepository){
     this.postRepository = postRepository;
     this.postMapper = postMapper;
+    this.tagRepository = tagRepository;
   }
 
   public List<PostResponseDto> getAll() {
@@ -52,7 +56,11 @@ public class PostService {
   public PostResponseDto create(PostRequestDto requestDto) {
     log.info("Creating post {}", requestDto);
 
-    Post entity = this.postMapper.toEntity(requestDto);
+    List<Tag> tags = requestDto.tags().stream()
+        .map(name -> tagRepository.findByName(name)
+            .orElseGet(() -> Tag.builder().name(name).build()))
+        .toList();
+    Post entity = this.postMapper.toEntity(requestDto, tags);
     entity = this.postRepository.save(entity);
     PostResponseDto dto = this.postMapper.toDto(entity);
 
@@ -66,8 +74,11 @@ public class PostService {
 
     Post entity = this.postRepository.findById(id)
         .orElseThrow(() -> new PostNotFoundException(id));
-    Post other =  this.postMapper.toEntity(requestDto);
-    entity.update(other);
+    List<Tag> otherTags = requestDto.tags().stream()
+        .map(name -> tagRepository.findByName(name)
+            .orElseGet(() -> Tag.builder().name(name).build()))
+        .toList();
+    entity.update(requestDto.title(), requestDto.content(), requestDto.category(), otherTags);
     PostResponseDto dto = this.postMapper.toDto(entity);
 
     log.info("Returning post {}...", dto);

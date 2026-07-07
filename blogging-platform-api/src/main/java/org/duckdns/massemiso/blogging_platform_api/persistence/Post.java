@@ -63,18 +63,18 @@ public class Post {
     this.tags = tags;
   }
 
-  public void update(Post other) {
-    if (!other.title.isBlank()){
-      this.title = other.title;
+  public void update(String title, String content, String category, List<Tag> tags) {
+    if (!title.isBlank()){
+      this.title = title;
     }
-    if (!other.content.isBlank()){
-      this.content = other.content;
+    if (!content.isBlank()){
+      this.content = content;
     }
-    if (!other.category.isBlank()){
-      this.category = other.category;
+    if (!category.isBlank()){
+      this.category = category;
     }
-    if (!other.tags.isEmpty()){
-      this.tags = other.tags;
+    if (!tags.isEmpty()){
+      this.tags = tags;
     }
   }
 }

@@ -23,10 +23,7 @@ public class PostMapper {
     );
   }
 
-  public Post toEntity(PostRequestDto requestDto) {
-    List<Tag> tags = requestDto.tags().stream()
-        .map(t -> Tag.builder().name(t).build())
-        .toList();
+  public Post toEntity(PostRequestDto requestDto, List<Tag> tags) {
     return Post.builder()
         .title(requestDto.title())
         .content(requestDto.content())
