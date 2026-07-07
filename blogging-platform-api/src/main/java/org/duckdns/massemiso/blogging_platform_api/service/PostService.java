@@ -29,12 +29,29 @@ public class PostService {
     this.tagRepository = tagRepository;
   }
 
-  public List<PostResponseDto> getAll() {
+  public List<PostResponseDto> getAll(String term, String tagSearch) {
     log.info("Getting all posts");
 
-    List<PostResponseDto> list = this.postRepository.findAll().stream()
-        .map(postMapper::toDto)
-        .toList();
+    List<PostResponseDto> list;
+    if (!term.isBlank()){
+      list = this.postRepository
+          .findBySearchTerm(term)
+          .stream()
+          .map(postMapper::toDto)
+          .toList();
+    } else {
+      list = this.postRepository.findAll().stream()
+          .map(postMapper::toDto)
+          .toList();
+    }
+    if (!tagSearch.isBlank()){
+      list = list.stream()
+          .filter(dto -> dto.tags().stream()
+              .map(String::toLowerCase)
+              .toList()
+              .contains(tagSearch.toLowerCase()))
+          .toList();
+    }
     log.info("Returning all posts {}...",
         (list.size() > 3) ? list.subList(0, 3) : list);
 

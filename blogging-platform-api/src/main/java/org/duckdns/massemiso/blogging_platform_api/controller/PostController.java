@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,9 +28,11 @@ public class PostController {
   private PostService postService;
 
   @GetMapping
-  public ResponseEntity<List<PostResponseDto>> getAll(){
+  public ResponseEntity<List<PostResponseDto>> getAll(
+      @RequestParam(required = false, defaultValue = "") String term,
+      @RequestParam(required = false, defaultValue = "") String tag){
     log.info("REQUEST: getAll()");
-    List<PostResponseDto> dtos = postService.getAll();
+    List<PostResponseDto> dtos = postService.getAll(term, tag);
     log.debug("RESPONSE: getAll() =  {}", dtos);
     return ResponseEntity.ok(dtos);
   }
