@@ -106,7 +106,8 @@ public class PostService {
   public void delete(Long id) {
     log.info("Deleting post {}", id);
 
-    Post entity = this.postRepository.findById(id).orElseThrow();
+    Post entity = this.postRepository.findById(id)
+        .orElseThrow(() -> new PostNotFoundException(id));
     this.postRepository.delete(entity);
 
     log.info("Deleting post {}...", entity);
