@@ -50,6 +50,13 @@ A REST API that integrates with external services to provide weather information
 
 - **Concepts:** REST API Consumption, External API Integration, Caching, Asynchronous Service Orchestration.
 
+### 8. [Blogging Platform API](./blogging-platform-api)
+
+A professional-grade REST API for a blogging platform with PostgreSQL.
+
+- **Concepts:** PostgreSQL, Testcontainers, REST-Assured API Testing, JaCoCo Coverage.
+
+
 ## 🛠 Tech Stack
 
 - **Go (Golang):** My primary language for CLI tools and high-performance services, emphasizing standard library usage and clean architecture.
