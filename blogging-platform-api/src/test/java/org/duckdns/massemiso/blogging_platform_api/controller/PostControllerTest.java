@@ -35,10 +35,14 @@ class PostControllerTest {
   @ServiceConnection
   static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
 
+  private final PostRepository postRepository;
+  private final TagRepository tagRepository;
+
   @Autowired
-  private PostRepository postRepository;
-  @Autowired
-  private TagRepository tagRepository;
+  public PostControllerTest(PostRepository postRepository, TagRepository tagRepository) {
+    this.postRepository = postRepository;
+    this.tagRepository = tagRepository;
+  }
 
   @BeforeEach
   void setUp() {
