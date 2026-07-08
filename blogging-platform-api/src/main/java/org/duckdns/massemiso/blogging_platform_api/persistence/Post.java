@@ -41,7 +41,7 @@ public class Post {
   private String category;
 
   @NotEmpty(message = "A post must have at least one tag")
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToMany(cascade = {CascadeType.MERGE})
   @JoinTable(
       name = "post_tags",
       joinColumns = @JoinColumn(name = "post_id"),

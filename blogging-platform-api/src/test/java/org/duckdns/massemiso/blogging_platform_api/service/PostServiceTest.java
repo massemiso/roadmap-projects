@@ -327,6 +327,7 @@ class PostServiceTest {
     );
 
     when(tagRepository.findByName("new tag")).thenReturn(Optional.empty());
+    when(tagRepository.save(any(Tag.class))).thenReturn(new Tag("new tag"));
     when(postMapper.toEntity(eq(requestDto), anyList())).thenReturn(post);
     when(postRepository.save(post)).thenReturn(post);
     when(postMapper.toDto(post)).thenReturn(responseDto);
@@ -345,6 +346,7 @@ class PostServiceTest {
     assertThat(actual.updatedAt()).isEqualTo(responseDto.updatedAt());
 
     verify(tagRepository).findByName("new tag");
+    verify(tagRepository).save(any(Tag.class));
     verify(postMapper).toEntity(eq(requestDto), anyList());
     verify(postRepository).save(post);
     verify(postMapper).toDto(post);
@@ -381,6 +383,7 @@ class PostServiceTest {
 
     when(postRepository.findById(id)).thenReturn(Optional.of(post));
     when(tagRepository.findByName("new tag")).thenReturn(Optional.empty());
+    when(tagRepository.save(any(Tag.class))).thenReturn(new Tag("new tag"));
     when(postMapper.toDto(post)).thenReturn(responseDto);
 
     // act
@@ -399,6 +402,7 @@ class PostServiceTest {
 
     verify(postRepository).findById(id);
     verify(tagRepository).findByName("new tag");
+    verify(tagRepository).save(any(Tag.class));
     verify(postMapper).toDto(post);
   }
 

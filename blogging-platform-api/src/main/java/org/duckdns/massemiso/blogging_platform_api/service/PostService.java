@@ -73,10 +73,7 @@ public class PostService {
   public PostResponseDto create(PostRequestDto requestDto) {
     log.info("Creating post {}", requestDto);
 
-    List<Tag> tags = requestDto.tags().stream()
-        .map(name -> tagRepository.findByName(name)
-            .orElseGet(() -> Tag.builder().name(name).build()))
-        .toList();
+    List<Tag> tags = this.getOrCreateTags(requestDto);
     Post entity = this.postMapper.toEntity(requestDto, tags);
     entity = this.postRepository.save(entity);
     PostResponseDto dto = this.postMapper.toDto(entity);
@@ -91,10 +88,7 @@ public class PostService {
 
     Post entity = this.postRepository.findById(id)
         .orElseThrow(() -> new PostNotFoundException(id));
-    List<Tag> otherTags = requestDto.tags().stream()
-        .map(name -> tagRepository.findByName(name)
-            .orElseGet(() -> Tag.builder().name(name).build()))
-        .toList();
+    List<Tag> otherTags = this.getOrCreateTags(requestDto);
     entity.update(requestDto.title(), requestDto.content(), requestDto.category(), otherTags);
     PostResponseDto dto = this.postMapper.toDto(entity);
 
@@ -111,5 +105,12 @@ public class PostService {
     this.postRepository.delete(entity);
 
     log.info("Deleting post {}...", entity);
+  }
+
+  private List<Tag> getOrCreateTags(PostRequestDto requestDto) {
+    return requestDto.tags().stream()
+        .map(name -> tagRepository.findByName(name)
+            .orElseGet(() -> tagRepository.save(Tag.builder().name(name).build())))
+        .toList();
   }
 }
