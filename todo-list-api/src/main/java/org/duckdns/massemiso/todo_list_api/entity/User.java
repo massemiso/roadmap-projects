@@ -1,13 +1,16 @@
 package org.duckdns.massemiso.todo_list_api.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,10 +28,12 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @Column(nullable = false, unique = true)
-  private String email;
-  private String password;
   @CreatedDate private Instant createdAt;
   @LastModifiedDate private Instant modifiedAt;
+  private String email;
+  private String password;
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Todo> todos;
 
   @Builder
   public User(String email, String password) {

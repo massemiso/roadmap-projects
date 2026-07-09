@@ -1,11 +1,15 @@
 package org.duckdns.massemiso.todo_list_api.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.Builder;
@@ -24,10 +28,13 @@ public class Todo {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String title;
-  private Boolean completed;
   @CreatedDate private Instant createdAt;
   @LastModifiedDate private Instant modifiedAt;
+  private String title;
+  private Boolean completed;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
 
   @Builder
   public Todo(String title, Boolean completed) {
