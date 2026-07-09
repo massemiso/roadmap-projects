@@ -6,15 +6,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthMapper {
 
-  public User toUser(AuthRequestDto requestDto) {
+  public User toUser(AuthRequestDto requestDto, String encodedPassword) {
     return User.builder()
         .name(requestDto.name())
         .email(requestDto.email())
-        .password(requestDto.password())
+        .password(encodedPassword)
         .build();
   }
 
-  public AuthResponseDto toResponse() {
-    return new AuthResponseDto("SAMPLE_TOKEN");
+  public AuthResponseDto toResponse(String jwtToken) {
+    return new AuthResponseDto(jwtToken);
   }
 }
