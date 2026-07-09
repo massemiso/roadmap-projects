@@ -30,13 +30,15 @@ public class User {
   @Column(nullable = false, unique = true)
   @CreatedDate private Instant createdAt;
   @LastModifiedDate private Instant modifiedAt;
+  private String name;
   private String email;
   private String password;
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Todo> todos;
 
   @Builder
-  public User(String email, String password) {
+  public User(String name, String email, String password) {
+    this.name = name;
     this.email = email;
     this.password = password;
   }
@@ -45,6 +47,7 @@ public class User {
   public String toString() {
     return "User{" +
         "id=" + id +
+        ", name='" + name + '\'' +
         ", email='" + email + '\'' +
         ", password=[MASKED]" + '\'' +
         '}';
