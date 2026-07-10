@@ -2,7 +2,6 @@ package org.duckdns.massemiso.todo_list_api.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.duckdns.massemiso.todo_list_api.config.JwtTokenProvider;
 import org.duckdns.massemiso.todo_list_api.dto.TodoFilterDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoMapper;
 import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;

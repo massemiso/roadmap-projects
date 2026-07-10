@@ -1,6 +1,5 @@
 package org.duckdns.massemiso.todo_list_api.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.duckdns.massemiso.todo_list_api.dto.TodoFilterDto;
