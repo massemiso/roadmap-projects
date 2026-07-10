@@ -3,7 +3,20 @@ services:
     image: "postgres:17"
     environment:
       - "POSTGRES_DB=tododb"
-      - "POSTGRES_PASSWORD=secret"
       - "POSTGRES_USER=todo"
+      - "POSTGRES_PASSWORD=secret"
     ports:
       - "5432:5432"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-list
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      - "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/tododb"
+      - "SPRING_DATASOURCE_USERNAME=todo"
+      - "SPRING_DATASOURCE_PASSWORD=secret"
