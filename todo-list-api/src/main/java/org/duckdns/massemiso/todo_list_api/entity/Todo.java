@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,14 +32,27 @@ public class Todo {
   @CreatedDate private Instant createdAt;
   @LastModifiedDate private Instant modifiedAt;
   private String title;
+  private String description;
   private Boolean completed;
   @ManyToOne
   @JoinColumn(name = "user_id")
   private User user;
 
   @Builder
-  public Todo(String title, Boolean completed) {
+  public Todo(String title, String description, Boolean completed, User user) {
    this.title = title;
+   this.description = description;
    this.completed = completed;
+   this.user = user;
+  }
+
+  public void update(String title, String description, Boolean completed) {
+    if (!title.isBlank()){
+      this.title = title;
+    }
+    if (!description.isBlank()){
+      this.description = description;
+    }
+    this.completed = completed;
   }
 }
