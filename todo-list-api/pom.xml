@@ -31,6 +31,7 @@
     <rest-assured.version>6.0.0</rest-assured.version>
     <jacoco.version>0.8.11</jacoco.version>
     <java-jwt.version>4.5.0</java-jwt.version>
+    <testcontainers-version>2.0.5</testcontainers-version>
   </properties>
 	<dependencies>
 		<dependency>
@@ -92,13 +93,26 @@
       <version>${java-jwt.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers-junit-jupiter</artifactId>
+      <version>${testcontainers-version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers-postgresql</artifactId>
+      <version>${testcontainers-version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -185,6 +199,9 @@
         <configuration>
           <excludes>
             <exclude>**/TodoListApiApplication.class</exclude>
+            <exclude>**/repository/**</exclude>
+            <exclude>**/config/**</exclude>
+            <exclude>**/exception/**</exclude>
           </excludes>
         </configuration>
       </plugin>
