@@ -1,7 +1,6 @@
 package org.duckdns.massemiso.todo_list_api.service;
 
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdns.massemiso.todo_list_api.config.JwtTokenProvider;
 import org.duckdns.massemiso.todo_list_api.dto.TodoMapper;
@@ -14,6 +13,8 @@ import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFound;
 import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -67,14 +68,13 @@ public class TodoService {
     return responseDto;
   }
 
-  public List<TodoResponseDto> findAll() {
+  public Page<TodoResponseDto> findAll(Pageable pageable) {
     log.info("Trying to find all tasks");
 
-    List<Todo> todos = todoRepository.findAll();
-    List<TodoResponseDto> dtos = todos.stream().map(todoMapper::toDto).toList();
+    Page<TodoResponseDto> page = todoRepository.findAll(pageable).map(todoMapper::toDto);
 
-    log.info("Successfully found all tasks {}", dtos);
-    return dtos;
+    log.info("Successfully found {} tasks {}", page.getTotalElements(), page);
+    return page;
   }
 
   @Transactional

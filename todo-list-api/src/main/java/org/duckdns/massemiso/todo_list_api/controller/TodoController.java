@@ -3,11 +3,12 @@ package org.duckdns.massemiso.todo_list_api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoResponseDto;
 import org.duckdns.massemiso.todo_list_api.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,8 +57,8 @@ public class TodoController {
   }
 
   @GetMapping
-  public ResponseEntity<List<TodoResponseDto>> findAll() {
-    List<TodoResponseDto> dtos = this.todoService.findAll();
+  public ResponseEntity<Page<TodoResponseDto>> findAll(Pageable pageable) {
+    Page<TodoResponseDto> dtos = this.todoService.findAll(pageable);
     return ResponseEntity.ok(dtos);
   }
 
