@@ -56,6 +56,12 @@ A professional-grade REST API for a blogging platform with PostgreSQL.
 
 - **Concepts:** PostgreSQL, Testcontainers, REST-Assured API Testing, JaCoCo Coverage.
 
+### 9. [Todo List API](./todo-list-api)
+
+A secure, multi-user REST API with JWT authentication and dynamic filtering.
+
+- **Concepts:** JWT Authentication, Spring Security, JPA Specifications, Dynamic Filtering.
+
 
 ## 🛠 Tech Stack
 
