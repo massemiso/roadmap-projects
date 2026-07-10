@@ -3,6 +3,7 @@ package org.duckdns.massemiso.todo_list_api.service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdns.massemiso.todo_list_api.config.JwtTokenProvider;
+import org.duckdns.massemiso.todo_list_api.dto.TodoFilterDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoMapper;
 import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoResponseDto;
@@ -70,19 +71,10 @@ public class TodoService {
     return responseDto;
   }
 
-  public Page<TodoResponseDto> findAll(String title, String description, Boolean completed, Pageable pageable) {
+  public Page<TodoResponseDto> findAll(TodoFilterDto todoFilterDto, Pageable pageable) {
     log.info("Trying to find all tasks");
 
-    Specification<Todo> spec = Specification.unrestricted();
-    if (title != null && !title.isEmpty()) {
-      spec = spec.and(TodoSpecifications.titleLike(title));
-    }
-    if (description != null && !description.isEmpty()) {
-      spec = spec.and(TodoSpecifications.descriptionLike(description));
-    }
-    if (completed != null) {
-      spec = spec.and(TodoSpecifications.hasCompleted(completed));
-    }
+    Specification<Todo> spec = todoFilterDto.getSpecification();
     Page<TodoResponseDto> page = todoRepository.findAll(spec, pageable).map(todoMapper::toDto);
 
     log.info("Successfully found {} tasks {}", page.getTotalElements(), page);
