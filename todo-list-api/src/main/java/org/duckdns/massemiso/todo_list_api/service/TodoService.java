@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,32 +27,33 @@ public class TodoService {
 
   private final TodoRepository todoRepository;
   private final TodoMapper todoMapper;
-  private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
 
   @Autowired
   public TodoService(
       TodoRepository todoRepository,
       TodoMapper todoMapper,
-      JwtTokenProvider jwtTokenProvider,
       UserRepository userRepository) {
     this.todoRepository = todoRepository;
     this.todoMapper = todoMapper;
-    this.jwtTokenProvider = jwtTokenProvider;
     this.userRepository = userRepository;
   }
 
-  private User getUserFromJwtToken(String jwtToken) {
+  private String getUserEmail(){
+    return SecurityContextHolder.getContext().getAuthentication().getName();
+  }
+
+  private User getUser() {
    return userRepository
-       .findByEmail(jwtTokenProvider.getEmail(jwtToken))
+       .findByEmail(this.getUserEmail())
        .orElseThrow(EmailNotFound::new);
   }
 
   @Transactional
-  public TodoResponseDto create(TodoRequestDto requestDto, String jwtToken) {
+  public TodoResponseDto create(TodoRequestDto requestDto) {
     log.info("Creating new todo task {}", requestDto);
 
-    Todo todo = todoMapper.toEntity(requestDto, this.getUserFromJwtToken(jwtToken));
+    Todo todo = todoMapper.toEntity(requestDto, this.getUser());
     todo = todoRepository.save(todo);
     TodoResponseDto responseDto = todoMapper.toDto(todo);
 
@@ -62,9 +64,11 @@ public class TodoService {
   public TodoResponseDto findById(Long id) {
     log.info("Trying to find task {}", id);
 
+    String email = this.getUserEmail();
     Todo todo = todoRepository
-        .findById(id)
-        .orElseThrow(() -> new TodoIdNotFound(id));
+        .findByUser_EmailAndId(email, id)
+        .orElseThrow(() -> new TodoIdNotFound(id)); // If not found, they don't own it or it doesn't exist
+
     TodoResponseDto responseDto = todoMapper.toDto(todo);
 
     log.info("Successfully found todo task {}", responseDto);
@@ -74,8 +78,13 @@ public class TodoService {
   public Page<TodoResponseDto> findAll(TodoFilterDto todoFilterDto, Pageable pageable) {
     log.info("Trying to find all tasks");
 
+    String email = this.getUserEmail();
     Specification<Todo> spec = todoFilterDto.getSpecification();
-    Page<TodoResponseDto> page = todoRepository.findAll(spec, pageable).map(todoMapper::toDto);
+    spec = spec.and(TodoSpecifications.ownedBy(email));
+    
+    Page<TodoResponseDto> page = todoRepository
+        .findAll(spec, pageable)
+        .map(todoMapper::toDto);
 
     log.info("Successfully found {} tasks {}", page.getTotalElements(), page);
     return page;
@@ -85,8 +94,9 @@ public class TodoService {
   public TodoResponseDto update(Long id, TodoRequestDto requestDto) {
     log.info("Trying to update task {} with {}", id, requestDto);
 
+    String email = this.getUserEmail();
     Todo todo = todoRepository
-        .findById(id)
+        .findByUser_EmailAndId(email, id)
         .orElseThrow(() -> new TodoIdNotFound(id));
     todo.update(requestDto.title(), requestDto.description(), requestDto.completed());
     TodoResponseDto responseDto = todoMapper.toDto(todo);
@@ -99,8 +109,9 @@ public class TodoService {
   public void delete(Long id) {
     log.info("Trying to delete task {}", id);
 
+    String email = this.getUserEmail();
     Todo todo = todoRepository
-        .findById(id)
+        .findByUser_EmailAndId(email, id)
         .orElseThrow(() -> new TodoIdNotFound(id));
     todoRepository.delete(todo);
 

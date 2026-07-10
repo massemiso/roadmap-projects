@@ -32,20 +32,10 @@ public class TodoController {
     this.todoService = todoService;
   }
 
-  private String extractToken(HttpServletRequest request){
-    String token = request.getHeader("Authorization");
-    if (token.startsWith("Bearer ")) {
-      token = token.substring(7); // Removes "Bearer "
-    }
-    return token;
-  }
-
   @PostMapping
   public ResponseEntity<TodoResponseDto> create(
-      HttpServletRequest request,
       @Valid @RequestBody TodoRequestDto requestDto){
-    String jwtToken = this.extractToken(request);
-    TodoResponseDto responseDto = this.todoService.create(requestDto, jwtToken);
+    TodoResponseDto responseDto = this.todoService.create(requestDto);
     return ResponseEntity
         .created(URI.create("/todos/" + responseDto.id()))
         .body(responseDto);

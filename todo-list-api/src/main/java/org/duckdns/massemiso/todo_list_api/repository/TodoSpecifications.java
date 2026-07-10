@@ -38,4 +38,9 @@ public class TodoSpecifications {
         completed == null ? null : criteriaBuilder.equal(root.get("completed"), completed);
   }
 
+  public static Specification<Todo> ownedBy(String email) {
+    return (root, query, criteriaBuilder) ->
+        criteriaBuilder.equal(root.get("user").get("email"), email);
+  }
+
 }
