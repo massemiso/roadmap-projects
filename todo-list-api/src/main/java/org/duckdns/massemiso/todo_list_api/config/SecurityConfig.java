@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final String[] AUTH_WHITELIST = {
-      "/login", "/register"
+      "/login", "/register", "/error"
   };
 
   private final UserService userService;
