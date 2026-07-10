@@ -1,6 +1,5 @@
 package org.duckdns.massemiso.todo_list_api.exception;
 
-import jakarta.validation.constraints.Email;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

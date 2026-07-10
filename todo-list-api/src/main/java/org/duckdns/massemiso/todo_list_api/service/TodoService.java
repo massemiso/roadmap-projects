@@ -9,6 +9,8 @@ import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoResponseDto;
 import org.duckdns.massemiso.todo_list_api.entity.Todo;
 import org.duckdns.massemiso.todo_list_api.entity.User;
+import org.duckdns.massemiso.todo_list_api.exception.EmailNotFound;
+import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFound;
 import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,9 @@ public class TodoService {
   }
 
   private User getUserFromJwtToken(String jwtToken) {
-   return userRepository.findByEmail(jwtTokenProvider.getEmail(jwtToken)).orElseThrow();
+   return userRepository
+       .findByEmail(jwtTokenProvider.getEmail(jwtToken))
+       .orElseThrow(EmailNotFound::new);
   }
 
   @Transactional
@@ -54,7 +58,9 @@ public class TodoService {
   public TodoResponseDto findById(Long id) {
     log.info("Trying to find task {}", id);
 
-    Todo todo = todoRepository.findById(id).orElseThrow();
+    Todo todo = todoRepository
+        .findById(id)
+        .orElseThrow(() -> new TodoIdNotFound(id));
     TodoResponseDto responseDto = todoMapper.toDto(todo);
 
     log.info("Successfully found todo task {}", responseDto);
@@ -75,7 +81,9 @@ public class TodoService {
   public TodoResponseDto update(Long id, TodoRequestDto requestDto) {
     log.info("Trying to update task {} with {}", id, requestDto);
 
-    Todo todo =  todoRepository.findById(id).orElseThrow();
+    Todo todo = todoRepository
+        .findById(id)
+        .orElseThrow(() -> new TodoIdNotFound(id));
     todo.update(requestDto.title(), requestDto.description(), requestDto.completed());
     TodoResponseDto responseDto = todoMapper.toDto(todo);
 
@@ -87,7 +95,9 @@ public class TodoService {
   public void delete(Long id) {
     log.info("Trying to delete task {}", id);
 
-    Todo todo =  todoRepository.findById(id).orElseThrow();
+    Todo todo = todoRepository
+        .findById(id)
+        .orElseThrow(() -> new TodoIdNotFound(id));
     todoRepository.delete(todo);
 
     log.info("Successfully deleted task {}", id);

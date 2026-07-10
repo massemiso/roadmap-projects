@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.todo_list_api.config;
 
+import org.duckdns.massemiso.todo_list_api.exception.AuthExceptionHandler;
 import org.duckdns.massemiso.todo_list_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,15 +25,18 @@ public class SecurityConfig {
       "/login", "/register"
   };
 
-  private final JwtTokenProvider jwtTokenProvider;
   private final UserService userService;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final AuthExceptionHandler authExceptionHandler;
 
   @Autowired
   public SecurityConfig(
       UserService userService,
-      JwtTokenProvider jwtTokenProvider) {
+      JwtTokenProvider jwtTokenProvider,
+      AuthExceptionHandler authExceptionHandler) {
     this.userService = userService;
     this.jwtTokenProvider = jwtTokenProvider;
+    this.authExceptionHandler = authExceptionHandler;
   }
 
   @Bean
@@ -43,6 +47,8 @@ public class SecurityConfig {
             session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(authExceptionHandler))
         .authorizeHttpRequests(auth -> {
           auth.requestMatchers(AUTH_WHITELIST).permitAll();
           auth.anyRequest().authenticated();

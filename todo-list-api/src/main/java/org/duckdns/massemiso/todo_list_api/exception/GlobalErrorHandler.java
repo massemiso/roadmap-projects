@@ -1,0 +1,101 @@
+package org.duckdns.massemiso.todo_list_api.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ControllerAdvice
+@Slf4j
+public class GlobalErrorHandler {
+
+  private ResponseEntity<ErrorResponse> helperHandler(
+      String logMsg,
+      Exception ex,
+      HttpStatus status,
+      String msg) {
+    log.warn(logMsg, ex);
+    ErrorResponse errorResponse = new ErrorResponse(
+        LocalDateTime.now(),
+        status.value(),
+        msg,
+        List.of(ex.getMessage())
+    );
+    return ResponseEntity.status(status).body(errorResponse);
+  }
+
+  // Authorization exceptions
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDeniedException(HttpServletRequest request,
+      AccessDeniedException ex) {
+    String apiMsg = String.format(
+        "You do not have the required permissions to perform a %s on %s", request.getMethod(),
+        request.getRequestURI());
+    String logMsg = String.format(
+        "403 FORBIDDEN: User '%s' doesn't have the required permissions to perform a %s on %s",
+        request.getRemoteUser(), request.getMethod(), request.getRequestURI());
+    return helperHandler(
+        logMsg,
+        ex,
+        HttpStatus.FORBIDDEN,
+        apiMsg
+    );
+  }
+
+  @ExceptionHandler(EmailAlreadyExists.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExists ex) {
+    return this.helperHandler(
+        "409 CONFLICT: Email already exists",
+        ex,
+        HttpStatus.CONFLICT,
+        "Email already exists"
+    );
+  }
+
+  @ExceptionHandler(EmailNotFound.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseEntity<ErrorResponse> handleEmailNotFound(EmailNotFound ex) {
+    return this.helperHandler(
+        "404 NOT FOUND: Email not found",
+        ex,
+        HttpStatus.NOT_FOUND,
+        "Email not found"
+    );
+  }
+
+  @ExceptionHandler(TodoIdNotFound.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseEntity<ErrorResponse> handleTodoIdNotFound(TodoIdNotFound ex) {
+    return this.helperHandler(
+        "404 NOT FOUND: Todo ID not found",
+        ex,
+        HttpStatus.NOT_FOUND,
+        "Todo ID not found"
+    );
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+    log.warn("400 BAD REQUEST: Validation failed", ex);
+    List<String> details = ex.getBindingResult().getFieldErrors().stream()
+        .map(err -> err.getField() + ": " + err.getDefaultMessage())
+        .toList();
+    ErrorResponse error = new ErrorResponse(
+        LocalDateTime.now(),
+        HttpStatus.BAD_REQUEST.value(),
+        "Validation Failed",
+        details
+    );
+    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+  }
+
+}
