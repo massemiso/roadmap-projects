@@ -41,8 +41,8 @@ The API will be available at `http://localhost:8080`.
 
 | Endpoint | Method | Status Codes | Description |
 | :--- | :--- | :--- | :--- |
-| `/auth/register` | POST | 201, 400 | Register a new user |
-| `/auth/login` | POST | 200, 401 | Authenticate and get JWT |
+| `/register` | POST | 201, 400 | Register a new user |
+| `/login` | POST | 200, 401 | Authenticate and get JWT |
 | `/todos` | GET | 200 | Retrieve all todos (filtered) |
 | `/todos` | POST | 201, 400 | Create a new todo |
 | `/todos/{id}` | PUT | 200, 404 | Update todo status/content |
