@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,8 +58,12 @@ public class TodoController {
   }
 
   @GetMapping
-  public ResponseEntity<Page<TodoResponseDto>> findAll(Pageable pageable) {
-    Page<TodoResponseDto> dtos = this.todoService.findAll(pageable);
+  public ResponseEntity<Page<TodoResponseDto>> findAll(
+      @RequestParam(required = false) String title,
+      @RequestParam(required = false) String description,
+      @RequestParam(required = false) Boolean completed,
+      Pageable pageable) {
+    Page<TodoResponseDto> dtos = this.todoService.findAll(title, description, completed, pageable);
     return ResponseEntity.ok(dtos);
   }
 

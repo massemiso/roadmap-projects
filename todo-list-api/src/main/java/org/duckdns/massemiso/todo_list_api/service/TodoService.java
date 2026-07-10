@@ -11,10 +11,12 @@ import org.duckdns.massemiso.todo_list_api.entity.User;
 import org.duckdns.massemiso.todo_list_api.exception.EmailNotFound;
 import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFound;
 import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
+import org.duckdns.massemiso.todo_list_api.repository.TodoSpecifications;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -68,10 +70,20 @@ public class TodoService {
     return responseDto;
   }
 
-  public Page<TodoResponseDto> findAll(Pageable pageable) {
+  public Page<TodoResponseDto> findAll(String title, String description, Boolean completed, Pageable pageable) {
     log.info("Trying to find all tasks");
 
-    Page<TodoResponseDto> page = todoRepository.findAll(pageable).map(todoMapper::toDto);
+    Specification<Todo> spec = Specification.unrestricted();
+    if (title != null && !title.isEmpty()) {
+      spec = spec.and(TodoSpecifications.titleLike(title));
+    }
+    if (description != null && !description.isEmpty()) {
+      spec = spec.and(TodoSpecifications.descriptionLike(description));
+    }
+    if (completed != null) {
+      spec = spec.and(TodoSpecifications.hasCompleted(completed));
+    }
+    Page<TodoResponseDto> page = todoRepository.findAll(spec, pageable).map(todoMapper::toDto);
 
     log.info("Successfully found {} tasks {}", page.getTotalElements(), page);
     return page;
