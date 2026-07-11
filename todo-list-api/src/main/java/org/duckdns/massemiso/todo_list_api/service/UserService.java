@@ -2,7 +2,7 @@ package org.duckdns.massemiso.todo_list_api.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.duckdns.massemiso.todo_list_api.entity.User;
-import org.duckdns.massemiso.todo_list_api.exception.EmailNotFound;
+import org.duckdns.massemiso.todo_list_api.exception.EmailNotFoundException;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +26,7 @@ public class UserService implements UserDetailsService {
     log.info("Loading user by email: {}", email);
     User user = userRepository
         .findByEmail(email)
-        .orElseThrow(() -> new EmailNotFound(email));
+        .orElseThrow(() -> new EmailNotFoundException(email));
     log.info("Found user: {}", user);
     return org.springframework.security.core.userdetails.User.builder()
         .username(user.getEmail())

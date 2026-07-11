@@ -12,7 +12,7 @@ import org.duckdns.massemiso.todo_list_api.dto.AuthMapper;
 import org.duckdns.massemiso.todo_list_api.dto.AuthRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.AuthResponseDto;
 import org.duckdns.massemiso.todo_list_api.entity.User;
-import org.duckdns.massemiso.todo_list_api.exception.EmailAlreadyExists;
+import org.duckdns.massemiso.todo_list_api.exception.EmailAlreadyExistsException;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +66,7 @@ public class AuthServiceTest {
     when(userRepository.findByEmail("email@ex.com")).thenReturn(
         Optional.of(User.builder().build()));
 
-    assertThrows(EmailAlreadyExists.class, () -> authService.register(request));
+    assertThrows(EmailAlreadyExistsException.class, () -> authService.register(request));
   }
 
   @Test

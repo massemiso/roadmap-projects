@@ -6,7 +6,7 @@ import org.duckdns.massemiso.todo_list_api.dto.AuthMapper;
 import org.duckdns.massemiso.todo_list_api.dto.AuthRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.AuthResponseDto;
 import org.duckdns.massemiso.todo_list_api.entity.User;
-import org.duckdns.massemiso.todo_list_api.exception.EmailAlreadyExists;
+import org.duckdns.massemiso.todo_list_api.exception.EmailAlreadyExistsException;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +40,7 @@ public class AuthService {
     log.info("Registering user: {}", requestDto);
 
     if (userRepository.findByEmail(requestDto.email()).isPresent()) {
-      throw new EmailAlreadyExists(requestDto.email());
+      throw new EmailAlreadyExistsException(requestDto.email());
     }
 
     String encodedPassword = passwordEncoder.encode(requestDto.password());

@@ -49,9 +49,9 @@ public class GlobalErrorHandler {
     );
   }
 
-  @ExceptionHandler(EmailAlreadyExists.class)
+  @ExceptionHandler(EmailAlreadyExistsException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
-  public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExists ex) {
+  public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
     return this.helperHandler(
         "409 CONFLICT: Email already exists",
         ex,
@@ -60,9 +60,9 @@ public class GlobalErrorHandler {
     );
   }
 
-  @ExceptionHandler(EmailNotFound.class)
+  @ExceptionHandler(EmailNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ResponseEntity<ErrorResponse> handleEmailNotFound(EmailNotFound ex) {
+  public ResponseEntity<ErrorResponse> handleEmailNotFound(EmailNotFoundException ex) {
     return this.helperHandler(
         "404 NOT FOUND: Email not found",
         ex,
@@ -71,9 +71,9 @@ public class GlobalErrorHandler {
     );
   }
 
-  @ExceptionHandler(TodoIdNotFound.class)
+  @ExceptionHandler(TodoIdNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ResponseEntity<ErrorResponse> handleTodoIdNotFound(TodoIdNotFound ex) {
+  public ResponseEntity<ErrorResponse> handleTodoIdNotFound(TodoIdNotFoundException ex) {
     return this.helperHandler(
         "404 NOT FOUND: Todo ID not found",
         ex,
@@ -98,4 +98,14 @@ public class GlobalErrorHandler {
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(RateExceededException.class)
+  @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+  public ResponseEntity<ErrorResponse> handleRateExceededException(RateExceededException ex) {
+    return this.helperHandler(
+        "429 TOO MANY REQUESTS: Rate limit exceeded",
+        ex,
+        HttpStatus.TOO_MANY_REQUESTS,
+        "Rate limit exceeded"
+    );
+  }
 }

@@ -17,8 +17,8 @@ import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoResponseDto;
 import org.duckdns.massemiso.todo_list_api.entity.Todo;
 import org.duckdns.massemiso.todo_list_api.entity.User;
-import org.duckdns.massemiso.todo_list_api.exception.EmailNotFound;
-import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFound;
+import org.duckdns.massemiso.todo_list_api.exception.EmailNotFoundException;
+import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFoundException;
 import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +80,7 @@ public class TodoServiceTest {
     TodoRequestDto requestDto = new TodoRequestDto("Title", "Desc", false);
     when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.empty());
 
-    assertThrows(EmailNotFound.class, () -> todoService.create(requestDto));
+    assertThrows(EmailNotFoundException.class, () -> todoService.create(requestDto));
   }
 
   @Test
@@ -103,7 +103,7 @@ public class TodoServiceTest {
   void findById_ShouldThrowException_WhenTodoNotFoundOrNotOwned() {
     when(todoRepository.findByUser_EmailAndId("user@example.com", 1L)).thenReturn(Optional.empty());
 
-    assertThrows(TodoIdNotFound.class, () -> todoService.findById(1L));
+    assertThrows(TodoIdNotFoundException.class, () -> todoService.findById(1L));
   }
 
   @Test
@@ -145,7 +145,7 @@ public class TodoServiceTest {
     TodoRequestDto request = new TodoRequestDto("T", "D", false);
     when(todoRepository.findByUser_EmailAndId("user@example.com", 1L)).thenReturn(Optional.empty());
 
-    assertThrows(TodoIdNotFound.class, () -> todoService.update(1L, request));
+    assertThrows(TodoIdNotFoundException.class, () -> todoService.update(1L, request));
   }
 
   @Test
@@ -163,6 +163,6 @@ public class TodoServiceTest {
   void delete_ShouldThrowException_WhenTodoNotFoundOrNotOwned() {
     when(todoRepository.findByUser_EmailAndId("user@example.com", 1L)).thenReturn(Optional.empty());
 
-    assertThrows(TodoIdNotFound.class, () -> todoService.delete(1L));
+    assertThrows(TodoIdNotFoundException.class, () -> todoService.delete(1L));
   }
 }

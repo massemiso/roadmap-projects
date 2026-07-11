@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class TodoIdNotFound extends RuntimeException {
+public class TodoIdNotFoundException extends RuntimeException {
 
-  public TodoIdNotFound(Long id) {
+  public TodoIdNotFoundException(Long id) {
     super(String.format("To-do with ID %d not found", id));
   }
 }

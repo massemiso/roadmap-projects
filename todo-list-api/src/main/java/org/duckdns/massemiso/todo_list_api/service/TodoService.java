@@ -8,8 +8,8 @@ import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoResponseDto;
 import org.duckdns.massemiso.todo_list_api.entity.Todo;
 import org.duckdns.massemiso.todo_list_api.entity.User;
-import org.duckdns.massemiso.todo_list_api.exception.EmailNotFound;
-import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFound;
+import org.duckdns.massemiso.todo_list_api.exception.EmailNotFoundException;
+import org.duckdns.massemiso.todo_list_api.exception.TodoIdNotFoundException;
 import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
 import org.duckdns.massemiso.todo_list_api.repository.TodoSpecifications;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
@@ -45,7 +45,7 @@ public class TodoService {
   private User getUser() {
    return userRepository
        .findByEmail(this.getUserEmail())
-       .orElseThrow(EmailNotFound::new);
+       .orElseThrow(EmailNotFoundException::new);
   }
 
   @Transactional
@@ -66,7 +66,7 @@ public class TodoService {
     String email = this.getUserEmail();
     Todo todo = todoRepository
         .findByUser_EmailAndId(email, id)
-        .orElseThrow(() -> new TodoIdNotFound(id)); // If not found, they don't own it or it doesn't exist
+        .orElseThrow(() -> new TodoIdNotFoundException(id)); // If not found, they don't own it or it doesn't exist
 
     TodoResponseDto responseDto = todoMapper.toDto(todo);
 
@@ -96,7 +96,7 @@ public class TodoService {
     String email = this.getUserEmail();
     Todo todo = todoRepository
         .findByUser_EmailAndId(email, id)
-        .orElseThrow(() -> new TodoIdNotFound(id));
+        .orElseThrow(() -> new TodoIdNotFoundException(id));
     todo.update(requestDto.title(), requestDto.description(), requestDto.completed());
     TodoResponseDto responseDto = todoMapper.toDto(todo);
 
@@ -111,7 +111,7 @@ public class TodoService {
     String email = this.getUserEmail();
     Todo todo = todoRepository
         .findByUser_EmailAndId(email, id)
-        .orElseThrow(() -> new TodoIdNotFound(id));
+        .orElseThrow(() -> new TodoIdNotFoundException(id));
     todoRepository.delete(todo);
 
     log.info("Successfully deleted task {}", id);
