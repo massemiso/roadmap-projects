@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
   @Value("${jwt.secret}")
   private String secretKey;
-  private final long validityInMilliseconds = 3600000; // 1 hour
 
-  public String createToken(String email) {
+  public String createToken(String email, long validityInMilliseconds) {
     return JWT.create()
         .withSubject(email)
         .withIssuedAt(new Date())

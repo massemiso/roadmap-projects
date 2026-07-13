@@ -26,7 +26,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
   private Bucket getBucket(String clientId){
     return buckets.computeIfAbsent(clientId, k ->
         Bucket.builder()
-            .addLimit(Bandwidth.classic(10, Refill.intervally(1, Duration.ofSeconds(30))))
+            .addLimit(Bandwidth.classic(1000, Refill.intervally(1000, Duration.ofSeconds(30))))
             .build());
   }
 

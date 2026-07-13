@@ -9,7 +9,8 @@ A secure, multi-user Todo List REST API built with Spring Boot, PostgreSQL, and 
 - **User Authentication:** Secure JWT-based authentication for private user data.
 - **Dynamic Filtering:** Advanced search/filtering for todos (title, status, etc.) using JPA Specifications.
 - **Database Persistence:** Reliable storage with PostgreSQL.
-- **Robust Security:** Implements Spring Security with custom JWT filters.
+- **Rate Limiting & Throttling:** Implemented request limiting to protect API stability.
+- **Refresh Token Mechanism:** Added secure token rotation for better UX and security.
 - **Containerized:** Full Docker support for portable development.
 
 ## ℹ️ Project Context
@@ -39,18 +40,19 @@ The API will be available at `http://localhost:8080`.
 
 ## 📋 API Endpoints
 
-| Endpoint | Method | Status Codes | Description |
-| :--- | :--- | :--- | :--- |
-| `/register` | POST | 201, 400 | Register a new user |
-| `/login` | POST | 200, 401 | Authenticate and get JWT |
-| `/todos` | GET | 200 | Retrieve all todos (filtered) |
-| `/todos` | POST | 201, 400 | Create a new todo |
-| `/todos/{id}` | PUT | 200, 404 | Update todo status/content |
-| `/todos/{id}` | DELETE | 204, 404 | Delete a todo |
+| Endpoint         | Method | Status Codes | Description                       |
+|:-----------------| :--- | :--- |:----------------------------------|
+| `/auth/register` | POST | 201, 400 | Register a new user               |
+| `/auth/login`    | POST | 200, 401 | Authenticate and get JWT          |
+| `/auth/refresh`  | POST | 200, 401 | Get a new JWT given refresh token |
+| `/todos`         | GET | 200 | Retrieve all todos (filtered)     |
+| `/todos`         | POST | 201, 400 | Create a new todo                 |
+| `/todos/{id}`    | PUT | 200, 404 | Update todo status/content        |
+| `/todos/{id}`    | DELETE | 204, 404 | Delete a todo                     |
 
 ## 🛠️ Technical Architecture
 
-- **Security:** JWT (JSON Web Token) based authentication with stateless session management.
+- **Security:** JWT (JSON Web Token) based authentication with stateless session management, including refresh tokens and rate limiting.
 - **Dynamic Querying:** JPA Specifications used for complex filtering in the `Todo` list.
 - **Data Persistence:** Spring Data JPA with PostgreSQL.
 - **Layered Design:** Strict separation of DTOs, Entities, Services, and Controllers.
@@ -66,14 +68,14 @@ The API will be available at `http://localhost:8080`.
 
 ## 🧠 Key Learnings
 
-- **JWT Auth:** Implementing custom filters and token providers in Spring Security.
+- **JWT Auth & Refresh Tokens:** Implementing custom filters, token providers, and secure rotation for extended sessions.
+- **Rate Limiting:** Managing request throughput to ensure API stability.
 - **JPA Specifications:** Building flexible query dynamic filters.
 - **Exception Strategy:** Custom `GlobalErrorHandler` for cleaner API responses.
 
 ## 🚧 Future Improvements
 
-- [ ] **Rate Limiting & Throttling:** Implementing request limiting to protect API stability.
-- [ ] **Refresh Token Mechanism:** Adding secure token rotation for better UX and security.
+- [ ] **Enhanced Search:** Implementing a global search feature for todos.
 
 ---
 

@@ -7,6 +7,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.duckdns.massemiso.todo_list_api.dto.AuthRequestDto;
 import org.duckdns.massemiso.todo_list_api.dto.TodoRequestDto;
+import org.duckdns.massemiso.todo_list_api.repository.RefreshTokenRepository;
 import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,8 @@ class TodoControllerTest {
   private UserRepository userRepository;
   @Autowired
   private TodoRepository todoRepository;
+  @Autowired
+  private RefreshTokenRepository refreshTokenRepository;
 
   private String token;
 
@@ -43,17 +46,18 @@ class TodoControllerTest {
     RestAssured.baseURI = "http://localhost";
     RestAssured.port = port;
     todoRepository.deleteAllInBatch();
+    refreshTokenRepository.deleteAllInBatch();
     userRepository.deleteAllInBatch();
 
     AuthRequestDto authRequest = new AuthRequestDto("Test", "test@test.com", "password");
-    given().contentType(ContentType.JSON).body(authRequest).post("/register");
+    given().contentType(ContentType.JSON).body(authRequest).post("/auth/register");
 
     token = given()
         .contentType(ContentType.JSON)
         .body(authRequest)
-        .post("/login")
+        .post("/auth/login")
         .jsonPath()
-        .getString("token");
+        .getString("accessToken");
   }
 
   @Test

@@ -2,7 +2,9 @@ package org.duckdns.massemiso.todo_list_api.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.duckdns.massemiso.todo_list_api.entity.RefreshToken;
 import org.duckdns.massemiso.todo_list_api.entity.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class AuthMapperTest {
@@ -21,7 +23,9 @@ public class AuthMapperTest {
 
   @Test
   void toResponse_ShouldMapToken() {
-    AuthResponseDto response = authMapper.toResponse("token");
-    assertEquals("token", response.token());
+    AuthResponseDto response = authMapper.toResponse("accessToken",
+        RefreshToken.builder().token("refreshToken").build());
+    assertEquals("accessToken", response.accessToken());
+    assertEquals("refreshToken", response.refreshToken());
   }
 }

@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.todo_list_api.dto;
 
+import org.duckdns.massemiso.todo_list_api.entity.RefreshToken;
 import org.duckdns.massemiso.todo_list_api.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ public class AuthMapper {
         .build();
   }
 
-  public AuthResponseDto toResponse(String jwtToken) {
-    return new AuthResponseDto(jwtToken);
+  public AuthResponseDto toResponse(String accessToken, RefreshToken refreshToken) {
+    return new AuthResponseDto(accessToken, refreshToken.getToken());
   }
 }

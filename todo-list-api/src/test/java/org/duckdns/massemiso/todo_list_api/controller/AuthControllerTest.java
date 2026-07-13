@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.duckdns.massemiso.todo_list_api.dto.AuthRequestDto;
+import org.duckdns.massemiso.todo_list_api.repository.RefreshTokenRepository;
+import org.duckdns.massemiso.todo_list_api.repository.TodoRepository;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,81 +34,88 @@ class AuthControllerTest {
 
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private RefreshTokenRepository refreshTokenRepository;
+  @Autowired
+  private TodoRepository todoRepository;
 
   @BeforeEach
   void setUp() {
     RestAssured.baseURI = "http://localhost";
     RestAssured.port = port;
+    todoRepository.deleteAllInBatch();
+    refreshTokenRepository.deleteAllInBatch();
     userRepository.deleteAllInBatch();
   }
 
   @Test
   void register_ShouldReturn201_WhenRequestIsValid() {
     AuthRequestDto request = new AuthRequestDto("Test", "test@test.com", "password");
-    given()
-        .contentType(ContentType.JSON)
-        .body(request)
+        given()
+            .contentType(ContentType.JSON)
+            .body(request)
         .when()
-        .post("/register")
+            .post("/auth/register")
         .then()
-        .statusCode(HttpStatus.CREATED.value())
-        .body("token", notNullValue());
-  }
+            .statusCode(HttpStatus.CREATED.value())
+            .body("accessToken", notNullValue());
+    }
 
-  @Test
-  void register_ShouldReturn409_WhenEmailAlreadyExists() {
-    AuthRequestDto request = new AuthRequestDto("Test", "test@test.com", "password");
-    // Pre-register
-    given().contentType(ContentType.JSON).body(request).post("/register");
+    @Test
+    void register_ShouldReturn409_WhenEmailAlreadyExists() {
+        AuthRequestDto request = new AuthRequestDto("Test", "test@test.com", "password");
+        // Pre-register
+        given().contentType(ContentType.JSON).body(request).post("/auth/register");
 
-    given()
-        .contentType(ContentType.JSON)
-        .body(request)
+        given()
+            .contentType(ContentType.JSON)
+            .body(request)
         .when()
-        .post("/register")
+            .post("/auth/register")
         .then()
-        .statusCode(HttpStatus.CONFLICT.value())
-        .body("message", is("Email already exists"));
-  }
+            .statusCode(HttpStatus.CONFLICT.value())
+            .body("message", is("Email already exists"));
+    }
 
-  @Test
-  void register_ShouldReturn400_WhenInvalidRequest() {
-    AuthRequestDto request = new AuthRequestDto("", "", "");
-    given()
-        .contentType(ContentType.JSON)
-        .body(request)
+    @Test
+    void register_ShouldReturn400_WhenInvalidRequest() {
+        AuthRequestDto request = new AuthRequestDto("", "", "");
+        given()
+            .contentType(ContentType.JSON)
+            .body(request)
         .when()
-        .post("/register")
+            .post("/auth/register")
         .then()
-        .statusCode(HttpStatus.BAD_REQUEST.value())
-        .body("message", is("Validation Failed"));
-  }
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .body("message", is("Validation Failed"));
+    }
 
-  @Test
-  void login_ShouldReturn200_WhenCredentialsValid() {
-    AuthRequestDto registerReq = new AuthRequestDto("Test", "login@test.com", "password");
-    given().contentType(ContentType.JSON).body(registerReq).post("/register");
+    @Test
+    void login_ShouldReturn200_WhenCredentialsValid() {
+        AuthRequestDto registerReq = new AuthRequestDto("Test", "login@test.com", "password");
+        given().contentType(ContentType.JSON).body(registerReq).post("/auth/register");
 
-    given()
-        .contentType(ContentType.JSON)
-        .body(registerReq)
+        given()
+            .contentType(ContentType.JSON)
+            .body(registerReq)
         .when()
-        .post("/login")
+            .post("/auth/login")
         .then()
-        .statusCode(HttpStatus.OK.value())
-        .body("token", notNullValue());
-  }
+            .statusCode(HttpStatus.OK.value())
+            .body("accessToken", notNullValue());
+    }
 
-  @Test
-  void login_ShouldReturn404_WhenUserDoesNotExist() {
-    AuthRequestDto request = new AuthRequestDto("Test", "unknown@test.com", "password");
-    given()
-        .contentType(ContentType.JSON)
-        .body(request)
+    @Test
+    void login_ShouldReturn404_WhenUserDoesNotExist() {
+        AuthRequestDto request = new AuthRequestDto("Test", "unknown@test.com", "password");
+        given()
+            .contentType(ContentType.JSON)
+            .body(request)
         .when()
-        .post("/login")
+            .post("/auth/login")
         .then()
-        .statusCode(HttpStatus.NOT_FOUND.value())
-        .body("message", is("Email not found"));
-  }
+            .statusCode(HttpStatus.NOT_FOUND.value())
+            .body("message", is("Email not found"));
+    }
+
 }
