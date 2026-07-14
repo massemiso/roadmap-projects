@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -53,9 +54,9 @@ public class AuthServiceTest {
     when(passwordEncoder.encode("pass")).thenReturn("encoded");
     when(authMapper.toUser(request, "encoded")).thenReturn(user);
     when(userRepository.save(user)).thenReturn(user);
+    when(passwordEncoder.matches("pass", user.getPassword())).thenReturn(true);
 
     // Mocking the internal login call
-    when(userService.loadUserByUsername("email@ex.com")).thenReturn(mock(UserDetails.class));
     when(jwtTokenProvider.createToken("email@ex.com", 15*60000)).thenReturn("token");
     when(refreshTokenRepository.findByUser(any())).thenReturn(Optional.empty());
     when(authMapper.toResponse(eq("token"), any())).thenReturn(new AuthResponseDto("token", "rt"));
@@ -81,13 +82,30 @@ public class AuthServiceTest {
     AuthRequestDto request = new AuthRequestDto("Name", "email@ex.com", "pass");
     User user = User.builder().email("email@ex.com").build();
 
-    when(userService.loadUserByUsername("email@ex.com")).thenReturn(mock(UserDetails.class));
     when(userRepository.findByEmail("email@ex.com")).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches("pass", user.getPassword())).thenReturn(true);
     when(jwtTokenProvider.createToken("email@ex.com", 15*60000)).thenReturn("token");
     when(refreshTokenRepository.findByUser(user)).thenReturn(Optional.empty());
     when(authMapper.toResponse(eq("token"), any())).thenReturn(new AuthResponseDto("token", "rt"));
 
     AuthResponseDto result = authService.login(request);
     assertEquals("token", result.accessToken());
+  }
+
+  @Test
+  void login_GivenBadPassword_ShouldReturn401Unauthorized() {
+    AuthRequestDto request = new AuthRequestDto("Name", "email@ex.com", "pass");
+    User user = User.builder().email("email@ex.com").build();
+
+    when(userRepository.findByEmail("email@ex.com")).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches("pass", user.getPassword())).thenReturn(false);
+
+    assertThrows(BadCredentialsException.class, () -> authService.login(request));
+
+    verify(userRepository).findByEmail("email@ex.com");
+    verify(passwordEncoder).matches("pass", user.getPassword());
+    verify(jwtTokenProvider, never()).createToken(anyString(), anyLong());
+    verify(refreshTokenRepository, never()).findByUser(any());
+    verify(authMapper, never()).toResponse(any(), any());
   }
 }

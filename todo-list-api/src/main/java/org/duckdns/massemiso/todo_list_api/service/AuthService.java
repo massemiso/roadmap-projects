@@ -13,6 +13,7 @@ import org.duckdns.massemiso.todo_list_api.exception.EmailNotFoundException;
 import org.duckdns.massemiso.todo_list_api.repository.RefreshTokenRepository;
 import org.duckdns.massemiso.todo_list_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -66,9 +67,12 @@ public class AuthService {
   public AuthResponseDto login(AuthRequestDto requestDto) {
     log.info("Logining user: {}", requestDto);
 
-    UserDetails userDetails = userService.loadUserByUsername(requestDto.email());
     User user = userRepository.findByEmail(requestDto.email())
         .orElseThrow(() -> new EmailNotFoundException(requestDto.email()));
+
+    if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
+      throw new BadCredentialsException("Invalid password");
+    }
 
     return createTokensForUser(user);
   }
