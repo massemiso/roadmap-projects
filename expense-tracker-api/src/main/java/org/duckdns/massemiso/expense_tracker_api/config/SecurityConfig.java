@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.expense_tracker_api.config;
 
+import org.duckdns.massemiso.expense_tracker_api.exception.AuthExceptionHandler;
 import org.duckdns.massemiso.expense_tracker_api.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,14 +26,15 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
-      JwtAuthenticationFilter jwtAuthenticationFilter)
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      AuthExceptionHandler authExceptionHandler)
       throws Exception {
     return http
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//        .exceptionHandling(ex -> ex
-//            .authenticationEntryPoint(authExceptionHandler))
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(authExceptionHandler))
         .authorizeHttpRequests(auth -> {
           auth.requestMatchers(WHITELIST).permitAll();
           auth.anyRequest().authenticated();
