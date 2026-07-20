@@ -2,6 +2,7 @@ package org.duckdns.massemiso.expense_tracker_api.controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseFilterDto;
 import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseRequestDto;
 import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseResponseDto;
 import org.duckdns.massemiso.expense_tracker_api.service.ExpenseService;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,9 +47,11 @@ public class ExpenseController {
   }
 
   @GetMapping
-  public ResponseEntity<Page<ExpenseResponseDto>> getById(Pageable pageable){
+  public ResponseEntity<Page<ExpenseResponseDto>> getById(
+      @ModelAttribute ExpenseFilterDto expenseFilterDto,
+      Pageable pageable){
     return ResponseEntity
-        .ok(this.expenseService.getAll(pageable));
+        .ok(this.expenseService.getAll(expenseFilterDto, pageable));
   }
 
   @PutMapping("/{id}")

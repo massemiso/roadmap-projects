@@ -2,6 +2,7 @@ package org.duckdns.massemiso.expense_tracker_api.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseFilterDto;
 import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseMapper;
 import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseRequestDto;
 import org.duckdns.massemiso.expense_tracker_api.dto.ExpenseResponseDto;
@@ -9,10 +10,12 @@ import org.duckdns.massemiso.expense_tracker_api.exception.ExpenseNotFoundExcept
 import org.duckdns.massemiso.expense_tracker_api.model.Expense;
 import org.duckdns.massemiso.expense_tracker_api.model.UserEntity;
 import org.duckdns.massemiso.expense_tracker_api.repository.ExpenseRepository;
+import org.duckdns.massemiso.expense_tracker_api.repository.ExpenseSpecifications;
 import org.duckdns.massemiso.expense_tracker_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -65,14 +68,19 @@ public class ExpenseService {
     return responseDto;
   }
 
-  public Page<ExpenseResponseDto> getAll(Pageable pageable) {
+  public Page<ExpenseResponseDto> getAll(ExpenseFilterDto expenseFilterDto, Pageable pageable) {
     log.info("Getting page of expenses");
 
-    Page<Expense> expenses = expenseRepository.findAll(pageable);
-    Page<ExpenseResponseDto> responseDtos = expenses.map(expenseMapper::toDto);
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    Specification<Expense> spec = expenseFilterDto.getSpecification();
+    spec = spec.and(ExpenseSpecifications.ownedBy(username));
 
-    log.info("Found {} expenses", responseDtos.getTotalElements());
-    return responseDtos;
+    Page<ExpenseResponseDto> expenses = expenseRepository
+        .findAll(spec, pageable)
+        .map(expenseMapper::toDto);
+
+    log.info("Found {} expenses", expenses.getTotalElements());
+    return expenses;
   }
 
   @Transactional
