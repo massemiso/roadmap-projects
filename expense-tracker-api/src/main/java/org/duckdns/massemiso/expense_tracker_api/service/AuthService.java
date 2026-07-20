@@ -5,6 +5,7 @@ import org.duckdns.massemiso.expense_tracker_api.config.JwtTokenProvider;
 import org.duckdns.massemiso.expense_tracker_api.dto.AuthMapper;
 import org.duckdns.massemiso.expense_tracker_api.dto.AuthRequestDto;
 import org.duckdns.massemiso.expense_tracker_api.dto.AuthResponseDto;
+import org.duckdns.massemiso.expense_tracker_api.exception.UserEntityAlreadyExists;
 import org.duckdns.massemiso.expense_tracker_api.model.UserEntity;
 import org.duckdns.massemiso.expense_tracker_api.repository.UserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,6 +54,10 @@ public class AuthService {
 
   public AuthResponseDto register(AuthRequestDto authRequestDto) {
     log.info("Trying to register user {}", authRequestDto);
+
+    if(userRepository.findByUsername(authRequestDto.username()).isPresent()){
+      throw new UserEntityAlreadyExists(authRequestDto.username());
+    }
 
     UserEntity user = authMapper.toEntity(authRequestDto,
         passwordEncoder.encode(authRequestDto.password()));
