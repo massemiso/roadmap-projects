@@ -31,6 +31,8 @@
     <rest-assured.version>6.0.0</rest-assured.version>
     <jacoco.version>0.8.11</jacoco.version>
     <java-jwt.version>4.5.0</java-jwt.version>
+    <jackson-datatype-jsr310.version>2.21.4</jackson-datatype-jsr310.version>
+    <springdoc.version>2.8.5</springdoc.version>
   </properties>
   <dependencies>
     <dependency>
@@ -50,12 +52,14 @@
       <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-docker-compose</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
+<!-- ENABLE THIS IF YOU DON'T WANT TO USE DOCKER FOR APP DEPLOYMENT -->
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.boot</groupId>-->
+<!--      <artifactId>spring-boot-docker-compose</artifactId>-->
+<!--      <scope>runtime</scope>-->
+<!--      <optional>true</optional>-->
+<!--    </dependency>-->
+
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
@@ -115,12 +119,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.21.4</version>
+      <version>${jackson-datatype-jsr310.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.8.5</version>
+      <version>${springdoc.version}</version>
     </dependency>
   </dependencies>
 
@@ -194,7 +198,7 @@
         </executions>
         <configuration>
           <excludes>
-            <exclude>**/TodoListApiApplication.class</exclude>
+            <exclude>**/ExpenseTrackerApiApplication.class</exclude>
             <exclude>**/repository/**</exclude>
             <exclude>**/config/**</exclude>
             <exclude>**/exception/**</exclude>
