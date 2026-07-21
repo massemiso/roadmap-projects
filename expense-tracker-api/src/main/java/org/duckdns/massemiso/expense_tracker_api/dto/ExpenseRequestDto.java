@@ -7,7 +7,11 @@ import java.time.LocalDate;
 import org.duckdns.massemiso.expense_tracker_api.model.Category;
 
 public record ExpenseRequestDto(
-    @NotEmpty String description,
-    @NotNull Category category,
-    @PastOrPresent LocalDate date
+    @NotEmpty(message = "must not be empty") String description,
+
+    @NotNull(message = "must be not empty and a valid category") Category category,
+
+    @NotNull(message = "must not be null")
+    @PastOrPresent(message = "must not be in a future date")
+    LocalDate date
 ) { }

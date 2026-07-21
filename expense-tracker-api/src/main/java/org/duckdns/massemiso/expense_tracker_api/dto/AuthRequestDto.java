@@ -3,8 +3,8 @@ package org.duckdns.massemiso.expense_tracker_api.dto;
 import jakarta.validation.constraints.NotEmpty;
 
 public record AuthRequestDto (
-    @NotEmpty String username,
-    @NotEmpty String password
+    @NotEmpty(message = "must be unique and not empty") String username,
+    @NotEmpty(message = "must be not empty") String password
 ) {
 
   @Override
