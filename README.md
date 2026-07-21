@@ -62,6 +62,12 @@ A secure, multi-user REST API with JWT authentication and dynamic filtering.
 
 - **Concepts:** JWT Authentication, Spring Security, JPA Specifications, Dynamic Filtering.
 
+### 10. [Expense Tracker API](./expense-tracker-api)
+
+A robust financial management API with Swagger documentation and multi-user support.
+
+- **Concepts:** RESTful API Design, SpringDoc (Swagger UI), PostgreSQL, Advanced Filtering (JPA Specifications).
+
 
 ## 🛠 Tech Stack
 
