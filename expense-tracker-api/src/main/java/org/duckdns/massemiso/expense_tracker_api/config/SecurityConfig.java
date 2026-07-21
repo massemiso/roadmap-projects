@@ -20,7 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final String[] WHITELIST = {
-      "/error", "/auth/*"
+      "/error",
+      "/auth/**",
+      "/swagger-ui/**",
+      "/swagger-ui.html",
+      "/v3/api-docs/**"
   };
 
   @Bean

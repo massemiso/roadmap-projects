@@ -1,5 +1,7 @@
 package org.duckdns.massemiso.expense_tracker_api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
@@ -9,13 +11,21 @@ import org.duckdns.massemiso.expense_tracker_api.repository.ExpenseSpecification
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 
+@Schema(description = "DTO for filtering expenses")
 public record ExpenseFilterDto(
+    @Schema(example = "PAST_WEEK", requiredMode = RequiredMode.NOT_REQUIRED)
     @Enumerated(EnumType.STRING)
     ExpenseFilter filter,
+
+    @Schema(requiredMode = RequiredMode.NOT_REQUIRED)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate firstDate,
+
+    @Schema(requiredMode = RequiredMode.NOT_REQUIRED)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate secondDate,
+
+    @Schema(requiredMode = RequiredMode.NOT_REQUIRED)
     @Enumerated(EnumType.STRING)
     Category category
 ) {

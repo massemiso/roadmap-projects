@@ -1,10 +1,16 @@
 package org.duckdns.massemiso.expense_tracker_api.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
+@Schema(description = "DTO used to register/login a user")
 public record AuthRequestDto (
-    @NotEmpty(message = "must be unique and not empty") String username,
-    @NotEmpty(message = "must be not empty") String password
+    @Schema(description = "Username of the user", example = "user")
+    @NotBlank @Size(min = 3, message = "must be at least 3 characters long") String username,
+
+    @Schema(description = "Password of the user", example = "123456")
+    @NotBlank @Size(min = 6, message = "must be at least 6 characters long") String password
 ) {
 
   @Override
