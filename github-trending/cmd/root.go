@@ -6,14 +6,22 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"slices"
 
 	"github.com/spf13/cobra"
 )
 
 var (
 	duration string
-	limit    int
+	limit    uint
 )
+
+var validDurations []string = []string{
+	"day",
+	"week",
+	"month",
+	"year",
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "github-trending",
@@ -22,6 +30,10 @@ var rootCmd = &cobra.Command{
 The tool allows users to specify a time range (day, week, month, or year) to filter the trending repositories.
 It fetches data from the GitHub API and present it in a user-friendly format.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if !slices.Contains(validDurations, duration) {
+			fmt.Printf("ERROR! duration has to be one of %v\n", validDurations)
+			return
+		}
 		fmt.Printf("RUNNING! duration=%s, limit=%d\n", duration, limit)
 	},
 }
@@ -35,5 +47,5 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().StringVar(&duration, "duration", "week", "Specify the time: day, week, month, year")
-	rootCmd.Flags().IntVar(&limit, "limit", 10, "Specify the number of repositories to show")
+	rootCmd.Flags().UintVar(&limit, "limit", 10, "Specify the number of repositories to show")
 }
