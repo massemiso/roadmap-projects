@@ -5,8 +5,11 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"slices"
+
+	"github-trending/internal/github"
 
 	"github.com/spf13/cobra"
 )
@@ -29,12 +32,24 @@ var rootCmd = &cobra.Command{
 	Long: `Display the trending repositories in a clear and readable format.
 The tool allows users to specify a time range (day, week, month, or year) to filter the trending repositories.
 It fetches data from the GitHub API and present it in a user-friendly format.`,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		if !slices.Contains(validDurations, duration) {
 			fmt.Printf("ERROR! duration has to be one of %v\n", validDurations)
 			return
 		}
-		fmt.Printf("RUNNING! duration=%s, limit=%d\n", duration, limit)
+
+		service := github.NewGitHubService()
+		trending, err := service.GetTrendingRepos(duration, limit)
+		if err != nil {
+			log.Fatalln(err.Error())
+			return
+		}
+
+		fmt.Printf("Number of repos: %d\n", len(trending))
+		for _, repo := range trending {
+			fmt.Println(repo.ToString())
+		}
 	},
 }
 
