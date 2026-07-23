@@ -10,6 +10,7 @@ import (
 	"slices"
 
 	"github-trending/internal/github"
+	"github-trending/internal/ui"
 
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,7 @@ import (
 var (
 	duration string
 	limit    uint
+	long     bool
 )
 
 var validDurations []string = []string{
@@ -46,10 +48,8 @@ It fetches data from the GitHub API and present it in a user-friendly format.`,
 			return
 		}
 
-		fmt.Printf("Number of repos: %d\n", len(trending))
-		for _, repo := range trending {
-			fmt.Println(repo.ToString())
-		}
+		ui := ui.NewUI(os.Stdout)
+		ui.PrintRepos(trending, long)
 	},
 }
 
@@ -63,4 +63,5 @@ func Execute() {
 func init() {
 	rootCmd.Flags().StringVar(&duration, "duration", "week", "Specify the time: day, week, month, year")
 	rootCmd.Flags().UintVar(&limit, "limit", 10, "Specify the number of repositories to show")
+	rootCmd.Flags().BoolVar(&long, "long", false, "If you want to display the entire description")
 }
