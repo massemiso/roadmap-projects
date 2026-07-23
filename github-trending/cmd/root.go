@@ -28,6 +28,26 @@ var validDurations []string = []string{
 	"year",
 }
 
+func runE(
+	service github.GitHubServiceInterface,
+	ui ui.UIInterface,
+	duration string,
+	limit uint,
+	long bool,
+) error {
+	if !slices.Contains(validDurations, duration) {
+		return fmt.Errorf("duration has to be one of %v", validDurations)
+	}
+
+	trending, err := service.GetTrendingRepos(duration, limit)
+	if err != nil {
+		return err
+	}
+
+	ui.PrintRepos(trending, long)
+	return nil
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "github-trending",
 	Short: "CLI application that talks to GitHub API and shows the trending repositories",
@@ -36,20 +56,11 @@ The tool allows users to specify a time range (day, week, month, or year) to fil
 It fetches data from the GitHub API and present it in a user-friendly format.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if !slices.Contains(validDurations, duration) {
-			fmt.Printf("ERROR! duration has to be one of %v\n", validDurations)
-			return
-		}
-
 		service := github.NewGitHubService()
-		trending, err := service.GetTrendingRepos(duration, limit)
-		if err != nil {
-			log.Fatalln(err.Error())
-			return
-		}
-
 		ui := ui.NewUI(os.Stdout)
-		ui.PrintRepos(trending, long)
+		if err := runE(service, ui, duration, limit, long); err != nil {
+			log.Fatalln(err.Error())
+		}
 	},
 }
 

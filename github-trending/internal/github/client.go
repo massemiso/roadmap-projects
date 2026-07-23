@@ -50,7 +50,7 @@ func (s *GitHubService) makeQuery(duration string, limit uint) string {
 	var diff time.Duration
 	switch duration {
 	case "day":
-		diff = 0 * time.Hour
+		diff = 24 * time.Hour
 	case "week":
 		diff = 24 * time.Hour * 7
 	case "month":

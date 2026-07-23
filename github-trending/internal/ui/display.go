@@ -11,7 +11,7 @@ import (
 )
 
 type UIInterface interface {
-	PrintRepos([]github.TrendingRepo)
+	PrintRepos([]github.TrendingRepo, bool)
 }
 
 type UI struct {
