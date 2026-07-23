@@ -68,6 +68,11 @@ A robust financial management API with Swagger documentation and multi-user supp
 
 - **Concepts:** RESTful API Design, SpringDoc (Swagger UI), PostgreSQL, Advanced Filtering (JPA Specifications).
 
+### 11. [GitHub Trending CLI](./github-trending)
+
+A high-performance CLI tool to fetch and display trending GitHub repositories.
+
+- **Concepts:** CLI Design, REST API Consumption, JSON Parsing, Go Standard Library.
 
 ## 🛠 Tech Stack
 
