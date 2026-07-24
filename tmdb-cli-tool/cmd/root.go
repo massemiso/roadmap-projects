@@ -18,30 +18,12 @@ import (
 )
 
 var (
-	typeVar string
-	text    bool
-	lang    string
+	typeVar    string
+	text       bool
+	lang       string
+	validTypes []string = []string{"playing", "popular", "top", "upcoming"}
+	validLangs []string = []string{"en", "es", "fr", "de", "it", "pt", "zh", "ja", "ko", "ru"}
 )
-
-var validTypes []string = []string{
-	"playing",
-	"popular",
-	"top",
-	"upcoming",
-}
-
-var validLangs []string = []string{
-	"en",
-	"es",
-	"fr",
-	"de",
-	"it",
-	"pt",
-	"zh",
-	"ja",
-	"ko",
-	"ru",
-}
 
 func runE(
 	service tmdb.TMDBServiceInterface,
