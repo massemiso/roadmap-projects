@@ -11,7 +11,7 @@ import (
 )
 
 type TMDBServiceInterface interface {
-	FetchMovies(typeVar string) ([]Movie, error)
+	FetchMovies(typeVar string, lang string) ([]Movie, error)
 }
 
 type TMDBService struct {
@@ -27,8 +27,8 @@ func NewTMDBService() *TMDBService {
 	}
 }
 
-func (s *TMDBService) FetchMovies(typeVar string) ([]Movie, error) {
-	url := s.makeQuery(typeVar)
+func (s *TMDBService) FetchMovies(typeVar string, lang string) ([]Movie, error) {
+	url := s.makeQuery(typeVar, lang)
 
 	body, bodyErr := s.conn(url)
 	if bodyErr != nil {
@@ -43,12 +43,13 @@ func (s *TMDBService) FetchMovies(typeVar string) ([]Movie, error) {
 	return movies, nil
 }
 
-func (s *TMDBService) makeQuery(typeVar string) string {
+func (s *TMDBService) makeQuery(typeVar string, lang string) string {
+	partQuery := "https://api.themoviedb.org/3/movie/%s?language=" + lang
 	queries := map[string]string{
-		"playing":  "https://api.themoviedb.org/3/movie/now_playing",
-		"popular":  "https://api.themoviedb.org/3/movie/popular",
-		"top":      "https://api.themoviedb.org/3/movie/top_rated",
-		"upcoming": "https://api.themoviedb.org/3/movie/upcoming",
+		"playing":  fmt.Sprintf(partQuery, "now_playing"),
+		"popular":  fmt.Sprintf(partQuery, "popular"),
+		"top":      fmt.Sprintf(partQuery, "top_rated"),
+		"upcoming": fmt.Sprintf(partQuery, "upcoming"),
 	}
 	return queries[typeVar]
 }

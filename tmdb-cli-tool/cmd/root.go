@@ -20,6 +20,7 @@ import (
 var (
 	typeVar string
 	text    bool
+	lang    string
 )
 
 var validTypes []string = []string{
@@ -29,17 +30,35 @@ var validTypes []string = []string{
 	"upcoming",
 }
 
+var validLangs []string = []string{
+	"en",
+	"es",
+	"fr",
+	"de",
+	"it",
+	"pt",
+	"zh",
+	"ja",
+	"ko",
+	"ru",
+}
+
 func runE(
 	service tmdb.TMDBServiceInterface,
 	ui ui.UIInterface,
 	typeArg string,
 	text bool,
+	lang string,
 ) error {
 	if !slices.Contains(validTypes, typeVar) {
 		return fmt.Errorf("type has to be one of %s", validTypes)
 	}
 
-	movies, serviceErr := service.FetchMovies(typeArg)
+	if !slices.Contains(validLangs, lang) {
+		return fmt.Errorf("lang has to be one of %s", validLangs)
+	}
+
+	movies, serviceErr := service.FetchMovies(typeArg, lang)
 	if serviceErr != nil {
 		return serviceErr
 	}
@@ -54,7 +73,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		service := tmdb.NewTMDBService()
 		ui := ui.NewUI(os.Stdout)
-		if err := runE(service, ui, typeVar, text); err != nil {
+		if err := runE(service, ui, typeVar, text, lang); err != nil {
 			log.Fatalln(err.Error())
 		}
 	},
@@ -75,4 +94,5 @@ func init() {
 
 	rootCmd.Flags().StringVar(&typeVar, "type", "", "Type of movie you want to see")
 	rootCmd.Flags().BoolVar(&text, "text", false, "Show movies info as a continued text")
+	rootCmd.Flags().StringVar(&lang, "lang", "en", "In what language you want the data")
 }
