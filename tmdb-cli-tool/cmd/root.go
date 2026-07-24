@@ -50,7 +50,7 @@ func runE(
 	text bool,
 	lang string,
 ) error {
-	if !slices.Contains(validTypes, typeVar) {
+	if !slices.Contains(validTypes, typeArg) {
 		return fmt.Errorf("type has to be one of %s", validTypes)
 	}
 
@@ -87,12 +87,17 @@ func Execute() {
 }
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-		os.Exit(1)
-	}
-
+	checkApiKey()
 	rootCmd.Flags().StringVar(&typeVar, "type", "", "Type of movie you want to see")
 	rootCmd.Flags().BoolVar(&text, "text", false, "Show movies info as a continued text")
 	rootCmd.Flags().StringVar(&lang, "lang", "en", "In what language you want the data")
+}
+
+func checkApiKey() {
+	godotenv.Load()
+	_, apiKeyExists := os.LookupEnv("TMDB_API_KEY")
+	if !apiKeyExists {
+		log.Fatalln("No api key found! Exiting")
+		os.Exit(1)
+	}
 }
