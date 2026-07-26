@@ -74,6 +74,12 @@ A high-performance CLI tool to fetch and display trending GitHub repositories.
 
 - **Concepts:** CLI Design, REST API Consumption, JSON Parsing, Go Standard Library.
 
+### 12. [TMDB CLI Tool](./tmdb-cli-tool)
+
+A CLI tool to interact with The Movie Database API for fetching trending and searching movies.
+
+- **Concepts:** External API Integration, API Key Management, CLI Design, Error Handling.
+
 ## 🛠 Tech Stack
 
 - **Go (Golang):** My primary language for CLI tools and high-performance services, emphasizing standard library usage and clean architecture.
