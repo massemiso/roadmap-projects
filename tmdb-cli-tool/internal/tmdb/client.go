@@ -15,15 +15,17 @@ type TMDBServiceInterface interface {
 }
 
 type TMDBService struct {
-	Client *http.Client
-	ApiKey string
+	Client  *http.Client
+	ApiKey  string
+	BaseURL string
 }
 
 func NewTMDBService() *TMDBService {
 	api_key := os.Getenv("TMDB_API_KEY")
 	return &TMDBService{
-		Client: &http.Client{Timeout: time.Second * 10},
-		ApiKey: api_key,
+		Client:  &http.Client{Timeout: time.Second * 10},
+		ApiKey:  api_key,
+		BaseURL: "https://api.themoviedb.org",
 	}
 }
 
@@ -44,7 +46,7 @@ func (s *TMDBService) FetchMovies(typeVar string, lang string) ([]Movie, error) 
 }
 
 func (s *TMDBService) makeQuery(typeVar string, lang string) string {
-	partQuery := "https://api.themoviedb.org/3/movie/%s?language=" + lang
+	partQuery := s.BaseURL + "/3/movie/%s?language=" + lang
 	queries := map[string]string{
 		"playing":  fmt.Sprintf(partQuery, "now_playing"),
 		"popular":  fmt.Sprintf(partQuery, "popular"),
