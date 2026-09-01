@@ -132,7 +132,7 @@ go test ./... -v
 
 ## 📋 TODO
 
-- [ ] **Caching:** Implement a local cache (e.g., in `/tmp`) to store API responses for 5 minutes, reducing network calls and avoiding rate limits.
+- [x] **Caching:** Implement a local cache (e.g., in `/tmp`) to store API responses for 5 minutes, reducing network calls and avoiding rate limits.
 
 ---
 

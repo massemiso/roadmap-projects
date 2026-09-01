@@ -25,6 +25,7 @@ func TestGetUserActivity(t *testing.T) {
 	// 2. Initialize service pointing to our local server instead of github.com
 	service := NewGitHubService()
 	service.BaseURL = server.URL + "/%s" // Override URL to point to mock server
+	service.CacheDir = t.TempDir()
 
 	// 3. Execute
 	activities, err := service.GetUserActivity("testuser", -1)
@@ -50,6 +51,7 @@ func TestGetUserActivity_NotFound(t *testing.T) {
 
 	service := NewGitHubService()
 	service.BaseURL = server.URL + "/%s"
+	service.CacheDir = t.TempDir()
 
 	_, err := service.GetUserActivity("testuser", -1)
 
@@ -78,6 +80,7 @@ func TestGetUserActivity_WithLimitOf3(t *testing.T) {
 
 	service := NewGitHubService()
 	service.BaseURL = server.URL + "/%s"
+	service.CacheDir = t.TempDir()
 
 	activities, err := service.GetUserActivity("testuser", 3)
 	if err != nil {

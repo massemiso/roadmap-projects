@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -14,21 +16,42 @@ type GitHubServiceInterface interface {
 }
 
 type GitHubService struct {
-	Client  *http.Client
-	BaseURL string
+	Client   *http.Client
+	BaseURL  string
+	CacheDir string
 }
 
 func NewGitHubService() *GitHubService {
 	const github_api = "https://api.github.com/users/%s/events"
 	return &GitHubService{
-		Client:  &http.Client{Timeout: time.Second * 2},
-		BaseURL: github_api,
+		Client:   &http.Client{Timeout: time.Second * 2},
+		BaseURL:  github_api,
+		CacheDir: os.TempDir(),
 	}
 }
 
 func (s *GitHubService) GetUserActivity(username string, limit int) ([]UserActivity, error) {
 	url := fmt.Sprintf(s.BaseURL, username)
-	body, bodyErr := s.conn(url, username)
+	cachePath := s.getCachePath(username)
+
+	var body []byte
+	var bodyErr error
+
+	// Check cache
+	if info, err := os.Stat(cachePath); err == nil {
+		if time.Since(info.ModTime()) < 5*time.Minute {
+			body, bodyErr = os.ReadFile(cachePath)
+		}
+	}
+
+	// Fetch from network if not in cache
+	if body == nil {
+		body, bodyErr = s.conn(url, username)
+		if bodyErr == nil {
+			_ = os.WriteFile(cachePath, body, 0644)
+		}
+	}
+
 	if bodyErr != nil {
 		return nil, bodyErr
 	}
@@ -42,6 +65,10 @@ func (s *GitHubService) GetUserActivity(username string, limit int) ([]UserActiv
 	} else {
 		return activity, nil
 	}
+}
+
+func (s *GitHubService) getCachePath(username string) string {
+	return filepath.Join(s.CacheDir, "github-activity-"+username+".json")
 }
 
 func (s *GitHubService) conn(url string, username string) ([]byte, error) {
