@@ -22,7 +22,7 @@ This project focuses on building a **production-ready REST API** with real-world
 ### 1. Requirements
 
 - Docker
-- Docker Compose 
+- Docker Compose
 - Java 21
 
 ### 2. Run the Application
@@ -41,14 +41,91 @@ The API will be available at `http://localhost:8080`.
 ## 📋 API Endpoints
 
 | Endpoint         | Method | Status Codes | Description                       |
-|:-----------------| :--- | :--- |:----------------------------------|
-| `/auth/register` | POST | 201, 400 | Register a new user               |
-| `/auth/login`    | POST | 200, 401 | Authenticate and get JWT          |
-| `/auth/refresh`  | POST | 200, 401 | Get a new JWT given refresh token |
-| `/todos`         | GET | 200 | Retrieve all todos (filtered)     |
-| `/todos`         | POST | 201, 400 | Create a new todo                 |
-| `/todos/{id}`    | PUT | 200, 404 | Update todo status/content        |
-| `/todos/{id}`    | DELETE | 204, 404 | Delete a todo                     |
+| :--------------- | :----- | :----------- | :-------------------------------- |
+| `/auth/register` | POST   | 201, 400     | Register a new user               |
+| `/auth/login`    | POST   | 200, 401     | Authenticate and get JWT          |
+| `/auth/refresh`  | POST   | 200, 401     | Get a new JWT given refresh token |
+| `/todos`         | GET    | 200          | Retrieve all todos (filtered)     |
+| `/todos`         | POST   | 201, 400     | Create a new todo                 |
+| `/todos/{id}`    | PUT    | 200, 404     | Update todo status/content        |
+| `/todos/{id}`    | DELETE | 204, 404     | Delete a todo                     |
+
+### 📚 API Examples
+
+#### 1. Authentication
+
+**Register:**
+
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "name": "user1",
+  "email": "user@email.com"
+  "password": "password123"
+}
+```
+
+**Login:**
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "user@email.com"
+  "password": "password123"
+}
+```
+
+**Refresh Token:**
+
+```http
+POST /auth/refresh
+Authorization: Bearer <refresh_token>
+```
+
+#### 2. Todo Operations
+
+**Create Todo:**
+
+```http
+POST /todos
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "title": "Buy groceries",
+  "description": "Milk, eggs, bread"
+}
+```
+
+**Updat Todo:**
+
+```http
+PUT /todos/{id}
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "title": "Updated groceries",
+  "description": "Milk, eggs, bread 2",
+  "completed": true
+}
+```
+
+**Get Todos (with filtering):**
+
+```http
+# Filter by status
+GET /todos?completed=false
+Authorization: Bearer <access_token>
+
+# Filter by title keyword
+GET /todos?title=groceries
+Authorization: Bearer <access_token>
+```
 
 ## 🛠️ Technical Architecture
 
@@ -75,7 +152,7 @@ The API will be available at `http://localhost:8080`.
 
 ## 🚧 Future Improvements
 
-- [ ] **Enhanced Search:** Implementing a global search feature for todos.
+- [x] **Enhanced Search:** Implementing a global search feature for todos.
 
 ---
 
