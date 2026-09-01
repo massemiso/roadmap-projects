@@ -38,8 +38,8 @@ export VISUALCROSSING_API_KEY=your_api_key_here
 
 | Endpoint            | Method | Arguments                 | Description                          |
 | :------------------ | :----- | :------------------------ | :----------------------------------- |
-| `/{cityCode}/today` | GET    | 'unit' = metric, us or uk | Returns current weather for the city |
-| `/{cityCode}/week`  | GET    | 'unit' = metric, us or uk | Returns 7-day forecast for the city  |
+| `/weather/{cityCode}/today` | GET    | 'unit' = metric, us or uk | Returns current weather for the city |
+| `/weather/{cityCode}/week`  | GET    | 'unit' = metric, us or uk | Returns 7-day forecast for the city  |
 
 ## 🛠️ Technical Architecture
 
