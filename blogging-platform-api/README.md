@@ -21,7 +21,7 @@ This project represents my transition from simple file-based storage to a profes
 ### 1. Requirements
 
 - Docker
-- Docker Compose 
+- Docker Compose
 - Java 21 (if you want to test locally)
 
 ### 2. Run the Application
@@ -39,13 +39,37 @@ The API will be available at `http://localhost:8080`.
 
 ## 📋 API Endpoints
 
-| Endpoint | Method | Status Codes | Description |
-| :--- | :--- | :--- | :--- |
-| `/posts` | GET | 200 OK | Retrieve all blog posts |
-| `/posts/{id}` | GET | 200 OK, 404 Not Found | Retrieve a specific post |
-| `/posts` | POST | 201 Created, 400 Bad Request | Create a new post |
-| `/posts/{id}` | PUT | 200 OK, 404 Not Found, 400 Bad Request | Update an existing post |
-| `/posts/{id}` | DELETE | 204 No Content, 404 Not Found | Delete a post |
+| Endpoint      | Method | Status Codes                           | Description              |
+| :------------ | :----- | :------------------------------------- | :----------------------- |
+| `/posts`      | GET    | 200 OK                                 | Retrieve all blog posts  |
+| `/posts/{id}` | GET    | 200 OK, 404 Not Found                  | Retrieve a specific post |
+| `/posts`      | POST   | 201 Created, 400 Bad Request           | Create a new post        |
+| `/posts/{id}` | PUT    | 200 OK, 404 Not Found, 400 Bad Request | Update an existing post  |
+| `/posts/{id}` | DELETE | 204 No Content, 404 Not Found          | Delete a post            |
+
+### API Request Examples
+
+#### Create a Post (POST `/posts`)
+
+```json
+{
+  "title": "My First Post",
+  "content": "This is the content of my first post.",
+  "category": "Tech",
+  "tags": ["java", "spring-boot", "api"]
+}
+```
+
+#### Update a Post (PUT `/posts/{id}`)
+
+```json
+{
+  "title": "Updated Title",
+  "content": "Updated content.",
+  "category": "Tech",
+  "tags": ["java", "updated"]
+}
+```
 
 ## 🛠️ Technical Architecture
 
@@ -59,6 +83,7 @@ The API will be available at `http://localhost:8080`.
 ## 🧪 Testing & Quality
 
 I prioritize high-quality code. This project enforces strict standards:
+
 - **JaCoCo:** Automatically generates coverage reports during the `verify` phase.
 - **Testcontainers:** Uses real database environments for integration tests, preventing "it works on my machine" bugs.
 
