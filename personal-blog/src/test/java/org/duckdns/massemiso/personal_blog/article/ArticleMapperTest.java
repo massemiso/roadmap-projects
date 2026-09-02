@@ -18,6 +18,7 @@ class ArticleMapperTest {
     Long id = 1L;
     String title = "some title";
     String content = "some content";
+    String htmlContent = "<p>some content</p>\n";
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, YYYY");
     LocalDate dop = LocalDate.now();
     String dopStr = dop.format(formatter);
@@ -32,7 +33,64 @@ class ArticleMapperTest {
     assertNotNull(responseDto, "Dto should not be null");
     assertEquals(article.getId(), responseDto.id(), "Ids should be equal");
     assertEquals(article.getTitle(), responseDto.title(), "Titles should be equal");
-    assertEquals(article.getContent(), responseDto.content(), "Content should be equal");
+    assertEquals(htmlContent, responseDto.content(),
+        "Content should be equal and with HTML format");
+    assertEquals(dopStr, responseDto.dop(),
+        "Date of publications should be equal");
+  }
+
+  @Test
+  void toDto_GivenValidArticleWithMarkdownContent_ShouldReturnDtoResponse() {
+    // arrange
+    ArticleMapper mapper = new ArticleMapper();
+
+    Long id = 1L;
+    String title = "some title";
+    String mdContent = "# some content";
+    String htmlContent = "<h1>some content</h1>\n";
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, YYYY");
+    LocalDate dop = LocalDate.now();
+    String dopStr = dop.format(formatter);
+
+    Article article = new Article(title, mdContent, dop);
+    article.setId(id);
+
+    // act
+    ArticleResponseDto responseDto = mapper.toDto(article);
+
+    // assert
+    assertNotNull(responseDto, "Dto should not be null");
+    assertEquals(article.getId(), responseDto.id(), "Ids should be equal");
+    assertEquals(article.getTitle(), responseDto.title(), "Titles should be equal");
+    assertEquals(htmlContent, responseDto.content(), "Content should be in html format");
+    assertEquals(dopStr, responseDto.dop(),
+        "Date of publications should be equal");
+  }
+
+  @Test
+  void toEditDto_GivenValidArticle_ShouldReturnDtoResponse() {
+    // arrange
+    ArticleMapper mapper = new ArticleMapper();
+
+    Long id = 1L;
+    String title = "some title";
+    String mdContent = "# some content";
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, YYYY");
+    LocalDate dop = LocalDate.now();
+    String dopStr = dop.format(formatter);
+
+    Article article = new Article(title, mdContent, dop);
+    article.setId(id);
+
+    // act
+    ArticleResponseDto responseDto = mapper.toEditDto(article);
+
+    // assert
+    assertNotNull(responseDto, "Dto should not be null");
+    assertEquals(article.getId(), responseDto.id(), "Ids should be equal");
+    assertEquals(article.getTitle(), responseDto.title(), "Titles should be equal");
+    assertEquals(article.getContent(), responseDto.content(),
+        "Content should be equal and in md format");
     assertEquals(dopStr, responseDto.dop(),
         "Date of publications should be equal");
   }

@@ -67,7 +67,7 @@ public class ArticleController {
   @GetMapping("/edit/{id}")
   public String formEdit(@PathVariable(name = "id", required = true) Long id, Model model) {
     log.info("Serving edit.html");
-    ArticleResponseDto responseDto = service.getById(id);
+    ArticleResponseDto responseDto = service.getArticleForEdit(id);
     model.addAttribute("dto", responseDto);
     model.addAttribute("id", id);
     return "edit";

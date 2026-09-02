@@ -10,4 +10,16 @@ public record ArticleRequestDto(
     @NotBlank(message = "Content cannot be blank") String content,
     @NotNull(message = "Publication date cannot be empty")
         @PastOrPresent(message = "Publication date cannot be in the future")
-        LocalDate dateOfPublication) {}
+        LocalDate dateOfPublication) {
+
+  @Override
+  public String toString() {
+    return "ArticleRequestDto["
+        + title
+        + ", content="
+        + ((content.length() < 12) ? content : content.substring(0, 12))
+        + ", dateOfPublication="
+        + dateOfPublication
+        + "]";
+  }
+}

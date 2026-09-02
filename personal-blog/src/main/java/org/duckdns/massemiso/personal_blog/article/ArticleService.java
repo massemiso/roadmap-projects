@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.personal_blog.article;
 
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,15 @@ public class ArticleService {
     return responseDto;
   }
 
+  public ArticleResponseDto getArticleForEdit(Long id) {
+    log.info("Fetching article id {}", id);
+    Article article = repository.findById(id).orElseThrow();
+    ArticleResponseDto responseDto = mapper.toEditDto(article);
+    log.debug("Found article {}", responseDto);
+    return responseDto;
+  }
+
+  @Transactional
   public ArticleResponseDto create(ArticleRequestDto requestDto) {
     log.info("Creating article {}", requestDto);
     Article article = mapper.toEntity(requestDto);
@@ -42,6 +52,7 @@ public class ArticleService {
     return responseDto;
   }
 
+  @Transactional
   public ArticleResponseDto update(Long id, ArticleRequestDto requestDto) {
     log.info("Updating article {}", requestDto);
     Article article = repository.findById(id).orElseThrow();
@@ -52,6 +63,7 @@ public class ArticleService {
     return responseDto;
   }
 
+  @Transactional
   public void delete(Long id) {
     log.info("Deleting article {}", id);
     Article article = repository.findById(id).orElseThrow();

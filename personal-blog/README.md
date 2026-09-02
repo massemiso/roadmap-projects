@@ -15,6 +15,8 @@ by [roadmap.sh](https://roadmap.sh/projects/personal-blog).
   authentication for admin endpoints.
 - **Responsive UI:** Fully stylized using **Bootstrap 5**, ensuring the blog looks great on both
   mobile and desktop devices.
+- **Markdown Rendering**: Support for rich text article content using `commonmark-java`,
+  dynamically converting Markdown input into HTML on the server-side.
 - **Robust Error Handling:** Centralized application exceptions using `@ControllerAdvice`, providing
   a consistent and user-friendly error experience.
 - **Comprehensive Testing:** Achieved high test coverage using JUnit 5, Mockito for service-layer
@@ -113,7 +115,7 @@ As this is a foundation project, I plan to extend it with:
 
 - [x] **Database Migration:** Moving from `.json` file storage to an embedded database (like H2 or
       SQLite) for better scalability.
-- [ ] **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich
+- [x] **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich
       text articles.
 - [x] **Containerization:** Adding a `Dockerfile` for easy deployment.
 - [ ] **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
