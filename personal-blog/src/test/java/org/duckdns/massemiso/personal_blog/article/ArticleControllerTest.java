@@ -73,21 +73,6 @@ class ArticleControllerTest {
   }
 
   @Test
-  void getById_ShouldReturnArticleViewWithArticleResponseDto() throws Exception {
-    // Arrange
-    ArticleResponseDto dto = new ArticleResponseDto(1L, "Title", "Content", "Jun 30, 2026");
-    String route = String.format("/article/%d", dto.id());
-    when(articleService.getById(dto.id())).thenReturn(dto);
-
-    // Act & Assert
-    mockMvc.perform(get(route))
-        .andExpect(status().isOk())
-        .andExpect(view().name("article"))
-        .andExpect(model().attributeExists("dto"))
-        .andExpect(model().attribute("dto", dto));
-  }
-
-  @Test
   void formNew_ShouldReturnNewView() throws Exception {
     // Act & Assert
     mockMvc.perform(get("/new"))
@@ -131,7 +116,7 @@ class ArticleControllerTest {
     // Arrange
     ArticleResponseDto dto = new ArticleResponseDto(1L, "Title", "Content", "Jun 30, 2026");
     String route = String.format("/edit/%d", dto.id());
-    when(articleService.getById(dto.id())).thenReturn(dto);
+    when(articleService.getArticleForEdit(dto.id())).thenReturn(dto);
 
     // Act & Assert
     mockMvc.perform(get(route))

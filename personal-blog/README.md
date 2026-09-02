@@ -7,8 +7,8 @@ by [roadmap.sh](https://roadmap.sh/projects/personal-blog).
 
 ## 🌟 Highlights
 
-- **Atomic File Storage:** Implemented a thread-safe repository layer using Java NIO `Files.move`
-  with `ATOMIC_MOVE` to prevent file corruption during updates.
+- **SQLite File Storage:** Implemented a basic repository layer using SQLite (previously JSON
+  files).
 - **Spring Boot & Thymeleaf:** Built a classic server-side rendered application utilizing the power
   of Spring MVC and Thymeleaf templates.
 - **Security-First:** Integrated `spring-boot-starter-security` to provide robust, configurable
@@ -56,7 +56,6 @@ The server will start on `http://localhost:8080`.
 
 | Endpoint        | Method | Role   | Description                    |
 | :-------------- | :----- | :----- | :----------------------------- |
-| `/`             | GET    | Public | Redirects to home              |
 | `/home`         | GET    | Public | Displays list of articles      |
 | `/article/{id}` | GET    | Public | Displays specific article      |
 | `/admin`        | GET    | Admin  | Admin dashboard                |
