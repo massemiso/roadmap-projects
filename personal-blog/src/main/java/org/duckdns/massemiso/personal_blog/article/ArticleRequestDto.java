@@ -14,12 +14,8 @@ public record ArticleRequestDto(
 
   @Override
   public String toString() {
-    return "ArticleRequestDto["
-        + title
-        + ", content="
-        + ((content.length() < 12) ? content : content.substring(0, 12))
-        + ", dateOfPublication="
-        + dateOfPublication
-        + "]";
+    return String.format(
+        "ArticleRequestDto[title=%s, content=%s, dateOfPublication=%s]",
+        title, content.length() >= 20 ? content.substring(0, 20) : content, dateOfPublication);
   }
 }
