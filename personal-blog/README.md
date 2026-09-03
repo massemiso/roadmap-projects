@@ -15,6 +15,8 @@ by [roadmap.sh](https://roadmap.sh/projects/personal-blog).
   authentication for admin endpoints.
 - **Responsive UI:** Fully stylized using **Bootstrap 5**, ensuring the blog looks great on both
   mobile and desktop devices.
+- **Pagination & Filtering**: Implemented server-side pagination and dynamic filtering (by title and date)
+  for articles on both the public home page and admin dashboard.
 - **Markdown Rendering**: Support for rich text article content using `commonmark-java`,
   dynamically converting Markdown input into HTML on the server-side.
 - **Robust Error Handling:** Centralized application exceptions using `@ControllerAdvice`, providing
