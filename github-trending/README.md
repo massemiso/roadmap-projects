@@ -9,6 +9,7 @@ A high-performance CLI tool to fetch and display trending GitHub repositories, b
 - **Live Trending Data:** Fetches the latest trending repositories directly from GitHub.
 - **Customizable Filtering:** Supports filtering by time range (`day`, `week`, `month`, `year`) and result limits.
 - **Clean CLI UX:** User-friendly output with color-coded information. Supports `NO_COLOR` environment variable for accessibility and plain-text output.
+- **Caching:** Automatically caches API responses for 5 minutes to reduce unnecessary network calls and improve performance.
 - **Robust Error Handling:** Handles API errors and invalid user inputs gracefully.
 - **Pure Go:** Built using Go Modules with efficient standard library usage.
 
@@ -74,7 +75,7 @@ go test ./... -v
 ## 📋 TODO & Future Improvements
 
 - [ ] **Data Export:** Add flags to export trending data to `CSV` or `JSON` files.
-- [ ] **Caching:** Implement a local cache (e.g., in `/tmp`) to store API responses for 5 minutes, reducing network calls.
+- [x] **Caching:** Implement a local cache (e.g., in `/tmp`) to store API responses for 5 minutes, reducing network calls.
 - [ ] **Interactive Mode:** Add a TUI (Terminal User Interface) for a more interactive browsing experience.
 
 ---

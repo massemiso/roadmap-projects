@@ -12,6 +12,7 @@
 *.so
 *.dylib
 github-trending
+trending-repos
 
 # Test binary, built with `go test -c`
 *.test
