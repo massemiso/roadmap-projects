@@ -16,6 +16,22 @@
     <div class="container mb-3">
       <a href="/home" class="btn btn-outline-primary">Return to Home</a>
     </div>
+
+    <div class="container mb-4">
+      <form th:action="@{/admin}" method="get" class="row g-3">
+        <div class="col-auto">
+          <input type="text" name="title" class="form-control" placeholder="Filter by title..." th:value="${articleFilterDto.title}">
+        </div>
+        <div class="col-auto">
+          <input type="date" name="dateOfPublication" class="form-control" th:value="${articleFilterDto.dateOfPublication}">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary">Filter</button>
+          <a href="/admin" class="btn btn-secondary">Clear</a>
+        </div>
+      </form>
+    </div>
+
     <main class="container">
       <nav>
         <ul class="list-group">
@@ -25,6 +41,21 @@
               <a class="btn btn-sm btn-outline-secondary me-2" th:href="@{/edit/{id}(id=${article.id})}">Edit</a>
               <a class="btn btn-sm btn-outline-danger" th:href="@{/delete/{id}(id=${article.id})}">Delete</a>
             </div>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Pagination Controls -->
+      <nav class="mt-4" th:if="${pageTotal > 1}">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" th:classappend="${pageNumber == 0} ? 'disabled'">
+            <a class="page-link" th:href="@{/admin(page=${pageNumber - 1}, title=${articleFilterDto.title}, dateOfPublication=${articleFilterDto.dateOfPublication})}">Previous</a>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link" th:text="|Page ${pageNumber + 1} of ${pageTotal}|"></span>
+          </li>
+          <li class="page-item" th:classappend="${pageNumber + 1 == pageTotal} ? 'disabled'">
+            <a class="page-link" th:href="@{/admin(page=${pageNumber + 1}, title=${articleFilterDto.title}, dateOfPublication=${articleFilterDto.dateOfPublication})}">Next</a>
           </li>
         </ul>
       </nav>

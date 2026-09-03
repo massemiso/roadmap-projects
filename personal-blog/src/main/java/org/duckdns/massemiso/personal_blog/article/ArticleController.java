@@ -1,12 +1,15 @@
 package org.duckdns.massemiso.personal_blog.article;
 
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -28,18 +31,32 @@ public class ArticleController {
   }
 
   @GetMapping("/home")
-  public String home(Model model) {
-    log.info("Fetching all articles");
-    List<ArticleResponseDto> articles = service.getAll();
-    model.addAttribute("articles", articles);
+  public String home(
+      Model model,
+      @PageableDefault(size = 5) Pageable pageable,
+      @ModelAttribute ArticleFilterDto articleFilterDto) {
+    log.info("Fetching home page");
+    Page<ArticleResponseDto> page = service.getAll(pageable, articleFilterDto);
+    model.addAttribute("articles", page.getContent());
+    model.addAttribute("pageNumber", pageable.getPageNumber());
+    model.addAttribute("pageSize", pageable.getPageSize());
+    model.addAttribute("pageTotal", page.getTotalPages());
+    model.addAttribute("pageNumElems", page.getTotalElements());
     return "home";
   }
 
   @GetMapping("/admin")
-  public String adminDashboard(Model model) {
-    log.info("Fetching all articles");
-    List<ArticleResponseDto> articles = service.getAll();
-    model.addAttribute("articles", articles);
+  public String adminDashboard(
+      Model model,
+      @PageableDefault(size = 5) Pageable pageable,
+      @ModelAttribute ArticleFilterDto articleFilterDto) {
+    log.info("Fetching admin page");
+    Page<ArticleResponseDto> page = service.getAll(pageable, articleFilterDto);
+    model.addAttribute("articles", page.getContent());
+    model.addAttribute("pageNumber", pageable.getPageNumber());
+    model.addAttribute("pageSize", pageable.getPageSize());
+    model.addAttribute("pageTotal", page.getTotalPages());
+    model.addAttribute("pageNumElems", page.getTotalElements());
     return "admin";
   }
 

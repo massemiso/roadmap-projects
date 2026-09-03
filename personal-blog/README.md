@@ -117,7 +117,7 @@ As this is a foundation project, I plan to extend it with:
 - [x] **Markdown Rendering:** Implementing a Markdown parser (e.g., `commonmark-java`) to allow rich
       text articles.
 - [x] **Containerization:** Adding a `Dockerfile` for easy deployment.
-- [ ] **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
+- [x] **Enhanced Search:** Implementing a search/filtering feature as the article count grows.
 
 ---
 

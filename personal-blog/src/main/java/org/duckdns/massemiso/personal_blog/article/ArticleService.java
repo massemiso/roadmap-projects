@@ -1,10 +1,12 @@
 package org.duckdns.massemiso.personal_blog.article;
 
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdns.massemiso.personal_blog.utils.MarkdownUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,25 +18,26 @@ public class ArticleService {
   private final MarkdownUtils markdownUtils;
 
   @Autowired
-  public ArticleService(ArticleRepository repository, ArticleMapper mapper,
-      MarkdownUtils markdownUtils) {
+  public ArticleService(
+      ArticleRepository repository, ArticleMapper mapper, MarkdownUtils markdownUtils) {
     this.repository = repository;
     this.mapper = mapper;
     this.markdownUtils = markdownUtils;
   }
 
-  public List<ArticleResponseDto> getAll() {
-    log.info("Fetching all articles");
-    List<ArticleResponseDto> articles = repository.findAll().stream().map(mapper::toDto).toList();
-    log.debug("Found {} articles", articles.size());
-    return articles;
+  public Page<ArticleResponseDto> getAll(Pageable pageable, ArticleFilterDto articleFilterDto) {
+    log.info("Fetching {} articles for page {}", pageable.getPageSize(), pageable.getPageNumber());
+    Specification<Article> spec = articleFilterDto.getSpecification();
+    Page<ArticleResponseDto> page = repository.findAll(spec, pageable).map(mapper::toDto);
+    log.debug("Found {}", page);
+    return page;
   }
 
   public ArticleResponseDto getById(Long id) {
     log.info("Fetching article id {}", id);
     Article article = repository.findById(id).orElseThrow();
-    ArticleResponseDto responseDto = mapper.toDto(article,
-        markdownUtils.markdownToHtml(article.getContent()));
+    ArticleResponseDto responseDto =
+        mapper.toDto(article, markdownUtils.markdownToHtml(article.getContent()));
     log.debug("Found article {}", responseDto);
     return responseDto;
   }
@@ -52,8 +55,8 @@ public class ArticleService {
     log.info("Creating article {}", requestDto);
     Article article = mapper.toEntity(requestDto);
     article = repository.save(article);
-    ArticleResponseDto responseDto = mapper.toDto(article,
-        markdownUtils.markdownToHtml(article.getContent()));
+    ArticleResponseDto responseDto =
+        mapper.toDto(article, markdownUtils.markdownToHtml(article.getContent()));
     log.debug("Created article {}", responseDto);
     return responseDto;
   }
@@ -64,8 +67,8 @@ public class ArticleService {
     Article article = repository.findById(id).orElseThrow();
     article.update(requestDto.title(), requestDto.content(), requestDto.dateOfPublication());
     article = repository.save(article);
-    ArticleResponseDto responseDto = mapper.toDto(article,
-        markdownUtils.markdownToHtml(article.getContent()));
+    ArticleResponseDto responseDto =
+        mapper.toDto(article, markdownUtils.markdownToHtml(article.getContent()));
     log.debug("Updated article {}", responseDto);
     return responseDto;
   }

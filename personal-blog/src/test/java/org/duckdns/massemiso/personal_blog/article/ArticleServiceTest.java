@@ -16,6 +16,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.duckdns.massemiso.personal_blog.utils.MarkdownUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,22 +50,22 @@ class ArticleServiceTest {
         new ArticleResponseDto(2L, "t2", "c2", nowStr));
 
     // Mock
-    when(repository.findAll())
-        .thenReturn(articles);
+    when(repository.findAll(any(Specification.class), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(articles));
     when(mapper.toDto(articles.getFirst()))
         .thenReturn(articleResponseDtos.getFirst());
     when(mapper.toDto(articles.getLast()))
         .thenReturn(articleResponseDtos.getLast());
 
     // Act
-    List<ArticleResponseDto> actual = articleService.getAll();
+    Page<ArticleResponseDto> actual = articleService.getAll(PageRequest.of(0, 10), new ArticleFilterDto(null, null));
 
     // Asserts
-    assertThat(actual.size(), is(2));
-    assertThat(actual.getFirst().id(), is(articles.getFirst().getId()));
-    assertThat(actual.getLast().id(), is(articles.getLast().getId()));
+    assertThat(actual.getContent().size(), is(2));
+    assertThat(actual.getContent().getFirst().id(), is(articles.getFirst().getId()));
+    assertThat(actual.getContent().getLast().id(), is(articles.getLast().getId()));
 
-    verify(repository).findAll();
+    verify(repository).findAll(any(Specification.class), any(Pageable.class));
     verify(mapper).toDto(articles.getFirst());
     verify(mapper).toDto(articles.getLast());
   }
@@ -73,16 +78,16 @@ class ArticleServiceTest {
     List<ArticleResponseDto> articleResponseDtos = List.of();
 
     // Mock
-    when(repository.findAll())
-        .thenReturn(List.of());
+    when(repository.findAll(any(Specification.class), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of()));
 
     // Act
-    List<ArticleResponseDto> actual = articleService.getAll();
+    Page<ArticleResponseDto> actual = articleService.getAll(PageRequest.of(0, 10), new ArticleFilterDto(null, null));
 
     // Asserts
-    assertThat(actual.size(), is(0));
+    assertThat(actual.getContent().size(), is(0));
 
-    verify(repository).findAll();
+    verify(repository).findAll(any(Specification.class), any(Pageable.class));
     verify(mapper, never()).toDto(any(Article.class));
   }
 

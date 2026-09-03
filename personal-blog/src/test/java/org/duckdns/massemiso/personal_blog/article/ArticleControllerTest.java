@@ -1,5 +1,6 @@
 package org.duckdns.massemiso.personal_blog.article;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -18,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MultiValueMap;
@@ -46,7 +50,8 @@ class ArticleControllerTest {
     List<ArticleResponseDto> articles = List.of(
         new ArticleResponseDto(1L, "Title", "Content", "Jun 30, 2026")
     );
-    when(articleService.getAll()).thenReturn(articles);
+    Page<ArticleResponseDto> page = new PageImpl<>(articles);
+    when(articleService.getAll(any(Pageable.class), any(ArticleFilterDto.class))).thenReturn(page);
 
     // Act & Assert
     mockMvc.perform(get("/home"))
@@ -62,7 +67,8 @@ class ArticleControllerTest {
     List<ArticleResponseDto> articles = List.of(
         new ArticleResponseDto(1L, "Title", "Content", "Jun 30, 2026")
     );
-    when(articleService.getAll()).thenReturn(articles);
+    Page<ArticleResponseDto> page = new PageImpl<>(articles);
+    when(articleService.getAll(any(Pageable.class), any(ArticleFilterDto.class))).thenReturn(page);
 
     // Act & Assert
     mockMvc.perform(get("/admin"))
