@@ -213,3 +213,47 @@ func TestGetTrendingRepos_CacheSave(t *testing.T) {
 		t.Errorf("Expected cache file to exist at %s, but it does not", cacheFilePath)
 	}
 }
+
+func TestExportTrendingRepos_JSON(t *testing.T) {
+	repos := []TrendingRepo{
+		{FullName: "a/b", Description: "desc", Stars: 1, Language: "Go"},
+	}
+	service := NewGitHubService()
+
+	// Use temporary directory for export
+	tmpDir := t.TempDir()
+	originalWd, _ := os.Getwd()
+	os.Chdir(tmpDir)
+	defer os.Chdir(originalWd)
+
+	err := service.ExportTrendingRepos(repos, "json")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	if _, err := os.Stat("trending.json"); os.IsNotExist(err) {
+		t.Errorf("Expected trending.json to exist")
+	}
+}
+
+func TestExportTrendingRepos_CSV(t *testing.T) {
+	repos := []TrendingRepo{
+		{FullName: "a/b", Description: "desc", Stars: 1, Language: "Go"},
+	}
+	service := NewGitHubService()
+
+	// Use temporary directory for export
+	tmpDir := t.TempDir()
+	originalWd, _ := os.Getwd()
+	os.Chdir(tmpDir)
+	defer os.Chdir(originalWd)
+
+	err := service.ExportTrendingRepos(repos, "csv")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	if _, err := os.Stat("trending.csv"); os.IsNotExist(err) {
+		t.Errorf("Expected trending.csv to exist")
+	}
+}

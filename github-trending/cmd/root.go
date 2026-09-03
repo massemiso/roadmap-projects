@@ -19,6 +19,7 @@ var (
 	duration string
 	limit    uint
 	long     bool
+	export   string
 )
 
 var validDurations []string = []string{
@@ -28,20 +29,38 @@ var validDurations []string = []string{
 	"year",
 }
 
+var validExports []string = []string{
+	"csv",
+	"json",
+	"none",
+}
+
 func runE(
 	service github.GitHubServiceInterface,
 	ui ui.UIInterface,
 	duration string,
 	limit uint,
 	long bool,
+	export string,
 ) error {
 	if !slices.Contains(validDurations, duration) {
 		return fmt.Errorf("duration has to be one of %v", validDurations)
 	}
 
+	if !slices.Contains(validExports, export) {
+		return fmt.Errorf("export has to be one of %v", validExports)
+	}
+
 	trending, err := service.GetTrendingRepos(duration, limit)
 	if err != nil {
 		return err
+	}
+
+	if !(export == "none") {
+		err := service.ExportTrendingRepos(trending, export)
+		if err != nil {
+			return err
+		}
 	}
 
 	ui.PrintRepos(trending, long)
@@ -58,7 +77,7 @@ It fetches data from the GitHub API and present it in a user-friendly format.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		service := github.NewGitHubService()
 		ui := ui.NewUI(os.Stdout)
-		if err := runE(service, ui, duration, limit, long); err != nil {
+		if err := runE(service, ui, duration, limit, long, export); err != nil {
 			log.Fatalln(err.Error())
 		}
 	},
@@ -75,4 +94,5 @@ func init() {
 	rootCmd.Flags().StringVar(&duration, "duration", "week", "Specify the time: day, week, month, year")
 	rootCmd.Flags().UintVar(&limit, "limit", 10, "Specify the number of repositories to show")
 	rootCmd.Flags().BoolVar(&long, "long", false, "If you want to display the entire description")
+	rootCmd.Flags().StringVar(&export, "export", "none", "If you want to export the data to an external json or csv file")
 }
