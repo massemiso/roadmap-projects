@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.duckdns.massemiso.personal_blog.utils.MarkdownUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,11 +27,13 @@ class ArticleServiceTest {
   ArticleRepository repository;
   @Mock
   ArticleMapper mapper;
+  @Mock
+  MarkdownUtils markdownUtils;
 
   @Test
   void getAll_GivenTwoArticlesInPersistence_ShouldReturnListOfResponseDto() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     LocalDate now = LocalDate.now();
     String nowStr = now.format(DateTimeFormatter.ofPattern("MMM d, YYYY"));
     List<Article> articles = List.of(new Article("t1", "c1", now),
@@ -64,7 +68,7 @@ class ArticleServiceTest {
   @Test
   void getAll_GivenNoneEntInPersistence_ShouldReturnAListEmptyOfResponseDto() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     List<Article> articles = List.of();
     List<ArticleResponseDto> articleResponseDtos = List.of();
 
@@ -85,16 +89,19 @@ class ArticleServiceTest {
   @Test
   void getById_GivenValidId_ShouldReturnResponseDto() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     Long validId = 1L;
     Article article = new Article("t1", "c1", null);
     article.setId(validId);
     ArticleResponseDto responseDto = new ArticleResponseDto(validId, "t1", "c1", null);
+    String htmlContent = "<p>c1</p>";
 
     // mock
     when(repository.findById(validId))
         .thenReturn(Optional.of(article));
-    when(mapper.toDto(article))
+    when(markdownUtils.markdownToHtml(article.getContent()))
+        .thenReturn(htmlContent);
+    when(mapper.toDto(article, htmlContent))
         .thenReturn(responseDto);
 
     // Act
@@ -107,13 +114,14 @@ class ArticleServiceTest {
     assertThat(actual.dop(), is(responseDto.dop()));
 
     verify(repository).findById(validId);
-    verify(mapper).toDto(article);
+    verify(markdownUtils).markdownToHtml(article.getContent());
+    verify(mapper).toDto(article, htmlContent);
   }
 
   @Test
   void getById_GivenInvalidId_ShouldThrowNoSuchElementException() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     Long invalidId = -1L;
 
     // mock
@@ -125,22 +133,25 @@ class ArticleServiceTest {
 
     // Assert
     verify(repository).findById(invalidId);
+    verify(markdownUtils, never()).markdownToHtml(anyString());
     verify(mapper, never()).toDto(any(Article.class));
   }
 
   @Test
   void create_GivenValidRequest_ShouldReturnResponseDto() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     ArticleRequestDto requestDto = new ArticleRequestDto("t1", "c1", LocalDate.now());
     Article article = new Article("t1", "c1", LocalDate.now());
     article.setId(1L);
     ArticleResponseDto responseDto = new ArticleResponseDto(1L, "t1", "c1", "...");
+    String htmlContent = "<p>c1</p>";
 
     // Mock
     when(mapper.toEntity(requestDto)).thenReturn(article);
     when(repository.save(article)).thenReturn(article);
-    when(mapper.toDto(article)).thenReturn(responseDto);
+    when(markdownUtils.markdownToHtml(article.getContent())).thenReturn(htmlContent);
+    when(mapper.toDto(article, htmlContent)).thenReturn(responseDto);
 
     // Act
     ArticleResponseDto actual = articleService.create(requestDto);
@@ -149,23 +160,26 @@ class ArticleServiceTest {
     assertThat(actual, is(responseDto));
     verify(mapper).toEntity(requestDto);
     verify(repository).save(article);
-    verify(mapper).toDto(article);
+    verify(markdownUtils).markdownToHtml(article.getContent());
+    verify(mapper).toDto(article, htmlContent);
   }
 
   @Test
   void update_GivenValidIdAndRequest_ShouldReturnUpdatedResponseDto() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     Long id = 1L;
     ArticleRequestDto requestDto = new ArticleRequestDto("new t", "new c", LocalDate.now());
     Article existingArticle = new Article("old t", "old c", LocalDate.now());
     existingArticle.setId(id);
-    ArticleResponseDto responseDto = new ArticleResponseDto(id, "new t", "new c", "...");
+    String htmlContent = "<p>new c</p>";
+    ArticleResponseDto responseDto = new ArticleResponseDto(id, "new t", htmlContent, "...");
 
     // Mock
     when(repository.findById(id)).thenReturn(Optional.of(existingArticle));
     when(repository.save(any(Article.class))).thenReturn(existingArticle);
-    when(mapper.toDto(existingArticle)).thenReturn(responseDto);
+    when(markdownUtils.markdownToHtml("new c")).thenReturn(htmlContent);
+    when(mapper.toDto(existingArticle, htmlContent)).thenReturn(responseDto);
 
     // Act
     ArticleResponseDto actual = articleService.update(id, requestDto);
@@ -174,13 +188,14 @@ class ArticleServiceTest {
     assertThat(actual, is(responseDto));
     verify(repository).findById(id);
     verify(repository).save(existingArticle);
-    verify(mapper).toDto(existingArticle);
+    verify(markdownUtils).markdownToHtml("new c");
+    verify(mapper).toDto(existingArticle, htmlContent);
   }
 
   @Test
   void delete_GivenValidId_ShouldCallRepositoryDelete() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     Article article = new Article("t1", "c1", LocalDate.now());
     Long id = 1L;
     article.setId(id);
@@ -198,7 +213,7 @@ class ArticleServiceTest {
   @Test
   void delete_GivenInvalidId_ShouldThrowNoSuchElementException() {
     // Arrange
-    ArticleService articleService = new ArticleService(repository, mapper);
+    ArticleService articleService = new ArticleService(repository, mapper, markdownUtils);
     Long id = 1L;
 
     when(repository.findById(id)).thenReturn(Optional.empty());
