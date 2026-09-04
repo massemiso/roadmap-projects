@@ -1,14 +1,11 @@
 package github
 
 import (
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -139,60 +136,11 @@ func (s *GitHubService) parse(body []byte) ([]TrendingRepo, error) {
 func (s *GitHubService) ExportTrendingRepos(repos []TrendingRepo, format string) error {
 	switch format {
 	case "json":
-		return s.exportJson(repos)
+		return ExportJson("trending", repos)
 	case "csv":
-		return s.exportCsv(repos)
+		headers := []string{"FULL_NAME", "DESCRIPTION", "STARS", "LANGUAGE"}
+		return ExportCsv("trending", headers, repos)
 	default:
 		return errors.New("export file format invalid")
 	}
-}
-
-func (s *GitHubService) exportJson(repos []TrendingRepo) error {
-	// marshal repos
-	json, err := json.Marshal(repos)
-	if err != nil {
-		return err
-	}
-
-	// write json file
-	path := filepath.Join("trending.json")
-	err = os.WriteFile(path, json, 0o644)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *GitHubService) exportCsv(repos []TrendingRepo) error {
-	// create csv file
-	file, err := os.Create("trending.csv")
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// parse repos to csv format
-	data := [][]string{
-		{"FULL_NAME", "DESCRIPTION", "STARS", "LANGUAGE"},
-	}
-	for _, repo := range repos {
-		data = append(data, []string{
-			repo.FullName,
-			repo.Description,
-			fmt.Sprintf("%d", repo.Stars),
-			repo.Language,
-		})
-	}
-
-	// write csv file
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	err = writer.WriteAll(data)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

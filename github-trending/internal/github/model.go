@@ -18,3 +18,12 @@ func (r *TrendingRepo) ToString() string {
 	return fmt.Sprintf("TrendingRepo {FullName=%s, Description=%s, Stars=%d, Language=%s}",
 		r.FullName, r.Description, r.Stars, r.Language)
 }
+
+func (r TrendingRepo) ToCsv() []string {
+	return []string{
+		r.FullName,
+		r.Description,
+		fmt.Sprint(r.Stars),
+		r.Language,
+	}
+}
