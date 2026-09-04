@@ -20,6 +20,10 @@ func (m *MockService) FetchMovies(typeVar string, lang string) ([]tmdb.Movie, er
 	return []tmdb.Movie{{Title: "Test Movie", Popularity: 10.0}}, nil
 }
 
+func (m *MockService) ExportMovies(movies []tmdb.Movie, format string) error {
+	return nil
+}
+
 type MockUI struct{}
 
 func (m *MockUI) PrintMovies(movies []tmdb.Movie, text bool) {}
@@ -29,7 +33,7 @@ func TestRunE(t *testing.T) {
 
 	t.Run("Valid type", func(t *testing.T) {
 		service := &MockService{}
-		err := runE(service, ui, "popular", false, "en")
+		err := runE(service, ui, "popular", false, "en", "none")
 		if err != nil {
 			t.Errorf("Expected no error, got %v", err)
 		}
@@ -37,7 +41,7 @@ func TestRunE(t *testing.T) {
 
 	t.Run("Invalid type", func(t *testing.T) {
 		service := &MockService{}
-		err := runE(service, ui, "invalid", false, "en")
+		err := runE(service, ui, "invalid", false, "en", "none")
 		if err == nil {
 			t.Error("Expected error for invalid type, got nil")
 		}
@@ -45,7 +49,7 @@ func TestRunE(t *testing.T) {
 
 	t.Run("Service error", func(t *testing.T) {
 		service := &MockService{ShouldError: true}
-		err := runE(service, ui, "popular", false, "en")
+		err := runE(service, ui, "popular", false, "en", "none")
 		if err == nil || err.Error() != "service error" {
 			t.Errorf("Expected service error, got %v", err)
 		}

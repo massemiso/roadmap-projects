@@ -12,27 +12,46 @@ import (
 
 type TMDBServiceInterface interface {
 	FetchMovies(typeVar string, lang string) ([]Movie, error)
+	ExportMovies([]Movie, string) error
 }
 
 type TMDBService struct {
 	Client  *http.Client
 	ApiKey  string
 	BaseURL string
+	Cache   CacheServiceInterface
 }
 
-func NewTMDBService() *TMDBService {
+func NewTMDBService(cache CacheServiceInterface) *TMDBService {
 	api_key := os.Getenv("TMDB_API_KEY")
 	return &TMDBService{
 		Client:  &http.Client{Timeout: time.Second * 10},
 		ApiKey:  api_key,
 		BaseURL: "https://api.themoviedb.org",
+		Cache:   cache,
 	}
 }
 
 func (s *TMDBService) FetchMovies(typeVar string, lang string) ([]Movie, error) {
-	url := s.makeQuery(typeVar, lang)
+	// check if available cache
+	body, bodyErr := s.Cache.CheckCache()
 
-	body, bodyErr := s.conn(url)
+	// if cache not available
+	if body == nil {
+		url := s.makeQuery(typeVar, lang)
+
+		body, bodyErr = s.conn(url)
+		if bodyErr != nil {
+			return nil, bodyErr
+		}
+
+		// save new cache
+		cacheErr := s.Cache.SaveCache(body)
+		if cacheErr != nil {
+			return nil, cacheErr
+		}
+	}
+
 	if bodyErr != nil {
 		return nil, bodyErr
 	}
@@ -111,4 +130,16 @@ func (s *TMDBService) parse(body []byte) ([]Movie, error) {
 		return nil, jsonErr
 	}
 	return apiResponse.Results, nil
+}
+
+func (s *TMDBService) ExportMovies(movies []Movie, format string) error {
+	switch format {
+	case "json":
+		return ExportJson("movies", movies)
+	case "csv":
+		headers := []string{"TITLE", "OVERVIEW", "POPULARITY", "RELEASE_DATE", "VOTE_AVERAGE"}
+		return ExportCsv("movies", headers, movies)
+	default:
+		return errors.New("export file format invalid")
+	}
 }

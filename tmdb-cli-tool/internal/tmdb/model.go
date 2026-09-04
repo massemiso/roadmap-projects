@@ -21,3 +21,13 @@ func (m *Movie) ToString() string {
 	return fmt.Sprintf("Movie {Title=%s, Overview=%s, Popularity=%f, ReleaseDate=%s, VoteAverage=%f}",
 		m.Title, m.Overview, m.Popularity, m.ReleaseDate, m.VoteAverage)
 }
+
+func (m Movie) ToCsv() []string {
+	return []string{
+		m.Title,
+		m.Overview,
+		fmt.Sprint(m.Popularity),
+		m.ReleaseDate,
+		fmt.Sprint(m.VoteAverage),
+	}
+}

@@ -12,6 +12,8 @@ A CLI application to interact with The Movie Database (TMDB) API, allowing users
 - **Customization:**
   - **Language:** Specify output language (e.g., `en`, `es`, `fr`, `zh`, etc.).
   - **Output Format:** Choose between a tabular view (default) or a verbose text view.
+  - **Data Export:** Export fetched data to `JSON` or `CSV` files.
+- **Caching:** Local caching to reduce unnecessary API requests.
 - **Robustness:** Includes error handling for API failures, status code checks, and input validation.
 - **Clean CLI UX:** User-friendly output with color-coded information. Supports `NO_COLOR` environment variable for accessibility and plain-text output.
 
@@ -51,15 +53,19 @@ TMDB_API_KEY="your_key" ./tmdb-cli --type popular
 
 # Using specific language and output format
 TMDB_API_KEY="your_key" ./tmdb-cli --type top --lang es --text
+
+# Using specific language, output format, and exporting data
+TMDB_API_KEY="your_key" ./tmdb-cli --type top --lang es --text --export csv
 ```
 
 ### Options
 
-| Flag     | Description                                                  | Default |
-| :------- | :----------------------------------------------------------- | :------ |
-| `--type` | Category of movies (`playing`, `popular`, `top`, `upcoming`) | N/A     |
-| `--lang` | ISO language code (`en`, `es`, `fr`, `de`, etc.)             | `en`    |
-| `--text` | Print output as formatted text instead of a table            | `false` |
+| Flag       | Description                                                  | Default |
+| :--------- | :----------------------------------------------------------- | :------ |
+| `--type`   | Category of movies (`playing`, `popular`, `top`, `upcoming`) | N/A     |
+| `--lang`   | ISO language code (`en`, `es`, `fr`, `de`, etc.)             | `en`    |
+| `--text`   | Print output as formatted text instead of a table            | `false` |
+| `--export` | Export data to file (`json`, `csv`, `none`)                  | `none`  |
 
 ## 🧪 Testing
 
@@ -71,8 +77,8 @@ TMDB_API_KEY="test" go test -v ./...
 
 ## 📋 TODO & Future Improvements
 
-- [ ] **Data Export:** Add flags to export trending data to `CSV` or `JSON` files.
-- [ ] **Caching:** Implement a local cache (e.g., in `/tmp`) to store API responses for 5 minutes, reducing network calls.
+- [x] **Data Export:** Add flags to export trending data to `CSV` or `JSON` files.
+- [x] **Caching:** Implement a local cache (e.g., in `/tmp`) to store API responses for 5 minutes, reducing network calls.
 
 ---
 

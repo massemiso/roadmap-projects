@@ -6,6 +6,16 @@ import (
 	"testing"
 )
 
+type mockCacheService struct{}
+
+func (m *mockCacheService) CheckCache() ([]byte, error) {
+	return nil, nil
+}
+
+func (m *mockCacheService) SaveCache(body []byte) error {
+	return nil
+}
+
 func TestFetchMovies(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -25,7 +35,7 @@ func TestFetchMovies(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewTMDBService()
+	service := NewTMDBService(&mockCacheService{})
 	service.BaseURL = server.URL
 
 	movies, err := service.FetchMovies("popular", "en")
@@ -52,7 +62,7 @@ func TestFetchMovies_Forbidden(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewTMDBService()
+	service := NewTMDBService(&mockCacheService{})
 	service.BaseURL = server.URL
 
 	_, err := service.FetchMovies("popular", "en")
