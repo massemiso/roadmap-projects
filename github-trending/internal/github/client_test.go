@@ -29,8 +29,10 @@ func TestGetTrendingRepos(t *testing.T) {
 	defer server.Close()
 
 	// Initialize service and override BaseURL to point to mock server
-	service := NewGitHubService()
-	service.CacheDir = t.TempDir()
+	cache := NewCacheService("test_cache")
+	cache.Dir = t.TempDir()
+	cache.File = filepath.Join(cache.Dir, "test_cache.json")
+	service := NewGitHubService(cache)
 	service.BaseURL = server.URL + "/search/repositories?q=%s"
 
 	repos, err := service.GetTrendingRepos("week", 10)
@@ -68,8 +70,10 @@ func TestGetTrendingRepos_GivenNoItems(t *testing.T) {
 	defer server.Close()
 
 	// Initialize service and override BaseURL to point to mock server
-	service := NewGitHubService()
-	service.CacheDir = t.TempDir()
+	cache := NewCacheService("test_cache")
+	cache.Dir = t.TempDir()
+	cache.File = filepath.Join(cache.Dir, "test_cache.json")
+	service := NewGitHubService(cache)
 	service.BaseURL = server.URL + "/search/repositories?q=%s"
 
 	repos, err := service.GetTrendingRepos("week", 10)
@@ -88,8 +92,10 @@ func TestGetTrendingRepos_Forbidden(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGitHubService()
-	service.CacheDir = t.TempDir()
+	cache := NewCacheService("test_cache")
+	cache.Dir = t.TempDir()
+	cache.File = filepath.Join(cache.Dir, "test_cache.json")
+	service := NewGitHubService(cache)
 	service.BaseURL = server.URL + "/search/repositories?q=%s"
 
 	_, err := service.GetTrendingRepos("week", 10)
@@ -104,8 +110,10 @@ func TestGetTrendingRepos_ServiceUnavailable(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGitHubService()
-	service.CacheDir = t.TempDir()
+	cache := NewCacheService("test_cache")
+	cache.Dir = t.TempDir()
+	cache.File = filepath.Join(cache.Dir, "test_cache.json")
+	service := NewGitHubService(cache)
 	service.BaseURL = server.URL + "/search/repositories?q=%s"
 
 	_, err := service.GetTrendingRepos("week", 10)
@@ -121,8 +129,10 @@ func TestGetTrendingRepos_InvalidJSON(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGitHubService()
-	service.CacheDir = t.TempDir()
+	cache := NewCacheService("test_cache")
+	cache.Dir = t.TempDir()
+	cache.File = filepath.Join(cache.Dir, "test_cache.json")
+	service := NewGitHubService(cache)
 	service.BaseURL = server.URL + "/search/repositories?q=%s"
 
 	_, err := service.GetTrendingRepos("week", 10)
@@ -134,6 +144,7 @@ func TestGetTrendingRepos_InvalidJSON(t *testing.T) {
 func TestGetTrendingRepos_CacheHit(t *testing.T) {
 	// Setup cache dir
 	cacheDir := t.TempDir()
+	cacheFile := filepath.Join(cacheDir, "test_cache.json")
 
 	// Create cached file
 	content := []byte(`{
@@ -147,16 +158,14 @@ func TestGetTrendingRepos_CacheHit(t *testing.T) {
 			}
 			]
 		}`)
-
-	cacheFilePath := filepath.Join(cacheDir, "github-trending-week10.json")
-	err := os.WriteFile(cacheFilePath, content, 0o644)
+	err := os.WriteFile(cacheFile, content, 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write cache file: %v", err)
 	}
 
 	// Initialize service
-	service := NewGitHubService()
-	service.CacheDir = cacheDir
+	cache := &CacheService{Dir: cacheDir, File: cacheFile}
+	service := NewGitHubService(cache)
 
 	// Should not need a server, as it should hit cache
 	repos, err := service.GetTrendingRepos("week", 10)
@@ -195,10 +204,11 @@ func TestGetTrendingRepos_CacheSave(t *testing.T) {
 
 	// Setup cache dir
 	cacheDir := t.TempDir()
+	cacheFile := filepath.Join(cacheDir, "test_cache.json")
+	cache := &CacheService{Dir: cacheDir, File: cacheFile}
 
 	// Initialize service
-	service := NewGitHubService()
-	service.CacheDir = cacheDir
+	service := NewGitHubService(cache)
 	service.BaseURL = server.URL + "/search/repositories?q=%s"
 
 	// Trigger network request
@@ -208,9 +218,8 @@ func TestGetTrendingRepos_CacheSave(t *testing.T) {
 	}
 
 	// Verify file is created
-	cacheFilePath := filepath.Join(cacheDir, "github-trending-week10.json")
-	if _, err := os.Stat(cacheFilePath); os.IsNotExist(err) {
-		t.Errorf("Expected cache file to exist at %s, but it does not", cacheFilePath)
+	if _, err := os.Stat(cacheFile); os.IsNotExist(err) {
+		t.Errorf("Expected cache file to exist at %s, but it does not", cacheFile)
 	}
 }
 
@@ -218,7 +227,8 @@ func TestExportTrendingRepos_JSON(t *testing.T) {
 	repos := []TrendingRepo{
 		{FullName: "a/b", Description: "desc", Stars: 1, Language: "Go"},
 	}
-	service := NewGitHubService()
+	cache := NewCacheService("test_export")
+	service := NewGitHubService(cache)
 
 	// Use temporary directory for export
 	tmpDir := t.TempDir()
@@ -240,7 +250,8 @@ func TestExportTrendingRepos_CSV(t *testing.T) {
 	repos := []TrendingRepo{
 		{FullName: "a/b", Description: "desc", Stars: 1, Language: "Go"},
 	}
-	service := NewGitHubService()
+	cache := NewCacheService("test_export")
+	service := NewGitHubService(cache)
 
 	// Use temporary directory for export
 	tmpDir := t.TempDir()

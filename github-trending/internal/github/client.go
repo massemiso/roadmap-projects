@@ -18,39 +18,29 @@ type GitHubServiceInterface interface {
 }
 
 type GitHubService struct {
-	Client   *http.Client
-	BaseURL  string
-	CacheDir string
+	Client  *http.Client
+	BaseURL string
+	Cache   CacheServiceInterface
 }
 
-func NewGitHubService() *GitHubService {
+func NewGitHubService(cache CacheServiceInterface) *GitHubService {
 	const github_api = "https://api.github.com/search/repositories?q=%s"
 	return &GitHubService{
-		Client:   &http.Client{Timeout: time.Second * 10},
-		BaseURL:  github_api,
-		CacheDir: os.TempDir(),
+		Client:  &http.Client{Timeout: time.Second * 10},
+		BaseURL: github_api,
+		Cache:   cache,
 	}
 }
 
 func (s *GitHubService) GetTrendingRepos(duration string, limit uint) ([]TrendingRepo, error) {
 	url := s.makeQuery(duration, limit)
-	cachePath := s.getCachePath(duration, limit)
-
-	var body []byte
-	var bodyErr error
-
-	// Check cache
-	if info, err := os.Stat(cachePath); err == nil {
-		if time.Since(info.ModTime()) < 5*time.Minute {
-			body, bodyErr = os.ReadFile(cachePath)
-		}
-	}
+	body, bodyErr := s.Cache.CheckCache()
 
 	// Fetch from network if not in cache
 	if body == nil {
 		body, bodyErr = s.conn(url)
 		if bodyErr == nil {
-			_ = os.WriteFile(cachePath, body, 0o644)
+			bodyErr = s.Cache.SaveCache(body)
 		}
 	}
 
@@ -144,13 +134,6 @@ func (s *GitHubService) parse(body []byte) ([]TrendingRepo, error) {
 		return nil, jsonErr
 	}
 	return searchResult.Items, nil
-}
-
-func (s *GitHubService) getCachePath(duration string, limit uint) string {
-	return filepath.Join(s.CacheDir, "github-trending-"+
-		duration+
-		fmt.Sprintf("%d", limit)+
-		".json")
 }
 
 func (s *GitHubService) ExportTrendingRepos(repos []TrendingRepo, format string) error {

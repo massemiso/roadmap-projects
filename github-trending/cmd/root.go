@@ -75,7 +75,8 @@ The tool allows users to specify a time range (day, week, month, or year) to fil
 It fetches data from the GitHub API and present it in a user-friendly format.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		service := github.NewGitHubService()
+		cache := github.NewCacheService(fmt.Sprintf("github-trending-%s-%d", duration, limit))
+		service := github.NewGitHubService(cache)
 		ui := ui.NewUI(os.Stdout)
 		if err := runE(service, ui, duration, limit, long, export); err != nil {
 			log.Fatalln(err.Error())
